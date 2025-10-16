@@ -1,0 +1,222 @@
+{
+    "title": "FlashSpeech: Efficient Zero-Shot Speech Synthesis",
+    "abstract": "Recent progress in large-scale zero-shot speech synthesis has been significantly advanced by language models and diffusion models. However, the generation process of both methods is slow and computationally intensive. Efficient speech synthesis using a lower computing budget to achieve quality on par with previous work remains a significant challenge. In this paper, we present FlashSpeech, a large-scale zero-shot speech synthesis system with approximately 5% of the inference time compared with previous work. FlashSpeech is built on the latent consistency model and applies a novel adversarial consistency training approach that can train from scratch without the need for a pre-trained diffusion model as the teacher. Furthermore, a new prosody generator module enhances the diversity of prosody, making the rhythm of the speech sound more natural.\nThe generation processes of FlashSpeech can be achieved efficiently with one or two sampling steps while maintaining high audio quality and high similarity to the audio prompt for zero-shot speech generation.\nOur experimental results demonstrate the superior performance of FlashSpeech. Notably, FlashSpeech can be about 20 times faster than other zero-shot speech synthesis systems while maintaining comparable performance in terms of voice quality and similarity. Furthermore, FlashSpeech demonstrates its versatility by efficiently performing tasks like voice conversion, speech editing, and diverse speech sampling.\nAudio samples can be found in https://flashspeech.github.io/.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "###figure_1### In recent years, the landscape of speech synthesis has been transformed by the advent of large-scale generative models. Consequently, the latest research efforts have achieved notable advancements in zero-shot speech synthesis systems by significantly increasing the size of both datasets and models.\nZero-shot speech synthesis, such as text-to-speech (TTS), voice conversion (VC) and Editing, aims to generate speech that incorporates unseen speaker characteristics from a reference audio segment during inference, without the need for additional training. Current advanced zero-shot speech synthesis systems typically leverage language models (LMs) Wang et al. (2023a  ###reference_b60###); Yang et al. (2023  ###reference_b64###); Zhang et al. (2023  ###reference_b67###); Kharitonov et al. (2023  ###reference_b21###); Wang et al. (2023b  ###reference_b62###); Peng et al. (2024  ###reference_b40###); Kim et al. (2024  ###reference_b23###) and diffusion-style models Shen et al. (2024  ###reference_b53###); Kim et al. (2023b  ###reference_b24###); Le et al. (2023  ###reference_b27###); Jiang et al. (2023b  ###reference_b19###) for in-context speech generation on the large-scale dataset. However, the generation process of these methods needs a long-time iteration. For example, VALL-E Wang et al. (2023a  ###reference_b60###) builds on the language model to predict 75 audio token sequences for a 1-second speech, in its first-stage autoregressive (AR) token sequence generation. When using a non-autoregressive (NAR) latent diffusion model Rombach et al. (2022  ###reference_b48###) based framework,\nNaturalSpeech 2 Shen et al. (2024  ###reference_b53###) still requires 150 sampling steps.\nAs a result, although these methods can produce human-like speech, they require significant computational time and cost. Some efforts have been made to accelerate the generation process. Voicebox Le et al. (2023  ###reference_b27###) adopts flow-matching Lipman et al. (2022  ###reference_b30###) so that fewer sampling steps (NFE111NFE: number of function evaluations.: 64) can be achieved because of the optimal transport path. ClaM-TTS Kim et al. (2024  ###reference_b23###) proposes a mel-codec with a superior compression rate and a latent language model that generates a stack of tokens at once.\nAlthough the slow generation speed issue has been somewhat alleviated, the inference speed is still far from satisfactory for practical applications.\nMoreover, the substantial computational time of these approaches leads to significant computational cost overheads, presenting another challenge.\nThe fundamental limitation of speech generation stems from the intrinsic mechanisms of language models and diffusion models, which require considerable time either auto-regressively or through a large number of denoising steps. Hence, the primary objective of this work is to accelerate inference speed and reduce computational costs while preserving generation quality at levels comparable to the prior research.\nIn this paper, we propose FlashSpeech as the next step towards efficient zero-shot speech synthesis. To address the challenge of slow generation speed, we leverage the latent consistency model (LCM) Luo et al. (2023  ###reference_b33###), a recent advancement in generative models. Building upon the previous non-autoregressive TTS system Shen et al. (2024  ###reference_b53###), we adopt the encoder of a neural audio codec to convert speech waveforms into latent vectors as the training target for our LCM. To train this model, we propose a novel technique called adversarial consistency training, which utilizes the capabilities of pre-trained speech language models Chen et al. (2022b  ###reference_b7###); Hsu et al. (2021  ###reference_b12###); Baevski et al. (2020  ###reference_b2###) as discriminators. This facilitates the transfer of knowledge from large pre-trained speech language models to speech generation tasks, efficiently integrating adversarial and consistency training to improve performance. The LCM is conditioned on prior vectors obtained from a phoneme encoder, a prompt encoder, and a prosody generator. Furthermore, we demonstrate that our proposed prosody generator leads to more diverse expressions and prosody while preserving stability.\nOur contributions can be summarized as follows:\nWe propose FlashSpeech, an efficient zero-shot speech synthesis system that generates voice with high audio quality and speaker similarity in zero-shot scenarios.\nWe introduce adversarial consistency training, a novel combination of consistency and adversarial training leveraging pre-trained speech language models, for training the latent consistency model from scratch, achieving speech generation in one or two steps.\nWe propose a prosody generator module that enhances the diversity of prosody while maintaining stability.\nFlashSpeech significantly outperforms strong baselines in audio quality and matches them in speaker similarity. Remarkably, it achieves this at a speed approximately 20 times faster than comparable systems, demonstrating unprecedented efficiency."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Related work",
+            "text": ""
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Acceleration of Speech Synthesis",
+            "text": "Since early neural speech generation models Tan et al. (2021  ###reference_b58###) use autoregressive models such as Tacotron Wang et al. (2017  ###reference_b61###) and TransformerTTS Li et al. (2019  ###reference_b28###), causing slow inference speed, with  computation, where  is the sequence length.\nTo address the slow inference speed, FastSpeech  Ren et al. (2020  ###reference_b45###, 2019  ###reference_b46###) proposes to generate a mel-spectrogram in a non-autoregressive manner.\nHowever, these models Ren et al. (2022  ###reference_b47###) result in blurred and over-smoothed mel-spectrograms due to the regression loss they used and the capability of modeling methods. To further enhance the speech quality, diffusion models are utilized Popov et al. (2021a  ###reference_b41###); Jeong et al. (2021  ###reference_b14###); Popov et al. (2021b  ###reference_b42###) which increase the computation to , where T is the diffusion steps. Therefore, distillation techniques Luo (2023  ###reference_b34###) for diffusion-based methods such as CoMoSpeech Ye et al. (2023  ###reference_b65###), CoMoSVC Lu et al. (2024  ###reference_b32###) and Reflow-TTS Guan et al. (2023  ###reference_b11###) emerge to reduce the sampling steps back to , but require additional pre-trained diffusion as the teacher model. Unlike previous distillation techniques, which require extra training for the diffusion model as a teacher and are limited by its performance, our proposed adversarial consistency training technique can directly train from scratch, significantly reducing training costs. In addition, previous acceleration methods only validate speaker-limited recording-studio datasets with limited data diversity. To the best of our knowledge, FlashSpeech is the first work that reduces the computation of a large-scale speech generation system back to ."
+        },
+        {
+            "section_id": "2.3",
+            "parent_section_id": "2",
+            "section_name": "Consistency Model",
+            "text": "The consistency model is proposed in Song et al. (2023  ###reference_b55###); Song and Dhariwal (2023  ###reference_b54###) to generate high-quality samples by directly mapping noise to data. Furthermore, many variants Kong et al. (2023  ###reference_b26###); Lu et al. (2023  ###reference_b31###); Sauer et al. (2023  ###reference_b52###); Kim et al. (2023a  ###reference_b22###) are proposed to further increase the generation quality of images.\nThe latent consistency model is proposed by Luo et al. (2023  ###reference_b33###) which can directly predict the solution of PF-ODE in latent space.\nHowever, the original LCM employs consistency distillation on the pre-trained latent diffusion model (LDM) which leverages large-scale off-the-shelf image diffusion models Rombach et al. (2022  ###reference_b48###). Since there are no pre-trained large-scale TTS models in the speech community, and inspired by the techniques Song and Dhariwal (2023  ###reference_b54###); Kim et al. (2023a  ###reference_b22###); Lu et al. (2023  ###reference_b31###); Sauer et al. (2023  ###reference_b52###); Kong et al. (2023  ###reference_b26###), we propose the novel adversarial consistency training method which can directly train the large-scale latent consistency model from scratch utilizing the large pre-trained speech language model Chen et al. (2022b  ###reference_b7###); Hsu et al. (2021  ###reference_b12###); Baevski et al. (2020  ###reference_b2###) such as WavLM for speech generation."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "FlashSpeech",
+            "text": "###figure_2###"
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Overview",
+            "text": "Our work is dedicated to advancing the speech synthesis efficiency, achieving  computation cost while maintaining comparable performance to prior studies that require  or  computations.\nThe framework of the proposed method, FlashSpeech, is illustrated in Fig. 2  ###reference_###. FlashSpeech integrates a neural codec, an encoder for phonemes and prompts, a prosody generator, and an LCM, which are utilized during both the training and inference stages. Exclusively during training, a conditional discriminator is employed. FlashSpeech adopts the in-context learning paradigm Wang et al. (2023a  ###reference_b60###), initially segmenting the latent vector z, extracted from the codec, into  and . Subsequently, the phoneme and  are processed through the encoder to produce the hidden feature. A prosody generator then predicts pitch and duration based on the hidden feature. The pitch and duration embeddings are combined with the hidden feature and inputted into the LCM as the conditional feature. The LCM model is trained from scratch using adversarial consistency training. After training, FlashSpeech can achieve efficient generation within one or two sampling steps."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Latent Consistency Model",
+            "text": "The consistency model Song et al. (2023  ###reference_b55###) is a new family of generative models that enables one-step or few-step generation. Let us denote the data distribution by . The core idea of the consistency model is to learn the function that maps any points on a trajectory of the PF-ODE to that trajectory’s origin, which can be formulated as:\nwhere  is the consistency function and  represents the data  perturbed by adding zero-mean Gaussian noise with standard deviation .  is a fixed small positive number. Then\n can then be viewed as an approximate sample from the data distribution . To satisfy property in equation (1  ###reference_###), following Song et al. (2023  ###reference_b55###), we parameterize the consistency model as\nwhere  is to estimate consistency function  by learning from data,  is a deep neural network with parameter ,  and  are are differentiable functions with  and  to ensure boundary condition. A valid consistency model should satisfy the self-consistency property Song et al. (2023  ###reference_b55###)\nwhere  and  following Karras et al. (2022  ###reference_b20###); Song et al. (2023  ###reference_b55###); Song and Dhariwal (2023  ###reference_b54###).\nThen the model can generate samples in one step by evaluating\nfrom distribution .\nAs we apply a consistency model on the latent space of audio, we use the latent features  which are extracted prior to the residual quantization layer of the codec,\nwhere  is the speech waveform. Furthermore, we add the feature from the prosody generator and encoder as the conditional feature ,\nour objective has changed to achieve\nDuring inference, the synthesized waveform  is transformed from  via the codec decoder. The predicted  is obtained by one sampling step\nor two sampling steps\nwhere  means the intermediate step,  is set to 2 empirically.\n is sampled from a standard Gaussian distribution."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "Adversarial Consistency Training",
+            "text": "A major drawback of the LCM Luo et al. (2023  ###reference_b33###) is that it needs to pre-train a diffusion-based teacher model in the first stage, and then perform distillation to produce the final model. This would make the training process complicated, and the performance would be limited as a result of the distillation. To eliminate the reliance on the teacher model training, in this paper,\nwe propose a novel adversarial consistency training method to train LCM from scratch.\nOur training procedure is outlined in Fig. 3  ###reference_###, which has three parts:"
+        },
+        {
+            "section_id": "3.3.1",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.1 Consistency Training",
+            "text": "To achieve the property in equation (3  ###reference_###), we adopt following consistency loss\nwhere  represents the noise level at discrete time step ,  is the distance function,  and  are the student with the higher noise level and the teacher with the lower noise level, respectively. The discrete time steps denoted as  are divided from the time interval , where the discretization curriculum  increases correspondingly as the number of training steps grows\nwhere ,  is the current training step and  is the total training steps.  and  are hyperparameters to control the size of . The distance function  uses the Pseudo-Huber metric Charbonnier et al. (1997  ###reference_b4###)\nwhere  is an adjustable constant, making the training more robust to outliers as it imposes a smaller penalty for large errors than  loss. The parameters  of teacher model are\nwhich are identical to the student parameters . This approach Song and Dhariwal (2023  ###reference_b54###) has been demonstrated to improve sample quality of previous strategies that employ varying decay rates Song et al. (2023  ###reference_b55###).\nThe weighting function refers to\nwhich emphasizes the loss of smaller noise levels. LCM through consistency training can generate speech with acceptable quality in a few steps, but it still falls short of previous methods. Therefore, to further enhance the quality of the generated samples, we integrate adversarial training.\n###figure_3###"
+        },
+        {
+            "section_id": "3.3.2",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.2 Adversarial Training",
+            "text": "For the adversarial objective, the generated samples  and real samples  are passed to the discriminator  which aims to distinguish between them, where  refers to the trainable parameters. Thus, we employ adversarial training loss\nIn this way, the error signal from the discriminator guides  to produce more realistic outputs.\nFor details, we use a frozen pre-trained speech language model  and a trainable lightweight discriminator head  to build the discriminator. Since the current  is trained on\nthe speech waveform, we covert both  and  to ground truth waveform and predicted waveform using the codec decoder.\nTo further increase the similarity between prompt audio and generated audio, our discriminator is conditioned on the prompt audio feature. This prompt feature  is extracted using  on prompt audio and applies average pooling on the time axis. Therefore,\nwhere  and  refer to feature extracted through  for ground truth waveform and predicted waveform.\nThe discriminator head consists of several 1D convolution layers. The input feature of the discriminator is conditioned on  via projection Miyato and Koyama (2018  ###reference_b37###)."
+        },
+        {
+            "section_id": "3.3.3",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.3 Combined Together",
+            "text": "Since there is a large gap on the loss scale between consistency loss and adversarial loss, it can lead to instability and failure in training.\nTherefore, we follow Esser et al. (2021  ###reference_b10###) to compute the adaptive weight with\nwhere  is the last layer of the neural network in LCM. The final loss of training LCM is defined as \nThis adaptive weighting significantly stabilizes the training by balancing the gradient scale of each term."
+        },
+        {
+            "section_id": "3.4",
+            "parent_section_id": "3",
+            "section_name": "Prosody Generator",
+            "text": "###figure_4###"
+        },
+        {
+            "section_id": "3.4.1",
+            "parent_section_id": "3.4",
+            "section_name": "3.4.1 Analysis of Prosody Prediction",
+            "text": "Previous regression methods for prosody prediction Ren et al. (2020  ###reference_b45###); Shen et al. (2024  ###reference_b53###), due to their deterministic mappings and assumptions of unimodal distribution, often fail to capture the inherent diversity and expressiveness of human speech prosody. This leads to predictions that lack variation and can appear over-smoothed. On the other hand, diffusion methods Le et al. (2023  ###reference_b27###); Li et al. (2023  ###reference_b29###) for prosody prediction offer a promising alternative by providing greater prosody diversity. However, they come with challenges regarding stability, and the potential for unnatural prosody. Additionally, the iterative inference process in DMs requires a significant number of sampling steps that may also hinder real-time application. Meanwhile,\nLM-based methods Jiang et al. (2024a  ###reference_b16###); Wang et al. (2023a  ###reference_b60###) also need a long time for inference. To alleviate these issues, our prosody generator consists of a prosody regression module and a prosody refinement module to enhance the diversity of prosody regression results with efficient one-step consistency model sampling."
+        },
+        {
+            "section_id": "3.4.2",
+            "parent_section_id": "3.4",
+            "section_name": "3.4.2 Prosody Refinement via Consistency Model",
+            "text": "As shown in 4  ###reference_###, our prosody generator consists of two parts which are prosody regression and prosody refinement. We first train the prosody regression module to get a deterministic output. Next, we freeze the parameters of the prosody regression module and use the residual of ground truth prosody and deterministic predicted prosody as the training target for prosody refinement. We adopt a consistency model as a prosody refinement module. The conditional feature of the consistency model is the feature from prosody regression before the final projection layer. Thus, the residual from a stochastic sampler refines\nthe output of a deterministic prosody regression and produces a diverse set of plausible prosody under the same transcription and audio prompt.\nOne option for the final prosody output  can be represented as:\nwhere  denotes the final prosody output,\n represents the residual output from the prosody refinement module, capturing the variations between the ground truth prosody and the deterministic prediction,\n is the initial deterministic prosody prediction from the prosody regression module.\nHowever, this formulation may negatively affect prosody stability, a similar observation is found in Vyas et al. (2023  ###reference_b59###); Le et al. (2023  ###reference_b27###). More specifically, higher diversity may cause less stability and sometimes produce unnatural prosody.\nTo address this, we introduce a control factor  that finely tunes the balance between stability and diversity in the prosodic output:\nwhere  is a scalar value ranging between 0 and 1. This adjustment allows for controlled incorporation of variability into the prosody, mitigating issues related to stability while still benefiting from the diversity offered by the prosody refinement module."
+        },
+        {
+            "section_id": "3.5",
+            "parent_section_id": "3",
+            "section_name": "Applications",
+            "text": "This section elaborates on the practical applications of FlashSpeech. We delve into its deployment across various tasks such as zero-shot TTS, speech editing, voice conversion, and diverse speech sampling. All the sample audios of applications are available on the demo page."
+        },
+        {
+            "section_id": "3.5.1",
+            "parent_section_id": "3.5",
+            "section_name": "3.5.1 Zero-Shot TTS",
+            "text": "Given a target text and reference audio, we first convert the text to phoneme using g2p (grapheme-to-phoneme conversion). Then we use the codec encoder to convert the reference audio into . Speech can be synthesized efficiently through FlashSpeech with the phoneme input and , achieving high-quality text-to-speech results without requiring pre-training on the specific voice."
+        },
+        {
+            "section_id": "3.5.2",
+            "parent_section_id": "3.5",
+            "section_name": "3.5.2 Voice Conversion",
+            "text": "Voice conversion aims to convert the source audio into the target audio using the speaker’s voice of the reference audio. Following Shen et al. (2024  ###reference_b53###); Preechakul et al. (2022  ###reference_b44###), we first apply the reverse of ODE to diffuse the source audio into a starting point that still maintains some information in the source audio. After that, we run the sampling process from this starting point with the reference audio as  and condition . The condition  uses the phoneme and duration from the source audio and the pitch is predicted by the prosody generator. This method allows for zero-shot voice conversion while preserving the linguistic content of the source audio, and achieving the same timbre as the reference audio."
+        },
+        {
+            "section_id": "3.5.3",
+            "parent_section_id": "3.5",
+            "section_name": "3.5.3 Speech Editing",
+            "text": "Given the speech, the original transcription, and the new transcription, we first use MFA (Montreal Forced Aligner) to align the speech and the original transcription to get the duration of each word. Then we remove the part that needs to be edited to construct the reference audio. Next, we use the new transcription and reference to synthesize new speech. Since this task is consistent with the in-context learning, we can concatenate the remaining part of the raw speech and the synthesized part as the final speech, thus enabling precise and seamless speech editing."
+        },
+        {
+            "section_id": "3.5.4",
+            "parent_section_id": "3.5",
+            "section_name": "3.5.4 Diverse Speech Sampling",
+            "text": "FlashSpeech leverages its inherent stochasticity to generate a variety of speech outputs under the same conditions. By employing stochastic sampling in its prosody generation and LCM, FlashSpeech can produce diverse variations in pitch, duration, and overall audio characteristics from the same phoneme input and audio prompt. This feature is particularly useful for generating a wide range of speech expressions and styles from a single input, enhancing applications like voice acting, synthetic voice variation for virtual assistants, and more personalized speech synthesis. In addition, the synthetic data via speech sampling can also benefit other tasks such as ASR Rossenbach et al. (2020  ###reference_b49###)."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Experiment",
+            "text": "###figure_5### In the experimental section, we begin by introducing the datasets and the configurations for training in our experiments. Following this, we show the evaluation metrics and demonstrate the comparative results against various zero-shot TTS models. Subsequently, ablation studies are conducted to test the effectiveness of several design choices. Finally, we also validate the effectiveness of other tasks such as voice conversion. We show our speech editing and diverse speech sampling results on our demo page."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Experimental Settings",
+            "text": ""
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1 Data and Preprocessing",
+            "text": "We use the English subset of Multilingual LibriSpeech (MLS) Pratap et al. (2020  ###reference_b43###), including 44.5k hours of transcribed audiobook data and it contains 5490 distinct speakers. The audio data is resampled at a frequency of 16kHz. The input text is transformed into a sequence of phonemes through grapheme-to-phoneme conversion Sun et al. (2019  ###reference_b57###) and then we use our internal alignment tool aligned with speech to obtain the phoneme-level duration. We adopt a hop size of 200 for all frame-level features. The pitch sequence is extracted using PyWorld222https://github.com/JeremyCCHsu/Python-Wrapper-for-World-Vocoder. we adopt Encodec Défossez et al. (2022  ###reference_b9###) as our audio codec. We use a modified version 333https://github.com/yangdongchao/UniAudio/tree/main/codec and train it on MLS. We use the dense features extracted before the residual quantization layer as our latent vector ."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2 Training Details",
+            "text": "Our training consists of two stages, in the first stage we train LCM and the prosody regression part. We use 8 H800 80GB GPUs with a batch size of 20k frames of latent vectors per GPU for 650k steps. We use the AdamW optimizer with a learning rate of 3e-4, warm up the learning rate for the first 30k updates and then linear decay it. We deactivate adversarial training with  = 0 before 600K training iterations. For hyper-parameters, we set  in Equation (12  ###reference_###) to 0.03. In equation (10  ###reference_###), \nwhere ,   . For N(k) in Equation (11  ###reference_###), we set . After 600k steps, we activate adversarial loss, and N(k) can be considered as fixed to 1280. We crop the waveform length fed into the discriminator into minimum waveform length in a minibatch.\nIn addition, the weight of the feature extractor WavLM and the codec decoder are frozen.\nIn the second stage, we train 150k steps for the prosody refinement module with consistency training in Equation (10  ###reference_###). Different from the above setting, we empirically set , . During training, only the weight of the prosody refinement part is updated."
+        },
+        {
+            "section_id": "4.1.3",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.3 Model Details",
+            "text": "The model structures of the prompt encoder and phoneme encoder are followShen et al. (2024  ###reference_b53###). The neural function part in LCM is almost the same as the Shen et al. (2024  ###reference_b53###). We rescale the sinusoidal position embedding in the neural function part by a factor of 1000. As for the prosody generator, we adopt 30 non-casual wavenet Oord et al. (2016  ###reference_b38###) layers for the neural function part in the prosody refinement module and the same configurations for prosody regression parts in Shen et al. (2024  ###reference_b53###). And we set  for the prosody refinement module empirically.\nFor the discriminator’s head, we\nstack 5 convolutional layers with weight normalization Salimans and Kingma (2016  ###reference_b51###) for binary classification."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Evaluation Metrics",
+            "text": "We use both objective and subjective evaluation metrics, including\nRTF: Real-time-factor (RTF) measures the time taken for the system to generate one second of speech. This metric is crucial for evaluating the efficiency of our system, particularly for applications requiring real-time processing. We measure the time of our system end-to-end on an NVIDIA V100 GPU following Shen et al. (2024  ###reference_b53###).\nSim-O and Sim-R: These metrics assess the speaker similarity. Sim-R measures the objective similarity between the synthesized speech and the reconstruction reference speech through the audio codec, using features embedding extracted from the pre-trained speaker verification model Wang et al. (2023a  ###reference_b60###); Kim et al. (2024  ###reference_b23###)444https://github.com/microsoft/UniSpeech/tree/main/downstreams/speaker_verification. Sim-O is calculated with the original reference speech. Higher scores in Sim-O and Sim-R indicate a higher speaker similarity.\nWER (Word Error Rate):\nTo evaluate the accuracy and clarity of synthesized speech from the TTS system, we employ the Automatic Speech Recognition (ASR) model Wang et al. (2023a  ###reference_b60###) 555https://huggingface.co/facebook/hubert-large-ls960-ft to transcribe generated audio. The discrepancies between these transcriptions and original texts are quantified using the Word Error Rate (WER), a crucial metric indicating intelligibility and robustness.\nCMOS, SMOS, UTMOS: we rank the comparative mean option score (CMOS) and similarity mean option score (SMOS)\nusing mturk. The prompt for CMOS refers to ’Please focus on the audio quality and naturalness and ignore other factors.’. The prompt for SMOS refers to ’Please focus on the similarity of the speaker to the reference, and ignore the differences of content, grammar or audio quality.’ Each audio has been listened to by at least 10 listeners.\nUTMOS Saeki et al. (2022  ###reference_b50###) is a Speech MOS predictor666https://github.com/tarepan/SpeechMOS to measure the naturalness of speech. We use it in ablation studies which reduced the cost for evaluation.\nProsody JS Divergence:\nTo evaluate the diversity and accuracy of the prosody prediction in our TTS system, we include the Prosody JS Divergence metric. This metric employs the Jensen-Shannon (JS) divergence Menéndez et al. (1997  ###reference_b36###) to quantify the divergence between the predicted and ground truth prosody feature distributions. Prosody features, including pitch, and duration, are quantized and their distributions in both synthesized and natural speech are compared. Lower JS divergence values indicate closer similarity between the predicted prosody features and those of the ground truth, suggesting a higher diversity of the synthesized speech."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "Experimental Results on Zero-shot TTS",
+            "text": "Following Wang et al. (2023a  ###reference_b60###), We employ LibriSpeech Panayotov et al. (2015  ###reference_b39###) test-clean for zero-shot TTS evaluation.\nWe adopt the cross-sentence setting in Wang et al. (2023a  ###reference_b60###) that we randomly select 3-second clips as prompts from the same speaker’s speech. The results are summarized in table 1  ###reference_### and figure 5  ###reference_###."
+        },
+        {
+            "section_id": "4.3.1",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.1 Evaluation Baselines",
+            "text": "VALL-E Wang et al. (2023a  ###reference_b60###): VALL-E predicts codec tokens using both AR and NAR models. RTF777In CLaM-TTS and Voicebox, they report the inference time for generating 10 seconds of speech. Therefore, we divide by 10 to obtain the time for generating 1 second of speech (RTF). is obtained from Kim et al. (2024  ###reference_b23###); Le et al. (2023  ###reference_b27###). We use our reproduced results for MOS, Sim, and WER. Additionally, we do a preference test with their official demo.\nVoicebox Le et al. (2023  ###reference_b27###): Voicebox uses flow-matching to predict maksed mel-spectrogram. RTF is from the original paper. We use our reproduced results for MOS, Sim, and WER. We also implement a preference test with their official demo.\nNaturalSpeech2 Shen et al. (2024  ###reference_b53###): NaturalSpeech2 uses a latent diffusion model to predict latent features of codec. The RTF is from the original paper. the Sim, WER and samples for MOS are obtained through communication with the authors. We also do a preference test with their official demo.\nMega-TTS Jiang et al. (2023a  ###reference_b18###)888Since we do not find any audio samples for Mega-TTS2 Jiang et al. (2024b  ###reference_b17###) under the 3-second cross-sentence setting, we are not able to compare with them.: Mega-TTS uses both language model and GAN to predict mel-spectrogram. We obtain RTF from mobilespeech Ji et al. (2024  ###reference_b15###) and WER from the original paper.\nWe do a preference test with their official demo.\nClaM-TTS Kim et al. (2024  ###reference_b23###): ClaM-TTS uses the AR model to predict mel codec tokens. We obtain the objective evaluation results from the original paper and do a preference test with their official demo."
+        },
+        {
+            "section_id": "4.3.2",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.2 Generation Quality",
+            "text": "FlashSpeech stands out significantly in terms of speaker quality, surpassing other baselines in both CMOS and audio quality preference tests. Notably, our method closely approaches ground truth recordings, underscoring its effectiveness. These results affirm the superior quality of FlashSpeech in speech synthesis.\nour method."
+        },
+        {
+            "section_id": "4.3.3",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.3 Generation Similarity",
+            "text": "Our evaluation of speaker similarity utilizes Sim, SMOS, and speaker similarity preference tests, where our methods achieve 1st, 2nd, and 3rd place rankings, respectively. These findings validate our methods’ ability to achieve comparable speaker similarity to other methods. Despite our training data (MLS) containing approximately 5k speakers, fewer than most other methods (e.g., Librilight with about 7k speakers or self-collected data), we believe that increasing the number of speakers in our methods can further enhance speaker similarity."
+        },
+        {
+            "section_id": "4.3.4",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.4 Robustness",
+            "text": "Our methods achieve a WER of 2.7, placing them in the first echelon. This is due to the non-autoregressive nature of our methods, which ensures robustness."
+        },
+        {
+            "section_id": "4.3.5",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.5 Generation Speed",
+            "text": "FlashSpeech achieves a remarkable approximately 20x faster inference speed compared to previous work. Considering its excellent audio quality, robustness, and comparable speaker similarity, our method stands out as an efficient and effective solution in the field of large-scale speech synthesis."
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "Ablation Studies",
+            "text": ""
+        },
+        {
+            "section_id": "4.4.1",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.1 Ablation studies of LCM",
+            "text": "We explored the impact of different pre-trained models in adversarial training on UTMOS and Sim-O. As shown in the table 2  ###reference_###, the baseline, which employs consistency training alone, achieved a UTMOS of 3.62 and a Sim-O of 0.45. Incorporating adversarial training using wav2vec2-large999https://huggingface.co/facebook/wav2vec2-large, hubert-large101010https://huggingface.co/facebook/hubert-large-ll60k, and wavlm-large111111https://huggingface.co/microsoft/wavlm-large as discriminators significantly improved both UTMOS and Sim-O scores. Notably, the application of adversarial training with Wavlm-large achieved the highest scores (UTMOS: 4.00, Sim-O: 0.52), underscoring the efficacy of this pre-trained model in enhancing the quality and speaker similarity of synthesized speech. Additionally, without using the audio prompt’s feature as a condition the discriminator shows a slight decrease in performance (UTMOS: 3.97, Sim-O: 0.51), highlighting the importance of conditional features in guiding the adversarial training process.\nAs shown in table 3  ###reference_###, the effect of sampling steps (NFE) on UTMOS and Sim-O revealed that increasing NFE from 1 to 2 marginally improves UTMOS (3.99 to 4.00) and Sim-O (0.51 to 0.52). However, further increasing to 4 sampling steps slightly reduced UTMOS to 3.91 due to the accumulation of score estimation errors Chen et al. (2022a  ###reference_b6###); Lyu et al. (2024  ###reference_b35###). Therefore, we use 2 steps as the default setting for LCM."
+        },
+        {
+            "section_id": "4.4.2",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.2 Ablation studies of Prosody Generator",
+            "text": "In this part, we investigated the effects of a control factor, denoted as , on the prosodic features of pitch and duration in speech synthesis, by setting another influencing factor to zero. Our study specifically conducted an ablation analysis to assess how  influences these features, emphasizing its critical role in balancing stability and diversity within our framework’s prosodic outputs.\nTable 4  ###reference_### elucidates the effects of varying  on the pitch component. With  set to 0, indicating no inclusion of the residual output from prosody refinement, we observed a Pitch JSD of 0.072 and a WER of 2.8. A slight modification to  resulted in a reduced Pitch JSD of 0.067, maintaining the same WER. Notably, setting  to 1, fully incorporating the prosody refinement’s residual output, further decreased the Pitch JSD to 0.063, albeit at the cost of increased WER to 3.7, suggesting a trade-off between prosody diversity and speech intelligibility.\nSimilar trends in table 5  ###reference_### are observed in the duration component analysis. With , the Duration JSD was 0.0175 with a WER of 2.8. Adjusting  to 0.2 slightly improved the Duration JSD to 0.0168, without affecting WER. However, fully embracing the refinement module’s output by setting  yielded the most significant improvement in Duration JSD to 0.0153, which, similar to pitch analysis, came with an increased WER of 3.9. The results underline the delicate balance required in tuning  to optimize between diversity and stability of prosody without compromising speech intelligibility."
+        },
+        {
+            "section_id": "4.5",
+            "parent_section_id": "4",
+            "section_name": "Evaluation Results for Voice Conversion",
+            "text": "In this section, we present the evaluation results of our voice conversion system, FlashSpeech, in comparison with state-of-the-art methods, including YourTTS 121212https://github.com/coqui-ai/TTS Casanova et al. (2022  ###reference_b3###) and DDDM-VC 131313https://github.com/hayeong0/DDDM-VC Choi et al. (2024  ###reference_b8###). We conduct the experiments with their official checkpoints in our internal test set.\nOur system outperforms both YourTTS and DDDM-VC in terms of CMOS, SMOS and Sim-O, demonstrating its capability to produce converted voices with high quality and similarity to the target speaker. These results confirm the effectiveness of our FlashSpeech approach in voice conversion tasks."
+        },
+        {
+            "section_id": "4.6",
+            "parent_section_id": "4",
+            "section_name": "Conclusions and Future Work",
+            "text": "In this paper, we presented FlashSpeech, a novel speech generation system that significantly reduces computational costs while maintaining high-quality speech output. Utilizing a novel adversarial consistency training method and an LCM, FlashSpeech outperforms existing zero-shot TTS systems in efficiency, achieving speeds about 20 times faster without compromising on voice quality, similarity, and robustness. In the future, we aim to further refine the model to improve the inference speed and reduce computational demands. In addition, we will expand the data scale and enhance the system’s ability to convey a broader range of emotions and more nuanced prosody. For future applications, FlashSpeech can be integrated for real-time interactions in applications such as virtual assistants and educational tools."
+        }
+    ]
+}

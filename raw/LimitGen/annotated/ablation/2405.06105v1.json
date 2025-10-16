@@ -1,0 +1,24 @@
+{
+    "title": "Can Perplexity Reflect Large Language Model’s Ability in Long Text Understanding?",
+    "abstract": "Recent studies have shown that Large Language Models (LLMs) have the potential to process extremely long text. Many works only evaluate LLMs’ long-text processing ability on the language modeling task, with perplexity (PPL) as the evaluation metric. However, in our study, we find that there is no correlation between PPL and LLMs’ long-text understanding ability. Besides, PPL may only reflect the model’s ability to model local information instead of catching long-range dependency. Therefore, only using PPL to prove the model could process long text is inappropriate. The local focus feature of PPL could also explain some existing phenomena, such as the great extrapolation ability of the position method ALiBi. When evaluating a model’s ability in long text, we might pay more attention to PPL’s limitation and avoid overly relying on it.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "INTRODUCTION",
+            "text": "Recently, many researchers (Chen et al., 2023b  ###reference_b3###; a  ###reference_b2###; Xiong et al., 2023  ###reference_b12###; Ding et al., 2023  ###reference_b5###; Chen et al., 2023c  ###reference_b4###) have proposed various approaches to scale up the context window of LLMs to more than 100k. Since there is not a comprehensive benchmark tailored for the evaluation of such extremely long text understanding, such as question answering (QA) over 100K tokens, researchers use perplexity (PPL), an evaluation metric for language modeling 111The definition and calculation method of PPL is shown in Appendix A.1  ###reference_###. A lower PPL shows a higher accuracy of a model in long-text language modeling, to demonstrate the model’s ability to process long text (Chen et al., 2023c  ###reference_b4###; Ding et al., 2023  ###reference_b5###; Liu et al., 2023  ###reference_b8###; Peng et al., 2023  ###reference_b9###).\nHowever, only given LLMs are excellent in language modeling, can it indicate LLMs’ ability to understand long text? We conduct experiments on three long context window LLM variants to figure out this. We use several available benchmarks of downstream tasks, such as QA and summerization, to evaluate their long-text understanding ability. Surprisingly, the models’ performance on language modeling is inconsistent with their performance on most downstream tasks, implying the PPL can not be a good indicator of the model’s long-text understanding ability.\nWe speculate that the phenomenon above may be because PPL is a reflection of the model’s ability to model local information. We use LLaMA2, which only has a short context window of 4,096 and cannot handle long context, to prove our speculation. The experiment results show that, LLaMA2 delivers comparable PPL with the long context window LLMs. The feature of PPL in reflecting local information modeling ability can also explain why methods such as ALiBi (Press et al., 2022  ###reference_b10###), which makes the model mainly focus on local information, could enable models to extrapolate to longer inference sequences while keeping the PPL at a low level."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Lower PPL  Understanding Long Text Better",
+            "text": "We compare models' performance in several downstream tasks to determine their long-text understanding ability. We choose three model variants with context windows longer than 100K tokens for experiments: 1) YARN-7B-128K, 2) Yi-6B-200K, and 3) LongLoRA-7B-100K.\n\nFor downstream tasks, we use two public benchmarks, QMSUM and NarrativeQA, to evaluate the models’ performance in long question answering and long document summarization. Additionally, following Li et al., we use a finer-grained line retrieval test to evaluate models’ retrieval ability. The experiment details are shown in Appendix A.1 and Appendix A.2.\n\nThe results are shown in Table 1. LongLoRA outperforms other models on all downstream tasks."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "CONCLUSION",
+            "text": "PPL can be an effective evaluation metric for long-text language modeling ability, but not for long-text understanding. A model without the ability to understand long text can also effectively use local information to model a long text. Considering PPL can not be a good indicator for long text understanding ability, except for using PPL to evaluate a model, we call for more diversified evaluation metrics for long text processing ability from multiple aspects."
+        }
+    ]
+}

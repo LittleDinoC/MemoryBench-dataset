@@ -1,0 +1,162 @@
+{
+    "title": "Arctic-Embed: Scalable, Efficient, and Accurate Text Embedding Models",
+    "abstract": "This report describes the training dataset creation and recipe behind the family of arctic-embed text embedding models (a set of five models ranging from 22 to 334 million parameters with weights open-sourced under an Apache-2 license). At the time of their release, each model achieved state-of-the-art retrieval accuracy for models of their size on the MTEB Retrieval leaderboard,111https://huggingface.co/spaces/mteb/leaderboard with the largest model, arctic-embed-l outperforming closed source embedding models such as Cohere’s embed-v3 and Open AI’s text-embed-3-large. In addition to the details of our training recipe, we have provided several informative ablation studies, which we believe are the cause of our model performance.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "Embedding models’ ability to provide accurate retrieval performance without additional tuning Lewis et al. (2020  ###reference_b12###) has made them a popular choice in search and Retrieval-augmented-generation (RAG) Ram et al. (2023  ###reference_b25###) workloads. \nUnlike traditional keyword search, embedding models encode information beyond token overlap. This allows embedding systems to represent queries like How tall is Tom Cruise? and Height of the actor who plays Maverick in Top Gun closely despite having no common words.\n###figure_1### Driven by the utility and the widespread adoption of these models, the broader open-source and research community has put forth a constant stream of ever-stronger text embedding models such as E5 Wang et al. (2022  ###reference_b30###), GTE Li et al. (2023a  ###reference_b14###), Jina Günther et al. (2024  ###reference_b8###). The quick experimentation and improvement underpinning these works is, in turn, thanks in part to large-scale open evaluation benchmarks such as MSMARCO Campos et al. (2016  ###reference_b1###), BEIR Thakur et al. (2021  ###reference_b27###), and MTEB Muennighoff et al. (2023  ###reference_b19###). These leaderboards combine an easy and efficient evaluation with a broad array of tasks, which allows for effective experimentation.\nThis paper’s work was motivated in early 2024 by the lack of efficient and effective open-text embedding models competing with the performance of closed-source models such as Cohere’s embed-v3 or OpenAI’s text-embed-3-large. While models such as\nSFR-Embedding-Mistral Yavuz (2024  ###reference_b37###) and GritLM Muennighoff et al. (2024  ###reference_b18###) outscore proprietary offerings; their size (each over 7 billion parameters) and their dimensionality (each 4096) make them impractical to use in many production workloads. Seeking to provide a high-quality retrieval model with fewer than a billion parameters, we set out to train a suite of high-quality embedding models.\nThrough fruitful data-centric experiments, we developed the recently released Arctic family of text embedding models. Based on five encoder-only pretrained language models of various sizes (see Table 1  ###reference_###) and leveraging the same training data and methodology, we trained each model to optimize retrieval performance as measured by nDCG@10 on the MTEB Retrieval leaderboard. As shown in Figure 1  ###reference_###, each variant achieved a new state-of-the-art performance for its size.222As of April 16th, 2024. We present these models and this technical report as a journal of our experiments that led to our improvements in performance."
+        },
+        {
+            "section_id": "1.1",
+            "parent_section_id": "1",
+            "section_name": "Summary of Contributions",
+            "text": "Open model release. We release a suite of embedding models, Arctic-embed, under a permissive Apache-2 license, which delivers state-of-the-art retrieval performance for their size/context window class on the Retrieval portion of the MTEB leaderboard.\nDemonstrated importance of data organization. We present a set of ablations that suggest improvements in retrieval quality are more strongly tied to data sampling during training and the method of negative mining than scaling up data scale and batch size, where previous work has focused.\nImproved methods for synthetic data. We present a novel technique for query generation grounded by mined hard negatives, which we found more effective than straightforward generation approaches that generate both queries and negatives and which served as a key ingredient in our models’ success."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Background",
+            "text": ""
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "Task Description",
+            "text": "An embedding model maps a variable input into a fixed-dimensional vector. This one-way transform can be applied to various modalities, scales, and scopes and directly used for downstream tasks such as classification, clustering, or retrieval. In the scope of our work, we focus on text embeddings for retrieval. This task aims to train a model that maximizes the similarity between relevant documents, given a query and a document collection, while minimizing the similarity with irrelevant documents.\nThe representation-based retrieval method has emerged as a standard paradigm as it minimizes the frequency with which inputs are transformed into vectors. Offline, the document corpus is processed, resulting in a set of vectors stored in an Approximate Nearest Neighbor Index such as FAISS Douze et al. (2024  ###reference_b7###). The input is transformed online into a vector at query time, and the documents with the closest embeddings are retrieved. In other words, the cosine distance between queries and documents signals relevance."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Related Work",
+            "text": "Training Approaches: Building on prior success in NLP and IR research knowledge, embedding model training uses supervised learning with examples of positive and negative document query pairs. It is common to use labeled positive and negative query-document retrieval examples (commonly extracted from weak signals or labeled data Lin et al. (2020  ###reference_b16###)) to fine-tune general-purpose pre-trained language models into specialized text embedding models. In this paradigm, Qu et al. (2021  ###reference_b22###) demonstrated the importance of scaling the batch size and training on hard negatives. In contrast, Xiong et al. (2020  ###reference_b35###) demonstrated the importance of adapting the negatives’ difficulty to the retriever’s competence.\nWhile earlier work focused on leveraging supervised datasets such as HotpotQA Yang et al. (2018  ###reference_b36###) or NQ Kwiatkowski et al. (2019  ###reference_b10###), Wang et al. (2022  ###reference_b30###) demonstrated the effectiveness of constructing large datasets from web-crawled title-document examples through the groundbreaking performance of their resulting E5 model. Xiao et al. (2023a  ###reference_b33###) and Nussbaum et al. (2024  ###reference_b20###) combine generated datasets with supervised labeled datasets to improve retrieval performance further.\nModel Architecture: Building on the success and utility of the transformer Vaswani et al. (2017  ###reference_b29###) prior work has primarily focused on training models using BERT Devlin et al. (2018  ###reference_b5###), or variants thereof. While some work has studied the usage of sequence to sequence Zhuang et al. (2022  ###reference_b38###) or large decoder-only models Yavuz (2024  ###reference_b37###) Muennighoff et al. (2024  ###reference_b18###), these models’ increased model size and associated worse inference efficiency have kept the majority of focus on encoder-only variants.\nTraining Objective: Many works initially trained retrievers and rankers leveraging traditional loss forms such as Mean Squared Error Lin et al. (2020  ###reference_b16###). Still, recently, the application of a contrastive loss Hadsell et al. (2006  ###reference_b9###); Mueller and Thyagarajan (2016  ###reference_b17###), which leverages not only positive pairs but the relationship between positive and negative pairs, has risen to prominence. InfoNCE (Noise Contrastive Estimation) van den Oord et al. (2018  ###reference_b28###) improved on the constrastive triplet loss and has quickly become one of the most popular and common losses used to train embedding models."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Arctic Embed",
+            "text": "With Arctic-embed, we aimed to start from the current consensus of best practices from the literature and train an embedding model from the ground up.\nConsistent with prior works, like E5, BGE, GTE, Jina, and Nomic Wang et al. (2024  ###reference_b31###); Xiao et al. (2023b  ###reference_b34###); Li et al. (2023b  ###reference_b15###); Günther et al. (2024  ###reference_b8###); Nussbaum et al. (2024  ###reference_b20###), we conduct two training rounds using two different kinds of datasets. The initial training round is large-scale pretraining using only in-batch negative examples. This round of training leverages a dataset of pairs of queries and relevant documents. The second round of training (often referred to as the fine-tuning step) calls for similar pairs of queries and documents augmented with an additional set of “hard” negative documents (where “hard” refers to the fact that it is not trivial to determine their lower relevance relative to the labeled-as-relevant document). We used a tunable negative mining strategy (see Section 3.3  ###reference_###) to construct a focused dataset of about a million samples for this round of training.\nAlthough our work closely replicates many of the steps prior works took, our resulting models score higher on the MTEB Retrieval benchmark, sometimes by a substantial margin. In Table 2  ###reference_### we present several hypotheses about what led to this improved performance, and in Section 7  ###reference_### we test several of these hypotheses through ablation studies."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Model Architecture",
+            "text": "We trained models of varying sizes from BERT-like backbones as shown in Table 1  ###reference_###. Our m and l are standard BERT architecture Devlin et al. (2019  ###reference_b6###) (BERT base and large, respectively). We looked to variants of the MiniLMv2 architecture Wang et al. (2021  ###reference_b32###) for our smaller sizes (xs and s), and we opted for the Nomic BERT architecture Nussbaum et al. (2024  ###reference_b20###) for our long-context variant (m-long)."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Pooling",
+            "text": "Architecturally, we do not modify any base model, even just the common practice of adding a pooling layer to the base model.333e.g., we use AutoModel.from_pretrained(…, add_pooling_layer=False) in the transformers Python package) Additionally, instead of pooling output vectors, we utilize the final hidden state of the [CLS] token as the embedding vector, in contrast to the mean pooling strategy used in E5, GTE, and Nomic Wang et al. (2024  ###reference_b31###); Li et al. (2023b  ###reference_b15###); Nussbaum et al. (2024  ###reference_b20###). This choice matches the BGE architecture Xiao et al. (2023b  ###reference_b34###) and is inspired by the ablation study in Li and Li (2023  ###reference_b13###), showing this led to a 2.5% higher score on the Semantic Text Similarity (STS) evaluation studied."
+        },
+        {
+            "section_id": "3.4",
+            "parent_section_id": "3",
+            "section_name": "Dataset Mix And Sampling",
+            "text": "Due to the different datasets’ sizes, consistency, hardness, and learning dynamics, simply concatenating all available datasets together proved a suboptimal strategy, especially in the fine-tuning stage. Instead, we ran isolated experiments to understand the effects of each dataset on fine-tuned performance. Then, we selected and combined datasets based on their relative performance in these experiments. Each data source we used is described in more depth below.\n###figure_2### ###figure_3### Our large pretraining dataset, described in figure 2  ###reference_###, amounts to 308 million query-document pairs (filtered from around 2 billion documents), of which 71% are web search documents paired with either a query or title. Aside from web search data, text pairs set include PAQ777https://github.com/facebookresearch/PAQ  ###reference_###, StackExchange title-body and title-body web documents pairs from common crawl based sources, and S2ORC title-abstract pairs888https://github.com/allenai/s2orc  ###reference_github.com/allenai/s2orc###. We have found the previous steps on quality annotation and filter transformative in improving quality and pruning noise in web search data and beyond for pairwise positive datasets.\nOur fine-tuning dataset, described in Figure 3  ###reference_###, consists of around 1 million pairs built by combining our web search data with several public datasets (HotpotQA999https://github.com/hotpotqa/hotpot  ###reference_###, NQ101010https://github.com/google-research-datasets/natural-questions  ###reference_s/natural-questions###, Fever111111https://fever.ai/dataset/fever.html  ###reference_###, and StackExchange title-body121212https://huggingface.co/datasets/sentence-transformers/embedding-training-data  ###reference_ransformers/embedding-training-data###), and then performing further expansion via synthetic mining strategy detailed in section below. This mix notably omits several popular public datasets used by other embedding models due to our observation of positive pair consistency and negative pair level of hardness. These found-to-be-less-useful datasets include NLI, MEDI, WikiAnswers, and SQuAD. Empirically, we have observed that quantity is less important than quality in the finetuning phase, and an overpowering amount of low-quality data can lead to lower-quality models."
+        },
+        {
+            "section_id": "3.5",
+            "parent_section_id": "3",
+            "section_name": "Synthetic Data For Semantic Dense Mining",
+            "text": "Compared to the abundance of web-scale data used in pretraining, high-quality examples suitable for finetuning are more scarce. To address this data scarcity, we used synthetic data creation to construct additional datasets that benefited downstream performance just as much as those listed above. Similar to the prior work of Dai et al. (2022  ###reference_b4###); Lee et al. (2024  ###reference_b11###), we leverage Large Language Models to generate novel queries. Breaking from these previous approaches, however, we found it critical to add negative documents to our LLM inputs to ground the query generation (see Algorithm 2  ###reference_### in the Appendix for details). Additionally, we chose to generate only synthetic queries rather than synthetic negatives because we found that LLMs do not easily generate relevant negatives of as high quality as those mined from a preexisting corpus of documents. Figure 4  ###reference_### shows this approach in action – two datasets generated by variants of Algorithm 2  ###reference_### led to score increases approaching that afforded by the original HotpotQA.\n###figure_4###"
+        },
+        {
+            "section_id": "3.6",
+            "parent_section_id": "3",
+            "section_name": "Tunable Hard Negative Mining",
+            "text": "Fine-tuning datasets typically include carefully chosen “hard” negative examples and a positively-relevant query-document pair. How hard should these negatives be for maximally effective learning in the fine-tuning phase? Our answer to this question was ultimately a tunable hard negative mining strategy in which we leveraged a preexisting text embedding model to identify and score the hardest negatives for each training example. Then, we applied a score threshold to discard the hard negatives from the above set. We found that using an upper threshold rather than a specific rank helped account for the fact that some queries admit much harder top-k negatives than others, and in Section 7.2  ###reference_###, we perform a parameter sweep of the negative hardness threshold to demonstrate the value of a tunable approach (the optimal threshold value scores significantly better than other choices). We additionally note that although Algorithm 1  ###reference_### indicates both an upper and lower relevance threshold for negative mining, in practice, we retrieved the top 100 hardest negatives and applied only an upper threshold as a performance optimization.\n###figure_5### Beyond tuning to a single hardness threshold level, we hypothesized that ordering the data by the difficulty of the negatives (i.e., curriculum learning) could lead to even better results. In this vein, we offer the experiment shown in Figure 5  ###reference_###, which compares the Impact of training with negatives of progressively increasing difficulty. While this initial experiment suggests some improvement in curating the curriculum of hard negatives, we note that this experiment was run after the release of the Arctic embed, and we did not use this curriculum approach when training our published models."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Training Recipe",
+            "text": ""
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Model Initialization",
+            "text": "We begin with a pretrained language model. Where permissively licensed base models pre-trained for information retrieval are available for a given model size, we prefer these weights over general-purpose pretrained ones 131313Such as https://huggingface.co/intfloat/e5-large-unsupervised. Our ablation studies in Sections 7.1  ###reference_### and 7.3  ###reference_### showed mixed results and suggested the effect of this design choice on performance may have been weak relative to other effects studied, but as Figure 6  ###reference_### shows, starting from a more thoroughly trained base model, such as e5-base-unsupervised, had an apparent effect on sample-efficiency and convergence speed, and this speedup was notably helpful for faster experimentation during model development.\n###figure_6###"
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Large Scale Contrastive Pretraining With In-Batch Negatives",
+            "text": "In the first round of contrastive training, we aim for large scale, both in batch and total dataset sizes. We use our pretraining dataset with the infoNCE contrastive loss using in-batch negatives (for each query, all documents associated with different queries in the minibatch are treated as negative examples). GPU parallelism, activation checkpointing, and truncated sequence length were instrumental in achieving large batch sizes.\nWe train for one epoch141414Some sizes of Arctic embed utilized early checkpoints from before one epoch of pretraining, though this was done for expediency, and we did not find evidence of this improved performance. using the AdamW optimizer, adjusting only the learning rate while leaving all other parameters at PyTorch default values. We perform a linear learning rate warmup for several hundred steps, then a linear decay to 10% of the original learning rate over the remainder of the training. As evidenced by the example shown in Figure 10  ###reference_###, we observed performance could be sensitive to the learning rate and the learning rate schedule. Batch sizes and learning rates for each model size are given in Table 3  ###reference_###."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "Longer Truncation Length",
+            "text": "Much of our pretraining data included documents significantly longer than 128 tokens. We used a document sequence length of 256 in large-scale contrastive training, in contrast to the 128 truncation length used in GTE and BGE. We truncated query sequence length to 32, consistent with BGE’s source code151515https://github.com/FlagOpen/FlagEmbedding/blob/53cfac4a50ac0e023b2f8d19b10667c9c210fa41/FlagEmbedding/baai_general_embedding/finetune/arguments.py  ###reference_blob/53cfac4a50ac0e023b2f8d19b10667c9c210fa41/FlagEmbedding/baai_general_embedding/finetune/arguments.py###. Our ablation study in Section 7  ###reference_### suggests this longer truncation length led to a substantial improvement in retrieval performance."
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "Source Stratification",
+            "text": "We fill each batch with data from a single source during pretraining, a source of accuracy gains in prior work Nussbaum et al. (2024  ###reference_b20###). Our ablation study in Section 7.1  ###reference_### indicates this led to a dramatic improvement in model quality (see Table 5  ###reference_###)."
+        },
+        {
+            "section_id": "4.5",
+            "parent_section_id": "4",
+            "section_name": "Quality-Focused Contrastive Training With Curated Negatives",
+            "text": "After large-scale training, we perform a second round of training leveraging our fine-tuning dataset, which contains explicitly labeled negative examples. We use no learning rate warmup but apply the same linear learning rate decay schedule as in the pretraining stage. We truncate sequence lengths to 512 for queries and documents for all models, including the long-context variant m-long. For each query in a batch, we include one positive document and ten hard negative documents. Batch sizes (number of queries) and learning rates for each model size are given in Table 3  ###reference_###."
+        },
+        {
+            "section_id": "4.6",
+            "parent_section_id": "4",
+            "section_name": "Disabling In-Batch Negative Loss",
+            "text": "Based on some early fine-tuning runs, we found that disabling in-batch negative loss did not measurably degrade performance. We stopped using in-batch negatives during fine-tuning (this made tuning easier, especially since the interaction between batch size and in-batch loss is not straightforward)."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Efficiency",
+            "text": "To maximize experimental throughput, iteration speed, and the maximum feasible batch size, we took pains to ensure our training setup was as effective as possible for our given computational budget. We carefully optimized the net efficiency of training and iteration, assuming a single training node with 8 NVIDIA H100 GPUs. We achieved high efficiency by carefully implementing a custom data loader and writing our training loop in plain PyTorch to leverage several “tricks” we detail in Section B.2  ###reference_###. Additionally, we identified and eliminated careless performance bottlenecks through performance benchmarking, keeping a watchful eye on both throughput and GPU utilization.\nFurther discussions about methods we found helpful for efficient experimentation and training can be found in the Appendix, including a discussion of granular evaluation during training in Section B.1  ###reference_###."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "Experimental Results",
+            "text": "To qualify our retrieval quality, we evaluate model performance on the Retrieval portion of the MTEB dataset Muennighoff et al. (2023  ###reference_b19###). Summary results of MTEB experiments are shown in Figure 1  ###reference_###, and a complete tabulation by dataset is given in Appendix E  ###reference_###. To quality the performance of our long context model, we leverage the LoCo Saad-Falcon et al. (2024  ###reference_b26###), the results of which are given immediately below."
+        },
+        {
+            "section_id": "6.1",
+            "parent_section_id": "6",
+            "section_name": "Long Context Performance",
+            "text": "For our initial Arctic embed release, we did not put any special efforts into adjusting our training recipe for long-context support. Instead, our m-long variant was only trained on short sequence data (it was pretrained with sequences truncated to 256 tokens and finetuned with sequences truncated to 512 tokens). Nonetheless, even on the specialized LoCo long context benchmark datasets (Table 4  ###reference_###), performance only tends to lag slightly compared to models trained end-to-end specifically with long-context in mind, e.g. nomic-embed-text-v1. While these LoCo results suggest m-long may not be the model of choice for long sequences, its strong MTEB Retrieval scores suggest it may be a good pick for datasets containing a mix of long and short sequences.\nThis surprisingly not-so-bad performance may be largely thanks to the base model of m-long, nomic-embed-unsupervised, being trained on long sequence retrieval, but unfortunately we did not have time to run an ablation study to quantify the Impact of this base model."
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "Ablation Studies",
+            "text": "We conducted several ablation studies to test some of the hypotheses stated in Table 2  ###reference_### regarding the causes of Arctic embed’s higher MTEB Retrieval scores relative to other similar models. Average scores are given in the following subsections, with full scores in Appendix E  ###reference_###."
+        },
+        {
+            "section_id": "7.1",
+            "parent_section_id": "7",
+            "section_name": "Pre-training Ablations",
+            "text": "###figure_7### We probed the effects of batch size, sequence length, base model, and training data in a series of ablations, with resulting MTEB Retrieval scores tabulated in Table 5  ###reference_###. In each case we trained for 20k steps using a linear learning rate decay from 2e-4 to 2e-5 after a 300-step linear warmup from 0.161616This ablation setup is slightly different from our published models’ configuration – the warmup was 300 steps instead of 100, gradient clipping was enabled, and 20k steps often slightly exceeded the one epoch through the data used in our published models (often one epoch was around 19k steps). In some cases, we evaluated a one-epoch checkpoint (around 19k steps instead of 20k) to mitigate a data loading correctness issue discovered post-training for the beyond-one-epoch regime for this dataset.\nOverall, the ablation study results support our hypotheses about data sourcing, longer sequence length, and source stratification improving model performance. In contrast, the choice of initializing from a pre-trained retrieval model did not significantly impact the MTEB Retrieval score after pretraining. We also notice the interesting curriculum-learning-like pattern of source stratification mattering more later in training than other factors like batch size (see Figure 7  ###reference_###)."
+        },
+        {
+            "section_id": "7.2",
+            "parent_section_id": "7",
+            "section_name": "Fine-tuning Ablations",
+            "text": "As discussed in Section 3.6  ###reference_###, our tunable negative mining approach uses a threshold to filter out too-hard negatives. We perform an ablation study on several threshold values to demonstrate the importance of the threshold parameter. The results shown in Figure 8  ###reference_### indicate that too-low and too-high maximum relevancy thresholds (too-hard and too-easy negatives) lead to significantly worse performance.\n###figure_8###"
+        },
+        {
+            "section_id": "7.3",
+            "parent_section_id": "7",
+            "section_name": "End-to-end ablations",
+            "text": "###figure_9### To thoroughly study the effect of training data on the final score, we extended a subset of our pretraining ablation study through the fine-tuning step. We conducted a finetuning step similar to the one used on our published arctic-embed-m model on configurations A, B, and C from Table 5  ###reference_### (different data and base model). The pretraining and fine-tuning trajectories are shown in Figure 9  ###reference_###, with final MTEB Retrieval scores in Table 6  ###reference_###. Although the performance gap between models pretrained with Snowflake and Nomic data was relatively modest in pretraining, the gap widens substantially with fine-tuning, despite the fine-tuning recipe is the same. We also see a slight improvement in the final score for the configuration using e5-unsupervised-base. We note that our tuning the fine-tuning step to an e5-unsupervised-base model pre-trained on our data may have affected these results."
+        },
+        {
+            "section_id": "8",
+            "parent_section_id": null,
+            "section_name": "Conclusion and Future Work",
+            "text": "By creating the suite of Arctic text embedding models, we sought to better understand how to optimize the training recipe for high-quality text embedding models. Our exploration found that dataset-stratified mini-batches and tuned hard negative mining were crucial ingredients for training a model for more effective retrieval.\nIn the future, we seek to continue our experimentation to leverage improved curriculum learning and better methods of source stratification. Additionally, we strive to train more robust models to compression approaches such as binarization or quantization of embeddings."
+        }
+    ]
+}

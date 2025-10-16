@@ -1,0 +1,168 @@
+{
+    "title": "In-Memory Learning: A Declarative Learning Framework for Large Language Models",
+    "abstract": "The exploration of whether agents can align with their environment without relying on human-labeled data presents an intriguing research topic. Drawing inspiration from the alignment process observed in intelligent organisms, where declarative memory plays a pivotal role in summarizing past experiences, we propose a novel learning framework. The agents adeptly distill insights from past experiences, refining and updating existing notes to enhance their performance in the environment. This entire process transpires within the memory components and is implemented through natural language, so we character this framework as In-memory Learning. We also delve into the key features of benchmarks designed to evaluate the self-improvement process. Through systematic experiments, we demonstrate the effectiveness of our framework and provide insights into this problem.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "The essential means by which intelligent organisms align themselves with changing environments is through learning and memory, which can be categorized into two distinct types in Neuroscience: declarative and non-declarative (Squire and Zola, 1996  ###reference_b18###). The memory acquired through non-declarative means is difficult to express in language, as depicted in Figure 1  ###reference_###. Conversely, declarative memory empowers individuals to convey past experiences with language, thus preparing them to navigate a wider array of scenarios with greater flexibility. When approaching new tasks or environments, humans summarize rules from initial experiences, subsequently refining and applying these rules to similar problems. This iterative refinement enhances understanding and effectiveness, gradually increasing familiarity with the task or environment.\nWhen comes to Deep Neural Networks, if we liken learning through gradient back-propagation to a form of non-declarative learning, it can be observed that large language models (Brown et al., 2020  ###reference_b2###) benefit from an explicit formulation of their context window. Whether it involves generating the thought process using a Chain of Thought (Wei et al., 2023  ###reference_b20###) approach or providing input-output pairs as examples via In-context learning (Dong et al., 2023  ###reference_b5###), large language models get similar improvement to those gained through gradient-based methods, reducing the loss value and enhancing their performance in downstream tasks. As shown in Figure 1  ###reference_###, this method mirrors declarative learning, where understanding context enhances the network’s performance. By leveraging this unique characteristic, agents built upon large language models can comprehend their environment, plan, and make decisions based on organizational context (Shridhar et al., 2020  ###reference_b17###; Xi et al., 2023  ###reference_b21###). This approach enables them to tackle a broad spectrum of problems effectively, which attracts the interest of many researchers.\nGiven that LLM-based agents exhibit capabilities similar to intelligent organisms, and recognizing that these abilities empower them to align with the natural world and enhance cognition, a natural question arises: Can agents develop similar self-improvement capabilities? Research on the autonomous agent (Qin et al., 2023  ###reference_b13###; Schick et al., 2023  ###reference_b14###) usually incorporates the use of tools to formulate their context window autonomously, including strategies for teaching agents to utilize these tools or the design of processes that involve tools (Wang et al., 2023  ###reference_b19###), such as retrievers. The enhancement in agent performance is significantly influenced by the performance of these tools, which can not improve themselves concurrently. The central question we are concerned about is whether agents can self-enhance in the absence of human-labeled data, which is the inherent capability of the model itself.\nIn this research, we propose a novel perspective on the learning process of agents, drawing inspiration from declarative learning methods employed by humans. We introduce a comprehensive learning framework, termed In-Memory Learning (IML), which encompasses three pivotal components: induction, revision, and inference. The learning process is completed in the memory component, which is what the name refers to. In analogy to the gradient calculation process in gradient-based learning, agents perform note induction from their current experience to identify an update direction, subsequently updating their previous notes. Through iterative updates, the rules summarized by the agents progressively align to the correct direction. Our experiments illustrate that, through applying this framework, the model can self-enhance without the requirement for human-annotated labels. The successful implementation of this method necessitates three distinct capabilities:\nInduction: the distillation of general principles from current experiences\nRevision: the refinement of pre-existing guidelines\nInference: the application of these updated rules for logical reasoning.\nIt’s worth noting that we do not directly compare our framework with those that incorporate tools within agent systems, as our objective is to demonstrate the inherent potential for agents to self-improve. Instead, we further delve into an analysis of the model’s capabilities and the impact of various IML parameters.\nOur main contribution is:\nWe discuss the essential properties that a benchmark requires to evaluate self-improvement abilities and have implemented a preliminary version of such a benchmark.\nWe introduced a novel framework named In-memory Learning and carried out a comprehensive series of systematic experiments to investigate its effectiveness and capabilities."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Related Work",
+            "text": ""
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "LLM-Agent",
+            "text": "Discussions about agents have erupted, given the capacity of large language models to tackle a variety of language tasks, as previously mentioned. A particularly intriguing question arises regarding the self-improvement of these agents. In numerous studies, agents have demonstrated the ability to leverage tools to enhance their performance (Yao et al., 2022b  ###reference_b24###; Schick et al., 2023  ###reference_b14###; Qin et al., 2023  ###reference_b13###; Shen et al., 2023  ###reference_b15###; Karpas et al., 2022  ###reference_b7###; Li et al., 2023  ###reference_b8###). In the Reflexion (Shinn et al., 2023  ###reference_b16###) framework, the model takes multiple trials on the same question, necessitating specific conditions to determine the appropriate moment to stop attempts.\nSimilar to the Voyager (Wang et al., 2023  ###reference_b19###), we believe that the agent should operate within a stable environment over a long period. In practical scenarios, where labels are hard to obtain, the agent must develop an understanding of its surroundings and enhance its capabilities, diverging from the traditional notion of an autonomous agent. We later developed the concept of ’lifelong agent’ in Voyager, to which our methods are specifically tailored. It’s worth noting that the common practice for agents based on retrievers directly is acquiring related experiences and integrating them into the context (Wang et al., 2023  ###reference_b19###), which essentially is in-context learning. Consequently, we have selected in-context learning as our foundational baseline. ExpeL Zhao et al. (2023  ###reference_b25###) also explores a similar process. The primary distinction from our work is we focus on iterative improvement and conduct systematic experiments about it, while ExpeL primarily emphasizes the benefits of cross-task experience."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Agent Benchmark",
+            "text": "Existing benchmarks for agents assess model capabilities across multiple dimensions, such as the ability to function as an agent (Liu et al., 2023  ###reference_b10###), the planning skills necessary to address real-world issues Shridhar et al. (2020  ###reference_b17###); Yao et al. (2022a  ###reference_b23###); Fan et al. (2022  ###reference_b6###); Ahn et al. (2022  ###reference_b1###) and their ability to complete tasks iteratively (Mohanty et al., 2023  ###reference_b11###). The methods used to assess agents’ performance vary widely, encompassing human evaluation through interviews Park et al. (2023  ###reference_b12###); Lin et al. (2023  ###reference_b9###) and subjective assessments (Choi et al., 2023  ###reference_b4###). However, there is a lack of benchmarks specifically designed to directly evaluate the self-improvement ability of agents Xi et al. (2023  ###reference_b21###). We will discuss the characteristics of such a benchmark in the next section, which form the basis of our proposal for a new benchmark to measure agents’ progression.\n###figure_1###"
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Meta Implementation",
+            "text": "The entire operation of an LLM-based agent can be formulated as a Partially Observed Markov Decision Process (Carta et al., 2023  ###reference_b3###)  and we briefly introduce here. In this context,  is the state space while  represents the vocabulary of the language model.  is the action space and  is the goal space. The transition function is represented by , the reward function by , and the observation function by .\nUtilizing this definition, we can consequently define the problem of the Life-long Agent in section 3  ###reference_###, discuss the characteristics of the benchmark assessing the self-improve capabilities in section 3.2  ###reference_###, and define the In-memory Learning Framework in section 3.3  ###reference_###."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Self-improved Agent",
+            "text": "###figure_2### Agents in real-world scenarios are often tasked with consistently performing some specific types of tasks  over an extended period. The question of the self-improved Agent centers on whether agents can enhance their performance without relying on human-labeled data since it’s difficult to obtain such golden labels. Consequently, the reward function is categorized into two scenarios: one that utilizes fabricated labels such as AI feedback and the other in which only the correctness of outcomes can be known since it’s often clear whether one solution has completed the task or not. In the implementation discussed below, we focus on the latter scenario.\nwhere  on the right-hand side stands for the real set. The ’else’ condition pertains to the correctness of the answer, 1 for correct and 0 for wrong."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Benchmark",
+            "text": "The benchmark for assessing an agent’s self-improvement ability should have certain essential characteristics. It should have a stable and clear testing goal to ensure that any progress by the model is noticeable. Additionally, the relationships within the data need to be learnable. Specifically, the least effective approach for self-improvement involves exhaustively searching through all possible solutions, which is meaningless here. Therefore, a relationship between the data is necessary. This also aligns with real-world scenarios, where common rules often exist across different experiences such as Newton’s law of universal gravitation. Moreover, there must be enough data to make the problem statistically significant and solvable.\nSince existing benchmarks are not designed to assess the ability for self-improvement, most of them do not fully align with the required features. For example, HotpotQA (Yang et al., 2018  ###reference_b22###), used in Reflexion, is primarily intended to evaluate multi-hop QA questions. However, upon analyzing errors made by agents that were tested by Exact Match(See AppendixA  ###reference_###), we find that many of them are due to formatting issues, which are not expected and can’t be generalized. As a result, we developed a straightforward classification dataset. We established a clear relationship between features and labels, making them learnable. The classification problem is suitably chosen because each correct feature-label match enhances the classifier’s accuracy. The detailed information about the benchmark is introduced in Section 4.1.1  ###reference_.SSS1###."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "In-memory Learning",
+            "text": "Within a Partially Observable Markov Decision Process (POMDP) trajectory , an agent selects an action based on , where  represents all the variables, including prompts and parameters. Uniquely in our framework, we use the symbol  to differentiate context notes from parameters of LLMs. The parameters of LLMs are frozen here and will therefore be omitted for simplicity. We will further explore the phases of the In-Memory Learning process in a formulaic manner below and introduce the details of implementation in section 4.1  ###reference_###."
+        },
+        {
+            "section_id": "3.3.1",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.1 Inference Phase",
+            "text": "In the inference phase, agents get the observation o about the current state , and select an action . The reward r that the model receives aligns with the concept of the self-improved agent, which was mentioned before. The trajectory  is recorded for later phase. This phase will continue until a specified threshold is reached.\n###figure_3###"
+        },
+        {
+            "section_id": "3.3.2",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.2 Induction Phase",
+            "text": "After collecting a set of trajectories, the agent aims to derive general notes  from them. This process is completed using natural language descriptions, similar to calculating the gradient of batch data in gradient-based learning approaches like Figure 2  ###reference_###. The size of the batch for this inductive process is limited by the length of the context window, making the topic of long context windows particularly significant here."
+        },
+        {
+            "section_id": "3.3.3",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.3 Revision Phase",
+            "text": "Like updating the parameter in gradient-based learning, the notes  in the context before will be updated based on the insights  gained during the induction phase. The updated notes  will then be utilized in the subsequent inference phase. The correctness of updating direction is ensured by statistical properties, that common rules are consistent in different experiences."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Experiments",
+            "text": "In this section, we will outline how we implemented the entire system first in section 4.1  ###reference_### and carry out systematic experiments to evaluate its performance."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Implementation Details",
+            "text": ""
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1 Benchmark",
+            "text": "To assess the self-improvement capabilities of agents, we developed a four-class classification problem. This problem involves a question describing one creature in 10 dimensions Like Figure 3  ###reference_###, where every dimension is described by two opposing sets of adjectives. For instance, within the size dimension, one set of adjectives represents \"huge\" while the other represents \"tiny\". Each description uniquely matches a specific entry in a truth table that spans ten dimensions, thereby directly correlating to a single label.\nIn the real scenario, when hearing the name of a new species, some features can be inferred because the naming process often includes hints about its characteristics. So we use abstract labels, like \"Creature A\", to avoid bringing in this kind of prior information. For each entry of the truth table, four unique combinations of adjectives are randomly selected and 896 entries are held out for extension in the future. In the end, we get 3200 shuffled samples. The first two features are designed to be the distinguishing features while the others are distractors. The accuracy achieved on this task can significantly demonstrate the extent to which the agents have grasped these rules."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2 Inference Phase Implementation",
+            "text": "During the inference phase, the agent needs to identify which creature the description refers to. Initially, the notes are set to \"no idea\". A task-unrelated example is provided to guide the answering format of the agent and we use random guessing for the agents' answers to assess the accuracy. By default, the agent processes 320 samples in a single step and saves the trajectories for use in the induction and revision phases. Following the implementation of Reflexion Shinn et al. (2023  ###reference_b16###), we instruct the agent to respond with \"Finish[Correct Answer]\"."
+        },
+        {
+            "section_id": "4.1.3",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.3 Induction Phase Implementation",
+            "text": "After gathering trajectories in the previous phase, the agent identifies common features between them and summarizes their findings into batch notes . Due to the constraint of the context window, the induction phase is executed in minibatch while the results  are accumulated iteratively, summarizing into . We will delve into this process in the next section, demonstrating how such accumulation enhances stability, mirroring the effect of momentum observed in gradient-based learning. The notes are summarized for each creature individually and are later combined in the revision phase."
+        },
+        {
+            "section_id": "4.1.4",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.4 Revision Phase Implementation",
+            "text": "Ultimately, the context notes for each creature are individually adjusted based on the batch notes and are then merged. We illustrate how the degree to which your instructions prompt the agent to make changes can impact the stability of the optimization process, similar to the momentum in gradient-based learning. Both the induction and revision phases occur within the agents’ memory, leading us to name this approach as In-memory Learning.\n###figure_4### ###figure_5###"
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Compared with In-Context Leaning",
+            "text": "We choose In-context Learning as our baseline and the final result is presented in Figure 4  ###reference_###. The result of in-context learning conducted in llama2-70b-chat is slightly better than random guessing. We use 4-shot as our benchmark consists of 4 labels, and the examples were manually chosen at random, ensuring the correctness of the answers. To validate the effectiveness of our approach, we conduct experiments using various models and analyze the outcomes.\n###figure_6###"
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "Test on Various Models",
+            "text": "As depicted in Figure 4  ###reference_###, the performance of GPT-3.5 and llama2-70b-chat shows a continuous improvement trend. However, llama2-13b-chat and llama2-7b-chat only improved a little and there is even a downward trend in the later steps for llama2-7b-chat. We analyze this outcome in three dimensions: the ability of inference, induction, and revision."
+        },
+        {
+            "section_id": "4.3.1",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.1 Inference Ability",
+            "text": "We assess the inference ability of agents with Oracle notes, which indicate the upper bounds the agents can achieve in the inference phase. Given the sensitivity to the format of the prompt, we evaluate the accuracy of 5 different styles and compute the statistical result. The results shown in Table 1  ###reference_### reveal that both the llama2-7b-chat and llama2-13b-chat models attain around 40 percent accuracy, explaining why the trend of improvement is not markedly evident, as the maximum accuracy with oracle notes is not high enough."
+        },
+        {
+            "section_id": "4.3.2",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.2 Induction Ability",
+            "text": "The induction ability refers to the agent’s capacity to summarize the common rules across different samples. In our study, four base models are tasked with performing induction on the same set of 320 samples, generating 80 groups of notes. We randomly select 5 of these 80 groups and use the llama2-70b-chat model to make inferences on the 320 samples. The results are presented in Table 1  ###reference_###, indicating that llama2-70b-chat is the best one while llama2-13b-chat is the worst unexpectedly. The performance of GPT3.5-turbo falls short of that achieved by the llama2-70b-chat, providing insight into why GPT3.5 did not exhibit superior overall performance."
+        },
+        {
+            "section_id": "4.3.3",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.3 Revision Ability",
+            "text": "During the revision phase, the agent is required to summarize two notes into one iteratively. To evaluate this capability, we devised a targeted experiment. Utilizing the notes collected by the llama2-70b-chat model, we randomly select 5 pairs of notes, and the agents need to merge each pair. We assess the agents’ inference accuracy before and after the revision process. The difference in accuracy, that between the merged notes and the lower accuracy of the original pairs, serves as a measure of the agents’ revision proficiency. The result is presented in Table 1  ###reference_###. The llama2-7b-chat model exhibited a decrease in accuracy, which accounts for the model’s declining performance in Figure 4  ###reference_###. Conversely, the llama2-13b-chat model is the most superior one in this ability test."
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "Effect of Parameters",
+            "text": "In our framework, certain key parameters influence the learning process. To explore these effects further, we conducted experiments focusing on the momentum and accumulation step, which are crucial for the stability of the learning process. We conduct the experiments on the llama2-70b-chat model."
+        },
+        {
+            "section_id": "4.4.1",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.1 Effect of Momentum",
+            "text": "Although the natural language is discrete, our framework incorporates a momentum mechanism. As illustrated in Figure 7  ###reference_###, instructing the model to initiate responses using the initial words of previous notes acts as a form of momentum, constraining the generative freedom. Additionally, we incorporated basic statistical information regarding the quantity of samples processed by the agents. We conducted comparative analyses across different momentum settings, with the results shown in Figure 7  ###reference_###. In our experiments, the full momentum setting yields the most stable performance whereas the no momentum leads to the opposite. This suggests that integrating a momentum-like feature can significantly enhance the model’s consistency.\n###figure_7###"
+        },
+        {
+            "section_id": "4.4.2",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.2 Effect of Accumulation step",
+            "text": "Another critical parameter in our framework is the accumulation step count, which can exert influence on the learning process in two distinct ways. As described in the meta-implement section, the optimization process direction is determined by statistical properties, and the accumulation step assumes significance due to the fixed minibatch size imposed by the context window. Additionally, our assessments of accuracy during the subsequent influence phase are also influenced by the volume of data. In our experiment, we examined three accumulation step values: 128, 200, and 320, with the result presented in Figure 6  ###reference_###. As observed, a smaller accumulation step leads to greater instability in the learning process."
+        },
+        {
+            "section_id": "4.5",
+            "parent_section_id": "4",
+            "section_name": "Trapped in Local Minimum",
+            "text": "An interesting observation about the learning process is the presence of optimization challenges analogous to the occurrence of saddle points in gradient-based learning. When tasked with modifying existing notes based on new experiences, the model may encounter difficulties in updating, even when the new experience contradicts the existing notes. This issue tends to occur more frequently in the intermediate and advanced stages of the iterative update step. Since we have observed this phenomenon across various models, including GPT-3.5-turbo, we believe that it’s not solely attributed to the diversity of training data. Rather, it appears as if the copy mechanism of transformers is triggered with the end-of-sequence token remaining the most likely outcome after repeating the previous notes, even in the presence of changed experiences. We have not identified the minimum support set to delve deeper into this question and leave it for future exploration. Figure 8  ###reference_### shows an simplified examples"
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Conclusion",
+            "text": "In conclusion, we formally define the problem of self-improved agents. We discuss the key properties of a benchmark designed to evaluate agents’ self-improvement capabilities and introduce a novel framework called In-memory Learning. Our systematic experiments demonstrate the effectiveness of this method and provide valuable insights into this domain."
+        }
+    ]
+}

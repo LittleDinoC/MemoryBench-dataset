@@ -1,0 +1,270 @@
+{
+    "title": "Reindex-Then-Adapt: Improving Large Language Models for Conversational Recommendation",
+    "abstract": "Large language models (LLMs) are revolutionizing conversational recommender systems by adeptly indexing item content, understanding complex conversational contexts, and generating relevant item titles. However, controlling the distribution of recommended items remains a challenge. This leads to suboptimal performance due to the failure to capture rapidly changing data distributions, such as item popularity, on targeted conversational recommendation platforms. In conversational recommendation, LLMs recommend items by generating the titles (as multiple tokens) autoregressively, making it difficult to obtain and control the recommendations over all items. Thus, we propose a Reindex-Then-Adapt framework, which converts multi-token item titles into single tokens within LLMs, and then adjusts the probability distributions over these single-token item titles accordingly. The framework marries the benefits of both LLMs and traditional recommender systems (RecSys): understanding complex queries as LLMs do; while efficiently controlling the recommended item distributions in conversational recommendations as traditional RecSys do. Our framework demonstrates improved accuracy metrics across three different conversational recommendation datasets and two adaptation settings.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "Conversational Recommender Systems (CRS) are an emerging recommendation task aiming to suggest relevant and personalized items via interactive dialogues between users and systems. Recently, Large Language Models (LLMs) have demonstrated proficiency in understanding user intentions within natural language conversational contexts and exhibited substantial domain-specific knowledge (e.g., in movies). Consequently, LLMs offer distinct advantages for CRS and outperform existing non-LLM baselines. This has garnered significant interest within the research community, positioning LLMs as an indispensable component of CRS.\n\nIn this work, we first provide preliminary analysis for LLMs as conversational recommenders. In detail, we view LLMs for conversational recommendations as Differentiable Search Indexing (DSI) models, then study LLMs’ abilities and limitations for item-indexing and item-recommendation tasks:\n\nAbilities: LLMs have indexed numerous popular movies, potentially adequate to understand complex conversation contexts and address many movie conversational recommendation scenarios.\n\nLimitations: LLMs exhibit misalignment with data distributions from target platforms, as illustrated by item popularity. Moreover, data distributions like item popularity evolve rapidly in practice, making adjusting LLMs more challenging.\n\nWe propose to overcome the aforementioned misalignment limitation by easily adjusting LLMs towards changing target distributions. These alignments bring additional recommendation accuracy improvements, and may have broader benefits, including controllability and fairness.\n\nTo achieve this recommendation probability distribution adjustment, there exists a technical challenge. Unlike adjusting recommendation probability distributions over all target items via tweaking the logit vectors in traditional RecSys, obtaining such logit vectors from LLMs is challenging due to their generative retrieval paradigm for CRS. LLMs generate recommendations by auto-regressively producing multiple item titles (e.g., Top-10), represented by varying numbers of tokens. This process makes obtaining probability distributions over all recommended items computationally expensive, hindering subsequent control or adjustment efforts.\n\nTo overcome this challenge, we propose a Reindex-Then-Adapt (RTA) framework. With treating LLMs as DSI models for conversational recommendations, we first conduct a reindex step: for original LLMs, we convert already-indexed multi-token item titles into single tokens; then we conduct an adapt step: for reindexed LLMs, the recommended item distributions can be obtained efficiently for following adapt step, e.g., bias terms adjustment or RecSys gating.\n\nBased on the RTA framework, we investigate four reindexing modules and two adaptation strategies across three CRS datasets. Our experimental results show improved recommendation accuracy in CRS. For instance, we improve the recommendation accuracy for the original Llama2-7b by 59.37% in terms of the Top-10 Hit Rate, surpassing all open-source baselines. Additionally, our studies highlight the significance of adjusting LLMs towards target distributions in CRS and provide insights into scheduling conversational recommendation modules with LLMs."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Preliminaries",
+            "text": ""
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "Task Formulation",
+            "text": "In CRS, a conversation is represented by involving users and items with conversation turns. Each utterance comprises tokens from vocabulary. A conversation typically involves a seeker and a recommender. As formulated in CRS studies (Li et al., 2018; Chen et al., 2019; Zhou et al., 2020; Wang et al., 2022; He et al., 2023), our goal is to learn a recommender to generate a ranked list of items at turn that aligns with, based on the preceding context."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Differentiable Search Index (DSI)",
+            "text": "The transformer model has shown proficiency in retrieval tasks, encoding item information within its parameters, which is a method termed Differentiable Search Index (DSI) (Tay et al., 2022). DSI involves two key training tasks for pre-trained language models: Learn to Index (L2I) and Learn to Retrieve (L2R), which can be used to train a model jointly or in a sequential order. L2I focuses on mapping item content, such as movie description, to item indices, exemplified by linking a description of Edge of Tomorrow to its title:\n\nL2I Example: “A 2014 American science fiction action film starring Tom Cruise and Emily Blunt with …”  Edge of Tomorrow\n\nL2R, on the other hand, maps queries to item indices, such as:\n\nL2R Example: “I’m feeling bored today and looking for a sci-fi action movie, preferably starring Tom Cruise.”  Edge of Tomorrow\n\nDSI models are originally proposed for text retrieval tasks (Tay et al., 2022), yet their formulation can be connected to LLMs used in CRS. Considering the LLMs as CRS framework proposed in (He et al., 2023) through the lens of DSI, we observe that:\nItem Indexing: LLMs index items by using the item titles (e.g., “Edge of Tomorrow”) as the item identifiers via L2I.\nItem Recommendation: LLMs use conversational context as queries to generate item indices via L2R.\n\nThus, LLMs inherently function as DSI models, by including a certain number of training samples for L2I and L2R tasks in their pre-training corpus. Compared to common two-tower models, DSI models require only a single model for item recommendations, by indexing item information into its parameters (Tay et al., 2022)."
+        },
+        {
+            "section_id": "2.3",
+            "parent_section_id": "2",
+            "section_name": "Item Indexing: LLMs Show Sufficient Item Content Knowledge",
+            "text": "According to (He et al., 2023  ###reference_b24###), LLMs demonstrate superior knowledge in content and context, particularly in the movie domain. This proficiency is attributed to the performance in the \"Learn to Index\" (L2I) task, as viewed through the DSI (Tay et al., 2022  ###reference_b51###). Therefore, our primary concern is the extent to which item content has been indexed in LLMs through the pre-training corpus."
+        },
+        {
+            "section_id": "2.3.1",
+            "parent_section_id": "2.3",
+            "section_name": "2.3.1 Observation",
+            "text": "Good Content Knowledge for Popular Items: All LLMs had indexed a considerable amount of movie content for conversational recommendation tasks. Notably, for frequently mentioned movies, all LLMs exhibit impressive content knowledge.\n\nBest LLMs: The proprietary model GPT-3.5-t (Schulman et al., 2022) outperforms others. Among the open-sourced LLMs of similar size, Llama2 demonstrates the best performance in the given task, making it the chosen base model for our subsequent experiments."
+        },
+        {
+            "section_id": "2.3.2",
+            "parent_section_id": "2.3",
+            "section_name": "2.3.2 Impact",
+            "text": "Figure 2 shows that, in terms of item indexing capability as DSI models, LLMs without specific fine-tuning have already indexed numerous popular movies. Table 1 shows the imbalance of item occurrences in conversational recommendations, where items labeled as warm and pop. constitute about 20% in terms of item counts but contribute to over 80% of occurrences. This suggests that zero-shot LLMs may be sufficient for handling many movie conversational recommendation scenarios, because many are about warm or popular movies. Although, we admit fine-tuning LLMs to cover more cold items remains future work."
+        },
+        {
+            "section_id": "2.4",
+            "parent_section_id": "2",
+            "section_name": "Item Recommendation: LLMs Show Severe Distribution Misalignment",
+            "text": ""
+        },
+        {
+            "section_id": "2.4.1",
+            "parent_section_id": "2.4",
+            "section_name": "2.4.1 Observation",
+            "text": "In this section, we aim to show that even though LLMs can index items effectively, the data distributions LLMs fitted in training do not match the target inference distributions for CRS. We discuss this distribution misalignment from two perspectives, using item popularity distribution as an example:\n\nStatic Perspective: As depicted in Figure 1, LLMs reflect item popularities from the large-scale training corpus to some extent, which often do not align with popular items on the specific platform for CRS.\n\nDynamic Perspective: Target data distributions, such as item popularity, undergo rapid changes over time due to factors like seasons and promotion strategies. For instance, Figure 3 shows that monthly relative item popularities on the Reddit-Movie dataset change over time, which cannot be captured by a static LLM, even fine-tuned ones."
+        },
+        {
+            "section_id": "2.4.2",
+            "parent_section_id": "2.4",
+            "section_name": "2.4.2 Impact",
+            "text": "Our observations highlight the distribution misalignments between items on the target platform and those recommended by LLMs. This misalignment is considered from both static and dynamic perspectives, suggesting that: (1) despite LLMs exhibiting impressive performance in conversational recommendation, there exists room for improving recommendation accuracy by aligning with the distributions of target platforms; (2) due to the dynamic nature of recommendation platforms, target data distributions change rapidly, necessitating the more efficient methods to adjust item recommendations from LLMs accordingly."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Framework",
+            "text": ""
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Overview",
+            "text": "As discussed in Section 1, representing target items with varying token counts in LLMs poses challenges for adjusting recommendation distributions over all target items. To tackle this, we view LLMs as DSI models that have already indexed sufficient item content knowledge (see Section 2.3) and propose the Reindex-Then-Adapt (RTA) framework:\n\nReindex item indices with varying token numbers in LLMs into single-token item indices using a mixture of data samples from the L2I corpus and/or L2R corpus. This aims to remove the adapt step barrier. In contrast to the index step in the original DSI models (Tay et al., 2022), the reindex step reuses the content of indexed items from the LLMs, thereby facilitating the learning process for the new item indices.\n\nAdapt logits from the reindexed LLMs, achieved by transforming the logit vectors or by combining with other traditional RecSys using Gating mechanism (Hochreiter and Schmidhuber, 1997; Chung et al., 2014; Gu et al., 2020). This adjustment aims to effectively align the recommendation probability distributions over items with the target data distributions."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Reindex Step: Single-Token Items in LLMs",
+            "text": "The key of the reindex step is to \"squeeze\" multi-token item embeddings into single-token item embeddings efficiently and preserve the semantics of the original item embeddings in LLMs generation."
+        },
+        {
+            "section_id": "3.2.1",
+            "parent_section_id": "3.2",
+            "section_name": "3.2.1 Identify Item Indices.",
+            "text": "Formally, for a sentence  consisting of tokens , we denote the tokens representing an item for CRS tasks as , where  indicates the starting position of the first token for the item in , and  is the number of tokens representing this item. Consequently, with the Embed layer, LLMs can retrieve the sequence of token embeddings for this item:\n\nwhere  is the token embedding, and  is the embedding size. For example, we may look up “Edge of Tomorrow” embeddings represented by “” in the sentence ."
+        },
+        {
+            "section_id": "3.2.2",
+            "parent_section_id": "3.2",
+            "section_name": "3.2.2 Aggregate Multi-Token Embeddings",
+            "text": "In the proposed reindex step, we assume that the semantics from multiple (typically shorter than 10) token embeddings can be aggregated into a new single token embedding with a trainable aggregator. The aggregated serves as the new representation of the target item in LLMs generation. Therefore, if all target items are represented by the \"squeezed\" single embedding, scoring all the target items to obtain a logit vector from LLMs is efficient. In general, many existing model architectures can be used as Aggregator, such as RNN-based (Cho et al., 2014), Transformer-based models (Vaswani et al., 2017), or even Weighted Pooling. We discuss the details and the comparisons with pure new embeddings in Section 4.3."
+        },
+        {
+            "section_id": "3.2.3",
+            "parent_section_id": "3.2",
+            "section_name": "3.2.3 Learning Process",
+            "text": "The contrastive loss (Oord et al., 2018) is used for learning the aggregator to “squeeze” multi-token item embeddings and preserve the semantics for LLMs:\n\nwhere we loop over the training set that consists of pairs. Those pairs are collected from sentences containing target items. Here, is the contextual embedding of the last position from a LLM, which is originally used to generate the first token of original indexed items, but now we aim to force the aggregated item representation described in Equation 2 to be generated by LLMs. To achieve this reindex step, we also prepare negatives from the negative representation set.\n\nTwo groups of corpus are considered in the reindex step:\n\nL2R Data: In this training corpus, (query, target) pairs are used as L2R samples. In CRS context, those are samples from the conversations.\n\nL2I Data: In this training corpus, (content, target) pairs are used as L2I samples. In CRS context, those are samples from the item metadata like textual descriptions.\n\nData Mixture: In this case, we consider mixing both L2R and L2I samples as a unified corpus and use it to train our model jointly. We use this option and include details in Section A.2."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "Adapt Step: Item Probabilities Adjustment",
+            "text": "After re-indexing, all the items are represented by single-token embeddings. It makes recommendation as easy as one-step decoding in LLMs, and also enables multiple efficient ways to adjust the recommendation item distributions to adapt towards target platforms or specific data distributions. We introduce two types of adaptation methods in the following sections, one for item popularity adjustments, and another one for combining with the traditional recommender systems. To start with, we assume the logit vector has already been given by the LLMs, and the corresponding probability vector should be."
+        },
+        {
+            "section_id": "3.3.1",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.1 Bias Term Adjustment",
+            "text": "Inspired by (Zhao et al., 2021  ###reference_b63###), a common way to adjust logits is an affine transformation, i.e.:\nwhere  is a weight matrix and  is the bias term. Similar to (Zhao et al., 2021  ###reference_b63###), we restrict the matrix  to be diagonal to prevent the size of parameters from growing quadratically in the size of items. Therefore, in this special case, we are able to interpret the  and  as multiplicative and additive bias terms towards the target data distributions, respectively."
+        },
+        {
+            "section_id": "3.3.2",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.2 Traditional RecSys Gating",
+            "text": "Inspired by the observation from He et al. (2023), we notice that LLMs excel at content/context knowledge, but traditional RecSys, where the output logit vector can be denoted as, is good at collaborative knowledge instead. Motivated by this observation, combining those two types of models becomes easy after the re-indexing step:\n\n\\[ z = \\alpha z_{\\text{LLM}} + (1-\\alpha)z_{\\text{RecSys}} \\]\n\nwhere the coefficient \\(\\alpha\\) can be set in many different ways. For simplicity's sake, we use a learnable scalar \\(\\alpha\\) in our experiments, but more options can be considered, such as being predicted by an MLP model to naturally determine how much we should weight the responses from LLMs or traditional RecSys:\n\n\\[ \\alpha = g(c) \\]\n\nwhere \\(g\\) can be the contextual embedding from an LLM in the previous equations."
+        },
+        {
+            "section_id": "3.3.3",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.3 Learning Process",
+            "text": "We use maximum likelihood estimation to derive the loss for adapt step, in order to learn the parameters of the bias terms or the recsys model. Note that the LLMs parameters are not involved in this step, ensuring an efficient learning process: where dataset is collected from the target platform, which is typically a small sized dataset. Here, denotes the probability of the ground-truth item in the data sample. Our purpose is to adapt the model towards the underlying data distributions of through this learning process."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Experiments",
+            "text": ""
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Experiment Setup",
+            "text": ""
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1 Datasets",
+            "text": "Three conversational recommendation datasets (Hayati et al., 2020 ###reference_b23###; He et al., 2023 ###reference_b24###) are used in our experiments, where the statistics are summarized in Table 2 ###reference_###: INSPIRED (Hayati et al., 2020 ###reference_b23###): This dataset consists of small-scale human-human conversations for movie recommendations with crowd-sourced annotations from MTurk 222https://mturk.com. Due to its short collection time span, temporal patterns are unlikely to be observed. Nevertheless, considering its widespread use, we present our model results based on this dataset. In the following experiments, we randomly split the dataset into training, validation, and test sets using an 8:1:1 ratio. Reddit-V1.5 (He et al., 2023 ###reference_b24###): This dataset comprises large-scale movie discussions on Reddit, which were collected and processed by (He et al., 2023 ###reference_b24###). This dataset shows real movie conversation recommendations in the wild and includes corresponding timestamps for 10 years to study temporal patterns. For data splitting, we use the last two months (i.e., Nov. and Dec. in 2022) as validation and testing set respectively to approximate the real setting. Due to the large size of the given dataset, we uniformly sample 20% conversation turns for validation (i.e., 11,241 samples) and testing (i.e., 13,816 samples)."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2 Baselines",
+            "text": "We consider four groups of baseline models for comparison. (1) We consider some representative traditional item-based RecSys models, including Popularity, FISM (Kabbur et al., 2013) and SASRec (Kang and McAuley, 2018). (2) We consider some representative CRS models: UniCRS (Wang et al., 2022): This model uses a pre-trained language model. (3) We consider some dense retrieval models given the connections to document retrieval: SBERT (Reimers and Gurevych, 2019) and Instructor (Su et al., 2022). (4) We consider some zero-shot open-sourced LLMs as baselines like (He et al., 2023) and use the 7-billion-parameter version due to compute burden: MPT-7b (Team, 2023), Mistral-7b (Jiang et al., 2023) and Llama2-7b (Touvron et al., 2023). We also discuss the results from GPT-3.5-turbo (Schulman et al., 2022), which is a much larger proprietary model that can achieve state-of-the-art CRS performance even in a zero-shot setting (He et al., 2023). The details of baseline models are found in Section A.1."
+        },
+        {
+            "section_id": "4.1.3",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.3 Evaluation Metrics",
+            "text": "We focus on recommendation accuracy using HIT@K (H@K) and NDCG@K (N@K), following (Li et al., 2018; Chen et al., 2019; Zhou et al., 2020; Wang et al., 2022). We consider the means and the standard errors of the metrics. Please find the implementation details in Section A.2."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "General CRS Performance",
+            "text": ""
+        },
+        {
+            "section_id": "4.2.1",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.1 Baseline Performance.",
+            "text": "Table 3 shows the recommendation accuracy of four groups of baselines on three conversational recommendation datasets. There are some observations:\n\nOn Traditional RecSys. Conventional recsys models effectively capture target popularity and further item-item similarities, resulting in reasonable recommendation accuracies. Interestingly, on INSPIRED, we find that non-personalized popularity serves as a strong baseline, because the limited size of the training set may restrict the ability to capture more complex item-item relationships. The results of traditional recommendation system models also indicate the potential of improving the recommendation accuracy by aligning with target data distributions.\n\nOn LLMs. LLMs with zero-shot prompting from (He et al., 2023) achieve impressive results. Additionally, the rank of recommendation accuracy within the LLM group aligns with the performance from Figure 2. Further details on the specific proprietary model GPT-3.5-t are discussed in Section 4.5.2.\n\nOn Other Baselines. We observe that zero-shot state-of-the-art dense retrievers are unable to achieve comparable performance as zero-shot LLMs; this may be due to two reasons: (1) Dense retrievers focus more on retrieving similar documents according to semantic similarities (e.g., similar contents), but LLMs show better understanding abilities for conversation contexts; (2) We are encoding the movie textual title rather than the description of the movie for fair comparison, which may limit the dense retrievers’ performance. As for traditional CRS models, since we follow the setting in (He et al., 2023) to remove “repeated” items, many popular CRS models perform relatively weaker in the corrected evaluation protocol."
+        },
+        {
+            "section_id": "4.2.2",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.2 Ours vs. Baselines.",
+            "text": "We construct a small-sized aggregator on top of Llama2 as an example, then use this aggregator to reindex multi-token movie titles into single-token movie titles as recommendation candidates, namely Llama2-R. \n\nOn Recommendation Accuracy. Table 3 shows that, following the reindex and adapt steps, our model excels over baselines on INSPIRED and Reddit-V1.5 datasets. Examining the reindex step (Llama2-R) and adapt step (+Bias or +RecSys), we observe a potential performance decrease in the reindex step due to the semantic gap from original token embeddings to the new single token embeddings from the relatively small aggregator. However, our models compensate by capturing the target data distribution through bias terms or traditional RecSys models. A more in-depth analysis of these adapt methods will be discussed in Section 4.4.\n\nOn Efficiency and Flexibility. It is crucial to mention that the aggregator-based methods are around smaller than the corresponding out-of-vocabulary item embedding tables and approximately smaller than the Llama2-7b base model, emphasizing its space efficiency. Additionally, as all movie titles with varying numbers of tokens are “squeezed” into single tokens, our model can rank all items with a single decoding step, making it around faster than the generative retrieval from LLMs to recommend the top-20 items. Moreover, single tokens facilitate easy acquisition of the recommendation item distribution, enhancing flexibility in control or further adjustment of the recommendations."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "Effectiveness of the Reindex Step",
+            "text": ""
+        },
+        {
+            "section_id": "4.3.1",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.1 Experiment Setup",
+            "text": "We explore methods for representing item titles with single-token embeddings in LLMs, investigating four approaches: (1) Embed: randomly initialized out-of-vocabulary (OOV) embeddings. Subsequently, three models aggregate existing LLM token embeddings into a single-token embedding and trained on the samples from those three datasets: (2) Weighted: learning position-wise attention weights to aggregate multi-token embeddings into a single one, followed by a simple linear projection; (3) TRM: employing a single-layer transformer to derive a contextual embedding from the output CLS token; (4) RNN: using a simple GRU model to aggregate multiple token embeddings, with the last hidden state vectors serving as the item representations."
+        },
+        {
+            "section_id": "4.3.2",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.2 Embedding vs. Aggregator",
+            "text": "The embedding-based method cannot be shared across different datasets due to the practical challenge in normalizing item titles. However, the aggregators are shared across different datasets, using the raw text of item titles as inputs. Figure 5 demonstrates that aggregators are not only generalizable across different datasets but also yield superior recommendation accuracy. Interestingly, despite Reddit having a dominant share of training samples (96%) as shown in Table 2, the trained aggregators with mixed data samples perform even better than the dataset-specific new embeddings in Figure 5."
+        },
+        {
+            "section_id": "4.3.3",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.3 Different Aggregators",
+            "text": "Among the three aggregators, the Weighted method demonstrates competitive performance despite its simple architecture. This suggests that the existing token embeddings from the LLMs are effective enough, making the weighted-sum with linear projection a reasonable approach to consolidating token embeddings. Additionally, TRM performs worse than RNN, possibly because (1) titles (e.g., movies) are typically short (fewer than 20 tokens), diminishing the significance of TRM’s advantages over RNN in handling long dependencies; (2) CLS tokens show difficulty in representing a sentence, as noted in the literature (Choi et al., 2021)."
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "Effectiveness of the Adapt Step",
+            "text": ""
+        },
+        {
+            "section_id": "4.4.1",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.1 Component Analysis.",
+            "text": "Table 4 shows introducing bias terms after the reindex step is a simple yet effective strategy. This is attributed to the potential for improving recommendation accuracy by addressing popularity misalignments, as discussed in Figure 1. Additionally, we observe that on the small dataset, INSPIRED, +Bias outperforms +RecSys. This is because the parameter space for learning is significantly reduced, changing from learning item-item relationships to learning item point-wise popularity, which can be effectively captured with a small number of training samples.\n\nMeanwhile, Table 4 demonstrates that introducing traditional RecSys models is effective when there is a large number of training samples available to adapt the recommendation distribution. On larger datasets, this leads to improved recommendation accuracy compared to Cont. and +Bias. However, on the small dataset INSPIRED, using RecSys to learn item-item relationships tends to result in overfitting. This motivates us to consider different adapt steps by cases. For example, after collecting the most recent samples, bias-term adjustment (+Bias) is recommended if the number of new samples is limited. Otherwise, RecSys gating would be a good option."
+        },
+        {
+            "section_id": "4.4.2",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.2 Impact of Bias Term Types",
+            "text": "Both multiplicative and additive bias terms improve accuracy across diverse datasets, though their impact varies. Specifically, multiplicative bias terms exhibit significant improvement on the INSPIRED dataset, whereas additive bias terms play a pivotal role on Reddit-V1.5."
+        },
+        {
+            "section_id": "4.4.3",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.3 Impact of RecSys Model Types",
+            "text": "Our current focus is on ”item-based” RecSys models without incorporating long-term user representations. In this context, FISM and SASRec exhibit enhanced performance. Notably, FISM outperforms SASRec on the INPSIRED dataset, possibly due to the complexity of SASRec, a transformer-based model, being less suitable for smaller datasets. Conversely, on larger datasets such as Reddit-V1.5, SASRec demonstrates superior performance, suggesting that employing transformer-based RecSys models is advantageous when dealing with larger data sizes."
+        },
+        {
+            "section_id": "4.5",
+            "parent_section_id": "4",
+            "section_name": "Discussions",
+            "text": ""
+        },
+        {
+            "section_id": "4.5.1",
+            "parent_section_id": "4.5",
+            "section_name": "4.5.1 Conversational Recommendation Responses",
+            "text": "Figure 6 illustrates the complete pipeline of generating results for conversational recommendation tasks. Our discussions are below:\n\nOn Recommendation. The outputs of the recommendation phase are items. In Figure 6, the three models (Llama2 and its variants under our framework) understand contexts, yielding high-quality recommendations for scary movies. Specifically, Llama2-RTA builds a connection between the superhero movie Avengers: Infinity War in the context and the candidate Wonder Woman, using item-to-item relationships modeled by the SASRec (Kang and McAuley, 2018) model. Meanwhile, multiple recommended items need to align with conversation contexts, and adjusting for the popularity of items on the target platform is crucial for zero-shot LLMs to meet user interests.\n\nOn Generation. The outputs of the generation phase are texts. In Figure 6, the generation phase is accomplished by prompting the Llama2 model. It is noted that our focus in this work is solely on the technical aspects of the recommendation phase. We treat the generation phase as a separate task that can be completed either by existing LLMs or adjusted based on user interface requirements. Still, we make some observations: (1) In many cases, presenting the recommendation phase suffices for users. However, our RTA framework, which introduces only a few additional parameters without changing the weights of the original LLMs, efficiently enables the reuse of LLMs for further generating natural-language responses as shown in Figure 6; (2) In conversational recommendations, there is an ongoing debate about whether to perform the recommendation or generation phase first (Li et al., 2018; Zhou et al., 2020; Wang et al., 2022). Our example suggests that, if the recommendation phase is frequently adjusted (a common scenario due to distribution shift), it is advisable to perform the recommendation phase first and then the generation phase. Reversing the order may lead to text-item inconsistency issues (e.g., the generated response is specifically tailored for a recommended movie, leading to a mismatch with the recommendation from Llama2)."
+        },
+        {
+            "section_id": "4.5.2",
+            "parent_section_id": "4.5",
+            "section_name": "4.5.2 Comparison with Proprietary Models",
+            "text": "To deepen our understanding of the models, we adopt the setting in (He et al., 2023  ###reference_b24###) to query the proprietary model GPT-3.5-t (Schulman et al., 2022  ###reference_b48###). As shown in Table 5  ###reference_###, GPT-3.5-t remains a competitive model for conversational recommendations with zero-shot prompting. However, it is reasonable to guess that, given our LLM-architecture-agnostic approach, improving recommendation accuracy based on GPT-3.5-t is possible if the weights are accessible. A reasonable next step involves working on models similar to GPT-3.5-t, such as Llama2-70b. This could be pursued as future work, if the required compute resources are available."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Related Work",
+            "text": ""
+        },
+        {
+            "section_id": "5.1",
+            "parent_section_id": "5",
+            "section_name": "Conversational Recommendation (CRS)",
+            "text": "The objective of conversational recommender systems (CRS) is to elicit user preferences and deliver tailored recommendations through interactive dialogues. Historically, CRS implementations have ranged from some template-driven systems (Christakopoulou et al., 2016  ###reference_b14###; Lei et al., 2020b  ###reference_b35###, a  ###reference_b34###; He et al., 2022  ###reference_b25###; Zhang et al., 2022  ###reference_b62###) to critique-based approaches (Chen and Pu, 2012  ###reference_b8###; Wu et al., 2019  ###reference_b59###; Li et al., 2021  ###reference_b38###). With the evolution of natural language processing, ”deep” CRS models (Li et al., 2018  ###reference_b37###; Chen et al., 2019  ###reference_b9###; Wang et al., 2022  ###reference_b57###) have been developed, enabling more natural-language interactions.\nResearch indicates the utility of CRS models is enhanced by incorporating diverse supplementary data, such as knowledge-enriched models (Chen et al., 2019  ###reference_b9###; Zhou et al., 2020  ###reference_b65###) utilizing external knowledge bases (Auer et al., 2007  ###reference_b4###; Liu and Singh, 2004  ###reference_b41###), review-centric models (Lu et al., 2021  ###reference_b43###), and session/sequence-oriented models (Zou et al., 2022  ###reference_b66###; Li et al., 2022b  ###reference_b39###).\nUniCRS (Wang et al., 2022  ###reference_b57###) uses knowledge bases (Auer et al., 2007  ###reference_b4###), built on DialoGPT (Zhang et al., 2020  ###reference_b61###) and employing prompt tuning (Brown et al., 2020b  ###reference_b6###), represents a state-of-the-art CRS model on datasets like INSPIRED (Hayati et al., 2020  ###reference_b23###). Recently, an emerging topic is to leverage LLMs in CRS, with (Friedman et al., 2023  ###reference_b19###; He et al., 2023  ###reference_b24###) introducing a novel CRS pipeline, even in the zero-shot setting (He et al., 2023  ###reference_b24###), and (Wang et al., 2023b  ###reference_b56###) focusing on advanced user simulation for LLM evaluation. Our research is the first to study the distribution misalignments in zero-shot LLMs for CRS and solutions for this issue to improve recommendation accuracy."
+        },
+        {
+            "section_id": "5.2",
+            "parent_section_id": "5",
+            "section_name": "Large Language Models (LLMs)",
+            "text": "Recent breakthroughs in natural language processing (NLP) have demonstrated that large language models (LLMs) possess a remarkable capacity for generalizing to unfamiliar tasks and areas (Chowdhery et al., 2022  ###reference_b13###; Brown et al., 2020a  ###reference_b7###; Wei et al., 2022  ###reference_b58###) in zero-shot or few-shot settings. Studies have shown that scaling up LLMs can significantly enhance their performance and efficiency in downstream applications (Kaplan et al., 2020  ###reference_b32###).\nIn line with these developments, LLMs have been successfully applied to various downstream tasks such as question answering, numerical reasoning, code generation, and commonsense reasoning, often without requiring gradient updates (Zheng et al., 2023  ###reference_b64###; Brown et al., 2020a  ###reference_b7###; Li et al., 2022a  ###reference_b40###; Kaplan et al., 2020  ###reference_b32###). The recommendation field has recently begun integrating LLMs, either by adapting LLM architectures (Geng et al., 2022  ###reference_b20###; Cui et al., 2022  ###reference_b16###) or repurposing existing LLMs for recommendation purposes (Li et al., 2023  ###reference_b36###; Wang et al., 2023a  ###reference_b55###; Liu et al., 2023  ###reference_b42###). Our study aligns with the research line of utilizing LLMs for conversational recommendations. We improvements in recommendation accuracy by adjusting item recommendations within the proposed framework."
+        },
+        {
+            "section_id": "5.3",
+            "parent_section_id": "5",
+            "section_name": "LLMs for Recommendation",
+            "text": "There is growing interest in the academic community to harness LLMs for recommendation-related tasks. One research direction explores LLMs within conventional recommendation setup, which typically incorporate user feedback and item metadata (Kang et al., 2023  ###reference_b31###; Hou et al., 2023  ###reference_b27###; Yue et al., 2023  ###reference_b60###; Dai et al., 2023  ###reference_b17###; Bao et al., 2023  ###reference_b5###; Harte et al., 2023  ###reference_b22###; Sanner et al., 2023  ###reference_b47###). This includes tasks such as rating prediction (Kang et al., 2023  ###reference_b31###) and sequential recommendation (Harte et al., 2023  ###reference_b22###; Yue et al., 2023  ###reference_b60###; Hou et al., 2023  ###reference_b27###). In such contexts, employing LLMs as recommenders has shown potential, particularly in scenarios with extreme data sparsity (Bao et al., 2023  ###reference_b5###) or during the cold-start phase (Sanner et al., 2023  ###reference_b47###). However, they often struggle to surpass simpler baseline methods, like non-personalized popularity-based models, in standard recommendation scenarios (Kang et al., 2023  ###reference_b31###; Hou et al., 2023  ###reference_b27###). Nevertheless, enhancing existing recommender systems with features generated by LLMs has yielded improved performance (Agrawal et al., 2023  ###reference_b3###). Another significant research direction focuses on language-centric recommendation tasks (He et al., 2023  ###reference_b24###; Acharya et al., 2023  ###reference_b2###; Mysore et al., 2023  ###reference_b44###; Feng et al., 2023  ###reference_b18###; Friedman et al., 2023  ###reference_b19###). These tasks include generating explanations for recommendations, narrative-based recommendations (Mysore et al., 2023  ###reference_b44###), and conversational recommendations (He et al., 2023  ###reference_b24###; Feng et al., 2023  ###reference_b18###; Friedman et al., 2023  ###reference_b19###). LLMs exhibit proficient performance in understanding intricate textual inputs, allowing for personalized recommendation outputs. Recent investigations in conversational recommendation demonstrate encouraging outcomes leveraging LLMs, even in zero-shot configurations. Our study employs existing LLMs with minimal additional parameters, implementing the Reindex-Then-Adapt framework. Through the reindexing of item content within LLMs and fine-tuning recommendations to align with target data distributions, our framework enhances recommendation accuracy in CRS."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "Conclusion",
+            "text": "This study proposes a solution to mitigate distribution misalignments between zero-shot large language models (LLMs) and target recommendation platforms for conversational recommendations. We conceptualize LLMs as Differential Search Index (DSI) models and introduce the Reindex-Then-Adapt (RTA) framework. The framework involves converting multi-token item titles into single tokens within LLMs (reindex step) and subsequently adjusting their probability distributions (adapt step). By combining the strengths of LLMs and traditional RecSys, the RTA framework achieves improved recommendation accuracy metrics across various conversational recommendation datasets and adaptation settings."
+        }
+    ]
+}

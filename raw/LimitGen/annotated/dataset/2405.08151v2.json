@@ -1,0 +1,180 @@
+{
+    "title": "Benchmarking Retrieval-Augmented Large Language Models in Biomedical NLP: Application, Robustness, and Self-Awareness",
+    "abstract": "Large language models (LLM) have demonstrated remarkable capabilities in various biomedical natural language processing (NLP) tasks, leveraging the demonstration within the input context to adapt to new tasks. However, LLM is sensitive to the selection of demonstrations. To address the hallucination issue inherent in LLM, retrieval-augmented LLM (RAL) offers a solution by retrieving pertinent information from an established database. Nonetheless, existing research work lacks rigorous evaluation of the impact of retrieval-augmented large language models on different biomedical NLP tasks. This deficiency makes it challenging to ascertain the capabilities of RAL within the biomedical domain. Moreover, the outputs from RAL are affected by retrieving the unlabeled, counterfactual, or diverse knowledge that is not well studied in the biomedical domain. However, such knowledge is common in the real world. Finally, exploring the self-awareness ability is also crucial for the RAL system.\n\nIn this paper, we systematically investigate the impact of RALs on 5 different biomedical tasks (triple extraction, link prediction, classification, and question answering). We analyze the performance of RALs in four fundamental abilities, including unlabeled robustness, counterfactual robustness, diverse robustness, and negative awareness. To this end, we proposed an evaluation framework to assess the RALs’ performance on different biomedical NLP tasks and establish four different testbeds based on the aforementioned fundamental abilities. Then, we evaluate 3 representative LLMs with 3 different retrievers on 5 tasks over 9 datasets. The evaluation indicates that while RALs enhance the performance of most biomedical datasets used and demonstrate a degree of counterfactual robustness, they still encounter significant challenges with unlabeled and counterfactual retrieval information, as well as negative awareness.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Related Work",
+            "text": ""
+        },
+        {
+            "section_id": "1.1",
+            "parent_section_id": "1",
+            "section_name": "Retrieval-Augmented Language Models (RALMs)",
+            "text": "Many studies Li & Zhang (2023  ###reference_b11###); Lewis et al. (2020  ###reference_b9###); Guu et al. (2020  ###reference_b4###); Ram et al. (2023  ###reference_b18###); Li et al. (2024a  ###reference_b13###; b  ###reference_b14###), have been proposed to use retrieved information from various knowledge stores to better understand the text or generate the expected output. For example, KIEST Li & Huang (2023  ###reference_b10###) dynamically injects retrieved entity and attribute knowledge from the knowledge graph when generating the entity or attribute in the task of entity stage changes. Lewis et al. (2020  ###reference_b9###) uses the maximum inner product search (MIPS) to find the top-K documents which are combined with a query to predict the answers. To enhance retrieval capability, BiomedRAG Li et al. (2024a  ###reference_b13###) proposes a learned retriever to retrieve the chunk information from the build database and improve the model performance. while CTLP Li et al. (2024b  ###reference_b14###) aims to create a condensed transition graph to improve the link prediction performance, the sample paths between two entities are retrieved to construct the condensed transition graph. RT Li & Zhang (2023  ###reference_b11###) employs a chain of thought and retrieves pertinent labeled sentences to enhance few-shot biomedical named entity recognition (NER) tasks."
+        },
+        {
+            "section_id": "1.2",
+            "parent_section_id": "1",
+            "section_name": "Evaluation of RAL",
+            "text": "Evaluating RALs has received significant attention due to their remarkable general capability. It enables researchers to gain a deeper understanding of the limitations and abilities of LLMs. However, there are few studies Zakka et al. (2024); Xiong et al. (2024) focusing on the evaluation of RAGs in the biomedical domain, primarily centered around question answering tasks. For example, Xiong et al. (2024) evaluated RAG models on five biomedical QA datasets using the zero-shot setting. Almanac Zakka et al. (2024) evaluates the ChatGPT with one retriever and one QA dataset. In contrast to the current work, we offer a broader evaluation across four testbeds and 5 tasks spanning 9 datasets."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "BioRAB: Biomedical Retrieval-Augmented Generation Benchmark",
+            "text": "In this section, we begin by outlining the operational flow of the RALs. Following this, we introduce the proposed four abilities and the building progress of four relevant testbeds. Finally, we introduce the evaluation metrics employed to assess performance.\n###figure_1###"
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "RAL Working Flow",
+            "text": "To solve the hallucination problem, RAL is proposed to retrieve the external knowledge from the corpus and improve the LLM performance. Generally, as shown in Figure 2  ###reference_###(a), retrieved corpus needs to be constructed initially, in numerous question-answering RAL models, the corpus primarily originates from the unlabeled open source such as PubMed, Textbook. However, for some label-sensitive tasks, such as triple extraction, the unlabeled open source may be invalid. In our work, the corpus is defined as the training set for the relevant task. For instance, as illustrated in Figure 2  ###reference_###(a), if \"n\" denotes the PHarmKG, each key corresponds to a sentence what is the relationship between the head entity and tail entity?  in its training set, while the corresponding value denotes the relevant label relationship for that key. In the second step, the retriever is used to obtain the relevant (key, value) pairs from the corpus based on the input sentence. At last, the retrieved (key, value) pairs with the input sentence are fed into the LLM to generate the expected output.\nFor each instance  of each \"n\", there are three components: Instruction , context , and response . For example, in the training dataset of ade-corpus-v2 (classification task), if the label of a sentence : She had been administered tacrolimus for prophylaxis of graft-versus-host reaction is False in the , You are an excellent linguist. The task is to predict whether this sentence is True or False. Examples: context: The hemangioma regressed markedly 6 weeks after the procedure and serous retinal detachment showed marked resolution.response: False, , ."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Defined four Ability of BioRAL",
+            "text": "Despite the RAL has achieved considerable success in solving the hallucination problem, in the biomedical domain, the ability of RAL is underexplored.\nFirstly,\nnot all tasks have vast labeled corpora. While many research endeavors employ the training set as the corpus, they still encounter limitations when contrasted with larger corpora.\nIf a RAL can achieve similar performance to the RAL that utilizes labeled corpus, it would demonstrate the former’s ability to operate effectively without relying on labeled data.\nFor another, the RAL may easily be misled by incorrectly labeled information (as shown in Figure 2  ###reference_###(c)).\nFurthermore, RALs may possess the capability to obtain useful information from labeled corpora of other tasks (as shown in Figure 2  ###reference_###(d)).\nHowever, retrieving knowledge from labeled corpora of other tasks may introduce noise and potentially mislead the generation process.\nFinally, when the retriever retrieves mislabeled (or counterfactual) information, the RAL may possess the ability to discern that the retrieved knowledge is not conducive to output generation (as shown in Figure 2  ###reference_###(e)). To this end, we built the Biomedical Retrieval-Augmented Generation Benchmark (BIoRAB) to evaluate the ability of RAL in the biomedical domain, and we proposed 4 testbeds to test these abilities. In the next, we will detail these four abilities and how to construct the testbeds."
+        },
+        {
+            "section_id": "2.2.1",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.1 unlabeled Robustness (UR)",
+            "text": "Not all tasks have vast labeled retrieval corpus, therefore, for each task, the retriever must gather information from unlabeled corpora, while the RAL may still have the ability to generate the expected results.\nTo evaluate the efficacy of RAL in this regard, we introduce our proposed UR testbed.\nSpecifically, as shown in Figure 2  ###reference_###(b), the corpus of \"n\" is defined as the training set without value(label) for the \"n\". The retriever retrieves the relevant information from this unlabeled corpus. After that, the retrieved Key with the input sentence is fed into the LLM. For example, in the training dataset of ade-corpus-v2 (classification task), if the label of a sentence : She had been administered tacrolimus for prophylaxis of graft-versus-host reaction is False In the , You are an excellent linguist. The task is to predict whether this sentence is True or False, retrieved sentence: A macrophage activation syndrome, possibly related to methotrexate toxicity, developed in a boy with systemic juvenile rheumatoid arthritis, , ."
+        },
+        {
+            "section_id": "2.2.2",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.2 Counterfactual Robustness (CR)",
+            "text": "Constructing a high-quality annotation corpus is challenging work, as it often involves dealing with incorrect data labeling. In our work, these mislabeled instances are called counterfactual instances.\nIn the condition of the mislabeled corpus, the RAL may have the ability to avoid negative information.\nTo validate the counterfactual robustness, we introduced our CR testbed. Specifically, as shown in Figure 2  ###reference_###(c), when constructing the corpus of n, we set the negative rate to be  or  or , corresponding to  or  or  of instances being wrongly labeled. An example of incorrect annotation in a classification dataset would be if there are two labels, \"True\" and \"False.\" If the true class of one instance is \"True,\" then its incorrect annotation would be \"False\".\nSubsequently, the retriever is tasked with retrieving relevant information from this corpus. The retrieved information, along with the input sentence, is fed into the LLM to generate the output."
+        },
+        {
+            "section_id": "2.2.3",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.3 Diverse Robustness (DR)",
+            "text": "Diverse Robustness refers to the ability to incorporate diverse information from various task corpora. On one hand, in numerous scenarios, the corpus from other tasks may contain valuable information to aid in generation. For instance, in the task of triple extraction, if a suitable triple extraction corpus is unavailable, the question-answering corpus may assist in extracting the necessary information. On the other hand, different tasks may introduce noise that could potentially impede the performance of the RAL.\nTo generate better output, it is necessary for RAL to have the ability to retrieve diverse information. So, we introduce our DR testbed, as shown in Figure 2  ###reference_###(d),\nwhen constructing the corpus of \"n\", it incorporates corpora from other tasks. For instance, if \"n\" refers to the Chemprot (triple extraction task), the corpus of \"n\" includes corpora from tasks such as GIT (triple extraction task), PHarmKG (link prediction task), and so on. Next, the retriever is required to extract the pertinent information from the diverse corpus. Subsequently, the retrieved information, along with the input sentence, is fed into the LLM to generate the output."
+        },
+        {
+            "section_id": "2.2.4",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.4 Negative Awareness (NA)",
+            "text": "Negative Awareness evaluates the ability of LLMs to discern whether the retrieved information is negative (it is not conducive to the expected output). In real-world scenarios, if the retriever obtains negative information and the LLM can identify it as such, the LLM can then seek out more useful information to aid in generation based on this feedback. So, we introduce our NA testbed, as shown in Figure 2  ###reference_###(e), we designate all values in the corpus of \"n\" as incorrect labels. After obtaining the retrieved documents from the corpus, the model is expected to produce two types of output. Firstly, task-based output, such as in the task of triple extraction, the output should be triple. Secondly, the model should also provide a judgment on whether the retrieved knowledge is negative or not."
+        },
+        {
+            "section_id": "2.3",
+            "parent_section_id": "2",
+            "section_name": "Evaluation Metrics",
+            "text": ""
+        },
+        {
+            "section_id": "2.3.1",
+            "parent_section_id": "2.3",
+            "section_name": "2.3.1 Task-based Metrics",
+            "text": "In the triple Extraction task, same as BiomedRAG Li et al. (2024a  ###reference_b13###), triple is regarded as correct when its relation type, the\nhead entity, and the tail entity are all correct. For example, in the sentence: Infusion of prostacyclin (PGI2) reportedly attenuates renal ischemic injury in the dog and the rat., triple <Infusion, treats, rat> is regarded as correct while  <injury, treats, rat> is not.\nWe evaluated all the models and reported the evaluation metric, including Micro Precision, Recall, and F1-score. For the text classification, link prediction, and question answering task, we follow the same evaluation metrics as triple extraction. For the natural language inference task, we use the same evaluation metric (Macro F1)."
+        },
+        {
+            "section_id": "2.3.2",
+            "parent_section_id": "2.3",
+            "section_name": "2.3.2 Negative Awareness Metrics",
+            "text": "To assess negative awareness in our study, we define a negative instance as a mislabeled instance. In the first, we need to evaluate the model performance using mislabeled examples. For instance, in the ade-corpus-v2 classification data, with two labels \"True\" and \"False\", this evaluation gauges the performance of \"True\" or \"False\" predictions.\nTypically, in the RAL framework, if the retrieved example contains the input sentence and its expected output, the LLM should achieve 100% performance when tested with the input sentence. Despite all instances in the retrieval corpus being mislabeled, the LLM may still generate the correct output when utilizing these examples. In our experiments, we also investigate this aspect.\nBuilding on this discovery, we delineate two types of negative instances:\nTrue negatives: When the negative instance is provided to the LLM along with the input sentence, resulting in the incorrect output. In this scenario, the number of input sentences is denoted as .\nFalse negatives: When the negative instance is presented to the LLM alongside the input sentence, leading to the correct output. In this case, the number of input sentences is represented as .\nAt the same time, we also expected the LLM could output True - The retrieved example is negative example or False- The retrieved example is not a negative example by providing a specific instruction Please determine whether the retrieved example constitutes negative information. If it is negative, please output False; if it is not negative, please output True for each input sentence.\nFor an input sentence that has false negative examples, if the LLM could output False - The retrieved example is not a negative example, it demonstrates that the LLM recognizes the example as a false negative. After the judgment of LLM, The count of input sentences with \"false negative examples\" is denoted as .\nFor an input sentence that has true negative examples, if the LLM could output True - The retrieved example is a negative example, it demonstrates that the LLM recognizes the example as a true negative. After the judgment of LLM, the count of input sentences with \"true negative examples\" is denoted as .\nSo the true negative awareness rate is calculated by , and the false negative awareness rate is calculated by ."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Experiments",
+            "text": "In this section, we assess RAL’s performance across various biomedical NLP tasks, analyze its efficacy on four proposed testbeds, and discuss its abilities."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Settings and Dataset",
+            "text": "We evaluated three state-of-the-art LLMs: LLamA2-13B (Touvron et al., 2023), MedLLamA-13B (Wu et al., 2023), and LLaMA3 8B, along with three retrievers: BM25 (Luo et al., 2023), Contriver (Izacard et al., 2021), and MedCPT (Jin et al., 2023). We considered five biomedical NLP tasks: triple extraction, link prediction, text classification, question answering, and natural language inference, across eight datasets: ADE, ChemProt, GIT, PHarmKG, Hetionet, Ade-corpus-v2, SemedCLass, and MedMCQA. The data statistics are shown in Table 1. The experiments were conducted using A100 GPUs."
+        },
+        {
+            "section_id": "3.1.1",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.1 Triple Extraction Dataset",
+            "text": "In this paper, we utilized ADE, Chemprot, and GIT as the foundational datasets.\n\nADE (Gurulingappa et al., 2012a) is extended from relation extraction task to triplet extraction task in this paper. All sentences either describe the effect of the drug or the dose of the drug. Thus, the triplets consist of (head entity: drug, relation type: effect, tail entity: effect_description) and (head entity: drug, relation type: dosage, tail entity: dose_description). Among all triplets, there are only two relation types: effect and dosage.\n\nChemProt (Taboureau et al., 2010): The Chemical Protein Interaction Corpus comprises 2432 PubMed abstracts annotated with chemical-protein interactions, encompassing 23 distinct interaction relations. Building upon prior research (Sun et al., 2022), the corpus exclusively considers sentence-level instances, with a particular focus on five prominent interaction types for classification: CPR3, CPR4, CPR5, CPR6, CPR9.\n\nGIT (Li et al., 2023) is a high-quality biomedical triple extraction dataset for non-drug therapies, characterized by its high-quality annotations and comprehensive coverage of relation types. It includes 22 relation types from SemMedDB."
+        },
+        {
+            "section_id": "3.1.2",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.2 Link Prediction",
+            "text": "In this paper, we utilized PHarmKG and Hetionet as the foundational datasets in the link prediction task. PHarmKG is a knowledge graph to describe the relationship among genes, drugs, and diseases. In this work, we aim to predict the four mentioned relation types (Interactions, Disease-Gene, Disease-Chemical, Chemical-Gene) between two entities. During the huge quantity of triples in the PHarmKG, we randomly select 4,000 samples from the source training set for training, 500 samples from the source testing set for testing, and 500 samples from the source validation set for validation. Hetionet is an integrative network of disease, which includes 46 relation types. In our paper, we randomly select 4,000 samples from the source training set for training, 500 samples from the source testing set for testing, and 500 samples from the source validation set for validation."
+        },
+        {
+            "section_id": "3.1.3",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.3 Text Classification",
+            "text": "In this paper, we utilized Ade-corpus-v2 and SemdClass as the foundational dataset in the text classification task. Ade-corpus-v2 (Gurulingappa et al., 2012a) dataset is designed for classifying whether a sentence is ADE (Adverse Drug Reaction)-related (True) or not (False). In our paper, we randomly select 4,000 instances for training, 500 for testing, and 500 for validation. The SemdClass (Vasilakes Jake A, 2018) aims to understand whether the provided triple belongs to the given sentence or not. It includes two classes, False and True."
+        },
+        {
+            "section_id": "3.1.4",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.4 Questing Answering and Natual Language Inference",
+            "text": "In this paper, we utilized MedMCQA as the foundational dataset in the question-answering task. MedMCQA (Pal et al., 2022) is a multi-choice question-answering dataset that is designed to address the medical entrance exam questions. In this work, we opt for the five-choice version (A, B, C, D, E)."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Comparison between RALs with backbone LLMs",
+            "text": "We first benchmark various LLMs and RALs on 9 datasets, the results are shown in Table 2 and Table 3. In the triple extraction task, we observed that RALs outperformed LLMs (specifically RALs without a retriever), achieving better performance. For example, RALs (MedLLaMA 13B with Contriever) enhanced the original MedLLaMA 13B by 22.37%, in terms of F1 score on the ADE dataset. However, RAL still faces challenges in entity recognition. For example, in ADE, LLaMA2-13B gets the best performance when compared to LLaMA2-13B with retrievers. Another interesting finding is that models with bigger parameters may not necessarily yield the best performance. For instance, on the ChemProt, LLaMA3-8B with Contriver outperforms other RALs with larger parameter sizes.\n\nRALs have also been evaluated as effective in improving the performance of LLMs across tasks such as link prediction, text classification, and natural language inference. RALs (LLaMA2 13B with Contriever) enhanced the original LLaMA2 13B by 0.40%, in terms of F1 score on the PHarmKG dataset, RALs (MedLLaMA 13B with BM25) enhanced the original MedLLaMA 13B by 11.86%, in terms of F1 score on the Hetionet dataset, RALs (LLaMA2 13B with MedCPT) enhanced the original LLaMA2 13B by 0.40%, in terms of F1 score on the Ade-corpus-v2 dataset, RALs (LLaMA2 13B with Contriever) enhanced the original LLaMA2 13B by 1.67%, in terms of F1 score on the SemClass dataset.\n\nOn MedMCQA, our findings differ from other works Xiong et al. (2024) as we observed that LLMs outperform RALs in achieving the best performance, we speculate that the reason for this discrepancy lies in the nature of label-not-sensitive tasks, where RALs have the capability to retrieve large corpora such as PubMed White (2020) or other relevant datasets. In our study, however, our corpus is derived solely from the training set, which may limit the breadth of knowledge accessible to the RALs."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "Results and Discussion on Testbed1: Unlabeled Robustness",
+            "text": "We evaluate the model performance based on the unlabeled corpus, and the results are shown in Table 4 and Table 5. We have the following observations:\n\n(1) RAL utilizing the unlabeled corpus exhibits lower performance compared to RAL utilizing the labeled corpus. RALs have demonstrated a strong dependence on the labeled corpus, especially on the label-intensive tasks. For instance, with labeled corpus, the performance of RAL surpasses that of RAL without labeled corpus by 26.41% on ADE.\n\n(2) Even without an unlabeled corpus, RAL still contributes to improving LLM performance in certain tasks. As shown in Table 4, on Chemprot and Hetionet, RAL utilizing an unlabeled corpus could enhance the original LLM’s performance by 30.16% and 0.06%, respectively. We speculate that LLMs may possess sufficient knowledge to contribute to enhancing model performance on specific datasets."
+        },
+        {
+            "section_id": "3.3.1",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.1 Error Analysis",
+            "text": "To better understand the impact of the unlabeled corpus on model generation, this section primarily analyzes the RAL performance on ADE and GIT, which exhibited the poorest performance among the datasets used. We primarily summarize two error types. We observed that with the unlabeled corpus, RAL tends to generate redundant information and struggles to accurately predict the output, such as the head entity or relation type in the triple extraction task."
+        },
+        {
+            "section_id": "3.4",
+            "parent_section_id": "3",
+            "section_name": "Results and Discussion on Testbed2: Counterfactual Robustness",
+            "text": "We evaluate the model performance based on different counterfactual rates, and the results are shown in Table 7  ###reference_### and Table 8  ###reference_###. We have the following observations:  \n(1) Counterfactual corpus posses a challenge for RALs. On ChemProt, counterfactual instances significantly influence the model performance. For instance, when the counterfactual rate is set to 80%, the triple F1 drops to 47.79%, showcasing a considerable disparity compared to the triple F1 performance on the labeled corpus. Similar observations are noted in GIT, PharmKG, ADE-corpus-v2, SemClass. This suggests that RALs can be easily misled by counterfactual corpus.  \n(2) A lower counterfactual rate may have a reduced impact on RALs. On ADE and Hetionet, we observed that when the counterfactual corpus is set to 20%, the model performance is better than the factual corpus. We speculate that retrievers have a greater chance of obtaining useful information when the counterfactual rate is lower.  \n(3) The counterfactual corpus can still contribute to improving LLM performance. On ADE, ChemProt, GIT, PHarmKG, Hetionet, Ade-corpus-v2, SemClass, MEdMCQA. The interesting finding is that even with a counterfactual corpus, the RAL performance often surpasses the original LLM. We speculate that the counterfactual corpus may have a beneficial effect on LLMs. Despite the content of the instances being counterfactual, the provided templates still aid in generation.  \n(4) Counterfactual rates and model performance are not inversely proportional. This finding contradicts human intuition. In some datasets, such as SemClass, when the counterfactual rate is higher, the model performance also improves. This suggests that RALs possess a certain ability to handle counterfactual facts."
+        },
+        {
+            "section_id": "3.5",
+            "parent_section_id": "3",
+            "section_name": "Results and Discussion on Testbed3: Diverse Robustness",
+            "text": "We evaluate the model performance of diversity robustness, and the results are shown in Table 9 and Table 10. We have the following observations: The diversity-labeled corpus poses a challenge to improve RALs. We found that RALs consider the knowledge in the diverse corpus as noise, which could potentially impact RAL performance, particularly evident in ADE and MedMCQA datasets."
+        },
+        {
+            "section_id": "3.5.1",
+            "parent_section_id": "3.5",
+            "section_name": "3.5.1 Error Analysis",
+            "text": "On ADE, we discovered that the Diversity-labeled corpus also leads to redundancy in RAL generation, for instance, in sentence easily reversible hypoxemia and hypotension induced by nimodipine., the expected tail entity is hypotension, while RAL regarded the hypoxemia and hypotension induced by nimodipine. as the entity. It also struggles with extracting complex entities. For example, in the sentence clinical, spectroscopic, and imaging abnormalities resolved with discontinuation of metronidazole, clinical, spectroscopic, and imaging abnormalities is considered the ground truth, while RAL regards the entire sentence clinical, spectroscopic, and imaging abnormalities resolved with discontinuation of metronidazole as a single entity. In summary, we find that the primary challenge lies in entity recognition, especially in the recognition of tail entities. On MedMCQA, we observed that error generation primarily stemmed from misjudgment. For instance, in sentence Question: All of the following muscles are elevators of the mandible EXCEPT: Options: (A) Digastric; (B) Masseter; (C) Medial pterygoid; (D) Temporalis, the ground truth is A, while RAL generates the D."
+        },
+        {
+            "section_id": "3.6",
+            "parent_section_id": "3",
+            "section_name": "Results and Discussion on Testbed4: Negative Awareness",
+            "text": "We evaluate the model performance of negative awareness, and the results are shown in Table 11. We have the following observations: RAL poses a challenge to the Negative Awareness. The true negative awareness rate on PharmKG was zero, and it was only 1.07% on ADE. Interestingly, the overall performance of fake negative awareness is better than that of true negative awareness. This suggests that RALs still struggle with self-awareness regarding which examples could provide useful information for generations."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Conclusion",
+            "text": "In this paper, we assess the performance of RALs on five distinct biomedical NLP tasks, while also evaluating their robustness and self-awareness abilities. To conduct the evaluation, we build a biomedical retrieval-augmented generation benchmark (BIoRAB), which mainly includes four testbeds."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Limitations",
+            "text": "In this study, we utilized the training set as the retriever corpus for the question-answering task. However, several studies utilize larger corpora with richer knowledge in the question answering task, such as PubMed and Wikidata. In other tasks such as link prediction, augmenting the size of the labeled corpus remains a formidable challenge. Additionally, three retrievers select the most relevant instance of the input sentence as an example. We strive to ensure the validity of our comparisons, but it’s important to note that our findings and results are confined to the dataset, RALs we utilized."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "Acknowledgements",
+            "text": "This work was supported by the National Institutes of Health’s National Center for Complementary and Integrative Health grant number R01AT009457 and National Institute on Aging grant number R01AG078154. The content is solely the responsibility of the authors and does not represent the official views of the National Institutes of Health."
+        }
+    ]
+}

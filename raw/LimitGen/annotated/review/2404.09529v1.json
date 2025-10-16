@@ -1,0 +1,150 @@
+{
+    "title": "Prepacking: A Simple Method for Fast Prefilling and Increased Throughput in Large Language Models",
+    "abstract": "During inference for transformer-based large language models (LLM), prefilling is the computation of the key-value (KV) cache for input tokens in the prompt prior to autoregressive generation. For longer input prompt lengths, prefilling will incur a significant overhead on decoding time. In this work, we highlight the following pitfall of prefilling: for batches containing high-varying prompt lengths, significant computation is wasted by the standard practice of padding sequences to the maximum length. As LLMs increasingly support longer context lengths, potentially up to 10 million tokens, variations in prompt lengths within a batch become more pronounced. To address this, we propose prepacking, a simple yet effective method to optimize prefilling computation. To avoid redundant computation on pad tokens, prepacking combines prompts of varying lengths into a sequence and packs multiple sequences into a compact batch using a bin-packing algorithm. It then modifies the attention mask and positional encoding to compute multiple prefilled KV-caches for multiple prompts within a single sequence. On standard curated dataset containing prompts with varying lengths, we obtain a significant speed and memory efficiency improvements as compared to the default padding-based prefilling computation within Huggingface across a range of base model configurations and inference serving scenarios.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "Transformer-based large language models (LLMs) have emerged as a powerful general purpose tool to service natural language queries (Bai et al., 2022  ###reference_b4###; Touvron et al., 2023  ###reference_b26###; Achiam et al., 2023  ###reference_b1###).\nAs language models continue to grow in scale and their usage proliferates across various domains (Eloundou et al., 2023  ###reference_b7###), the capability to generate tokens with optimal speed and efficiency becomes increasingly paramount.\nThe challenges of optimizing LLMs are unique compared to traditional software. LLMs are useful due to their generality, which means they can receive very diverse prompts, from short questions to long summarizing tasks. Due to the quadratic runtime of a Transformer, longer prompts require much more computation than short prompts. When long and short prompt queries are requested at the same time, the challenge of LLM inference is to route the queries in a manner that more computational resources are allocated where needed. In the current LLM paradigm, this poses a dilemma that worsens with increasing model scale due to longer, more compute-demanding queries. As an example, recent efforts are aimed at expanding the context window of LLMs to accommodate up to one million tokens and beyond (Reid et al., 2024  ###reference_b23###). The increasing diversity and complexity of queries demand a more efficient approach to computational resource allocation than ever before.\nThe conventional approach to LLM inference with varied size inputs is inefficient, and it is exemplified by the Huggingface Transformers library  (Wolf et al., 2020  ###reference_b28###). The Huggingface library has seen widespread adoption in the NLP community. Despite its wide use, Huggingface handles prompts of varying lengths by padding all prompts to match the length of the longest sequence and processing the batch through a Transformer model in its entirety. This results in substantial memory utilization and computational inefficiency. While LLMs are compute-bound during prefilling, they are also memory-bound during generation (Kwon et al., 2023  ###reference_b13###),\nso it is crucial to optimize memory and GPU utilization to enable efficient inference and scalability.\n###figure_1### In this work, we mitigate wasteful computation with an alternative pre-processing step called prepacking. Prepacking is specifically aimed at improving the speed and memory usage of LLM prefilling, which is the initial computation that populates the Key-Value cache (KV cache) preceding generation. Prepacking is conceptually simple; rather than padding every sequence to the same length, we pack multiple prompts together in place of padding tokens using an off-the-shelf bin-packing algorithm. This is made possible by custom attention masking and positional encoding\nthat enable the computation of a batch within a single sequence. The positional encoding restarts its index for each prompt in the sequence and the mask prevents prompts from attending to previous prompts in the packed sequence (Figure 1  ###reference_###). A forward pass on the pre-packed batch will populate a KV cache, which we can unpack to get the cache for the original prompts for next token generations.\nWe empirically demonstrate that prepacking leads to a speedup of up to 6x in prefilling and time-to-first-token (TTFT) compared to the full batching method used in Huggingface tested on NVIDIA A6000 GPUs. To evaluate prepacking’s runtime performance under conditions representative of real-world user traffic, we tested it across six diverse language datasets, encompassing tasks such as question answering, summarization, instruction following, language modeling, and human preference modeling, with language models ranging from 1B to 13B parameters. Prepacking achieves greater speedup when the sequences within a batch exhibit more diverse length variations and when the batch size is large. Additionally, we demonstrate that prepacking is a simple method for increasing LLM throughput, especially in memory-constrained settings. Specifically, prepacking significantly reduces memory consumption by allowing up to 16x larger batch size during prefilling. Beyond prefilling, we also demonstrate in premilinary experiments that prepacking can bring significant speedup and memory saving during generation."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Preliminaries",
+            "text": ""
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "Transformer Architecture",
+            "text": "The decoder-only Transformer (Vaswani et al., 2017  ###reference_b27###; Radford et al., 2019  ###reference_b22###) is ubiquitous in its use as the deep learning architecture for autoregressive LLMs. The core component of the Transformer is self-attention. Self-attention operates on input sequences  and is parameterized with matrices .\nWe can write self-attention as follows\nwhere  is an  attention matrix.\nThus, a Transformer forward pass will have an  runtime where  is the length of the input.\nTo preserve autoregressive dependencies, an  mask  is applied to  such that “past” tokens cannot attend to “future” tokens. Finally, while attention itself is permutation-equivariant, the inputs  typically incorporate positional information through the use of positional embeddings."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Language Model Inference",
+            "text": "Autoregressive sampling requires a forward pass through the Transformer for each new token generated. To avoid wastefully recomputing the attention matrix each forward pass, caching is standard practice at inference time. Sampling the -th token autoregressively requires computing the attention matrix for  previous tokens. When we generate the -th token, instead of computing an  attention matrix, we can cache the keys and values over the first  tokens to avoid redundant computation, and so on for . This technique is known as KV caching (Pope et al., 2023  ###reference_b21###).\nPrefilling is the population of the KV cache on the initial forward pass. In a typical text generation inference framework, a model will be run on a batch of  prompts that, when tokenized, have lengths . Because a Transformer takes tensor input, the batch will be padded to the maximum length . For the sake of simplicity, assume no parallelization over a batch. Although GPUs can parallelize computation over batches, we will argue in future sections that batch parallelization in practice has empirical limitations. Thus, under these assumptions the forward pass for prefilling will run in time ."
+        },
+        {
+            "section_id": "2.3",
+            "parent_section_id": "2",
+            "section_name": "Performance Metrics",
+            "text": "Key metrics for evaluating LLM serving (Miao et al., 2023  ###reference_b18###) include latency measures such as Time-to-First-Token (TTFT), the time required for prefilling the KV cache and generating the first token, and Time-per-Output-Token (TPOT), the average time to generate each subsequent token. Together, these determine the total generation time. Throughput measures the number of requests processed per unit time. In this work, we focus on optimizing the prefilling stage by evaluating prefilling time and TTFT metrics. This is particularly important for assessing the overall responsiveness of any deployed system."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Prepacking",
+            "text": "Although padding input prompts to the maximum length allows tensorized batch computation, the drawback is that significant computation is wasted on pad tokens. We propose a simple solution: insert more short prompts where padding was previously located. Because this method “packs” prompts together to speed up prefilling, we refer to this method as prepacking. In formal terms, we have a set of  prompts  of lengths , and our goal is to create a tensorized batch , where  are sequences that contain the original prompts such that . The full algorithm is shown in Algorithm 1  ###reference_###.\nNote that the above analysis assumes no parallelization over a batch. With perfect batch parallelization, prepacking will have better memory performance but no time improvement. We show empirically that GPUs cannot parallelize over batches without limitation. To show this, we sample a tensor of dimension , that is batch size  and prompt length . In Figure 2  ###reference_###, we demonstrate that for a fixed , increasing  results in a higher latency. As the batch size grows, constraints such as memory bandwidth and synchronization overhead become more pronounced (Yuan et al., 2024  ###reference_b32###). Prepacking exploits this by reducing batch size for a fixed sequence length . Figure 3  ###reference_### illustrates an actual packing done by prepacking which greatly reduces paddings."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Bin Packing",
+            "text": "The problem of packing prompts together can be cast as a bin packing problem, where a bin can contain tokens from several different sequences. The goal of prepacking is to efficiently concatenate prompts together such that original prompts with lengths  are placed into the smallest possible  bins, each of a fixed sized. It is guaranteed that . We shall select , where  is the maximum prompt length as previously defined, to be the fixed size of the bins. For sequences that do not completely reach size  after bin-packing, they will be padded to reach .\nNote that we choose the smallest possible constant for our bin size because the bin size will incur quadratic running time. In general, bin packing is an NP-hard problem (Garey & Johnson, 1979  ###reference_b8###), but many heuristic approaches exist obtain approximate solutions (Buljubašić & Vasquez, 2016  ###reference_b5###). We use a First-Fit Decreasing bin packing heuristic as implemented by Maier (2021  ###reference_b16###)."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Prompt-wise Independent Masking and Restart Positional Encoding",
+            "text": "Prepacking will concatenate multiple smaller prompts under a single bin. Simply using the KV-cache of this packed sequence will be incorrect, because every prompt within the bin will attend causally to previous prompts. As a remedy, we create a custom attention mask to prevent items from attending to each other.\nWe refer to this masking strategy as independent masking. We describe our masking strategy below and illustrate it in Figure 1  ###reference_###.\nFormally, consider a causal (lower triangular) attention mask  , where entry  signifies that token  can attend to  and . An independent mask  is a mask such that for all indices  that mark the start and end of a prompt, , where  is an  lower triangular matrix. All other entries will be 0. Creating the attention mask and extracting the resultant KV-cache requires a certain amount of bookkeeping for tracking lengths of sequences and indices, but these operations contribute an insignificant (linear) overhead compared to the Transformer forward pass.\nLastly, we need to modify the positional encodings for the packed sequences. In general, the Transformer architecture is permutation equivariant  (Naseer et al., 2021  ###reference_b19###), so the purpose of positional encodings (PE) is to give the model information about the position of a token in a sequence. Thus, in a prepacked sequence, we must edit the PEs for the tokens such that it is the same as it was in the unpacked prompts. This leads to positions that “restart” in the packed sequence at the beginning of any new prompt, hence the name restart positional encoding. With packed batches, independent masks, and restart PEs, we can compute and prefill the KV cache for each prompt and use it for autoregressive generation using any decoding algorithm."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "Runtime Analysis",
+            "text": "With Algorithm 1  ###reference_###, we are guaranteed to compute the exact KV caches as a padded, full-batching method.\nNext, we analyze the gains during the prefilling stage using our approach.\nLet the sum of prompt lengths over the batch be denoted by .\nIn the best case scenario, our bin packing algorithm is able to pack every prompt into bins with no additional padding. Then we can express the number of bins as .\nWe can now find the runtime of prefilling a batch with prepacking and compare it to the naive method.\nThe final inequality holds because the average length must be less than or equal to the maximum length. Also note that the prepacking algorithm itself runs in  time which is insignificant toward the overall runtime. Thus, we find that prepacking will outperform the naive padding approach in the best case scenario. In the worst case scenario, we cannot reduce the number of bins from the original batch size and  will lead to the same runtime. We shall show in our experiments that datasets tend to have enough length variation such that  is a comfortable assumption in practice, and the differences between the naive method and prepacking can be stark.\n###figure_2### ###figure_3### ###figure_4### Note that the above analysis assumes no parallelization over a batch. With perfect batch parallelization, prepacking will have better memory performance but no time improvement. We show empirically that GPUs cannot parallelize over batches without limitation. To show this, we sample a tensor of dimension , that is batch size  and prompt length . In Figure 2  ###reference_###  ###reference_###, we demonstrate that for a fixed , increasing  results in a higher latency. As the batch size grows, constraints such as memory bandwidth and synchronization overhead become more pronounced (Yuan et al., 2024  ###reference_b32###  ###reference_b32###). Prepacking exploits this by reducing batch size for a fixed sequence length . Figure 3  ###reference_###  ###reference_### illustrates an actual packing done by prepacking which greatly reduces paddings."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Experiments",
+            "text": "We empirically show the significant throughput improvements and GPU memory savings achieved by prepacking across real-world datasets with diverse length distributions. Our comprehensive evaluation spans language models of varying architectures and scales, ranging from 1.3B to 13B parameters. With constraints on our academic budget, all experiments are conducted on a single NVIDIA 48GB A6000 GPU connected to a Colfax CX41060s-EK9 4U Rackmount Server with AMD EPYC (Genoa) 9124 processors."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Datasets and Models",
+            "text": "To profile prepacking’s runtime performance under conditions representative of real-world user traffic, we evaluate on a diverse suite of datasets spanning question answering, summarization, instruction following, language modeling, and human preference modeling. Specifically, we use the MMLU (Hendrycks et al., 2021a  ###reference_b10###), SamSum (Gliwa et al., 2019  ###reference_b9###), Alpaca (Taori et al., 2023  ###reference_b25###), Wikitext (Merity et al., 2016  ###reference_b17###), and Anthropic HH RLHF (Bai et al., 2022  ###reference_b4###) datasets. While not actually evaluating task performance, we leverage the variety of formats and prompt length distributions present in these datasets to simulate the diverse input queries a LLM may encounter from user requests in production environments. Due to computational constraints, we subsample 1000 prompts from each dataset, and the lengths statistics are presented in Table 2  ###reference_###.\nWe profile a range of language models to comprehensively assess runtime impacts of scale and architecture choices: the 1.3B Sharded LLAMA (Xia et al., 2023  ###reference_b29###), 7B LLAMA 2 (Touvron et al., 2023  ###reference_b26###) and Mistral (Jiang et al., 2023  ###reference_b12###), and 13B LLAMA 2 (Touvron et al., 2023  ###reference_b26###) spanning 1.3B to 13B parameters with varying configurations shown in Appendix Table 3  ###reference_###. We profile them with 4 bit or 8 bit quantization due to computational constraints. Since prepacking aims to reduce wasted computation and memory on padding within batches, for fair evaluation, we do not manually construct batches. Instead, we use actual datasets to randomly sample batches and obtain aggregate metrics with respect to diverse prompt lengths. This also reflects a more realistic setting in which the flow of queries cannot be controlled."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Baselines",
+            "text": "Full Batching: As implemented by Huggingface, this method first determines the maximum prompt length across the batch and appends special padding tokens to shorter prompts until they match the maximum length. It then generates corresponding attention masks to ensure that the language model disregards the padded tokens during computation. Huggingface’s inference framework (Wolf et al., 2020  ###reference_b28###) employs this approach for handling prompts of variable lengths, serving as the basis for this baseline’s profiling.\nLength-Ordered Batching: This baseline assumes access to the full set of user requests, serving as an oracle baseline that can first sort the inputs according to their lengths and sample batches in order to minimize the padding required when using the Full Batching. This method reduces computational overhead on paddings. However, it is not practical in real-world scenarios where user requests arrive in an unpredictable order, and the entire set of requests is not available upfront. In contrast, prepacking does not rely on this assumption, making it more suitable for handling dynamic and continuous streams of input prompts.\n###figure_5###"
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "Prefilling Time and TTFT",
+            "text": "We compare the prefilling time and Time-to-First-Token (TTFT) between prepacking and Full Batching across datasets and models in Figure 4  ###reference_###. TTFT measures the total time required for prefilling the KV cache and generating the first token. For our method, TTFT additionally includes an overhead which is the unpacking phase, where we unpack the prompts to their original order for generation. This unpacking phase has a linear time complexity in the number of prompts, which is dominated by the quadratic computational complexity of prefilling. Prepacking consistently outperforms Full Batching with less prefilling time and TTFT, enhancing speed ranging from 1.6x to 3.5x. Moreover, Prepacking has lower inference time standard deviations, attributed to reduced padding overhead, enabling more reliable and predictable performance suitable for applications demanding consistent LLM serving."
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "GPU Memory Saving and Utilization",
+            "text": "We evaluate Prepacking’s GPU memory efficiency, stemming from reduced computation on padded tokens, against other baselines in Figure 5  ###reference_###. Prepacking consistently exhibits lower peak memory consumption, which directly translates to the ability to process larger batch sizes without encountering out-of-memory errors. For instance, with the Llama2-1.3B model on the MMLU dataset, prepacking can accommodate batch sizes up to 16x larger during prefilling compared to Full Batching before encountering OOM. This has significant implications for deploying models in resource-constrained environments, where maximizing hardware utilization is crucial. Consequently, as shown in Appendix Figure 13  ###reference_3###, Prepacking also exhibits lower GPU utilization when operating with the same batch size as the baselines, owing to its reduced computational overhead.\n###figure_6###"
+        },
+        {
+            "section_id": "4.5",
+            "parent_section_id": "4",
+            "section_name": "Enhanced Speedup with Increasing Batch Sizes",
+            "text": "In realistic situations, the distribution of batch sizes encountered during language model inference can fluctuate due to non-uniform user requests arrival patterns. To evaluate our method’s effectiveness in handling this variability, we conducted experiments across a range of batch sizes for the Llama2-7B and Llama2-1.3B models. The results shown in Figure 6  ###reference_### demonstrate substantial speedup gains achieved by our approach over Full Batching. Larger batch sizes exhibit greater performance improvements with our method, up to 4.5x and 6x speedup for the 7B and 1.3B Llama2 models, respectively. This trend stems from the increased likelihood of diverse prompt lengths within larger batches, which leads to more padding overhead for Full Batching. In contrast, our method efficiently handles variable-length prompts via bin-packing, mitigating this overhead.\n###figure_7###"
+        },
+        {
+            "section_id": "4.6",
+            "parent_section_id": "4",
+            "section_name": "Dataset Prepacking vs Length-Ordered Batching",
+            "text": "In the previous experiments, we apply prepacking on randomly sampled batches from each dataset. However, this assumes the inability to control the contents of each batch. Given the ability to determine batches, a method to padding inefficiency would be to sort the dataset by length and batch accordingly. We refer to this baseline as Length-Ordered Batching. Alternatively, we can create batches after performing prepacking on the dataset as a whole and apply prepacking, i.e. Dataset Prepacking. We find that even in this scenario, where one might expect length-ordered batching to have a near optimal runtime by reducing the number of pad tokens, we observe prepacking still exhibits improvements as shown in Figure 7  ###reference_###, where we compare the prefilling time per prompt.\n###figure_8###"
+        },
+        {
+            "section_id": "4.7",
+            "parent_section_id": "4",
+            "section_name": "How does the performance gain scale with characteristics of lengths within a batch?",
+            "text": "Previously in Section 3.3  ###reference_###, we find the runtime of full batching is . Prepacking is , where  is the original batch size,  is the batch size after prepacking, and  is the maximum prompt length. Therefore, we can estimate the speedup as a function of  (Batch Size Reduction). Because in practice it is difficult to predict  from the dataset statistics alone, we can also estimate the speedup as a function of  (Max Absolute Deviation), which is how much the maximum length of a batch deviates from the mean length. We conduct the analysis on 5000 synthetic prompts with lengths uniformly distributed from 1 to 512, using the Llama2 1.3B model with batch size of 32. As can be seen in Figure 8  ###reference_###, these metrics can predict the speedup obtained by using prepacking over full batching. We show more plots with different model and batch size in Appendix 11  ###reference_###.\n###figure_9###"
+        },
+        {
+            "section_id": "4.8",
+            "parent_section_id": "4",
+            "section_name": "Prepacking for Generation",
+            "text": "Beyong prefilling, the concept of packing holds great promise for LLM generation. Padding is also a problem for generation because when new tokens are generated, their queries must be dotted with cached keys and values, which inevitably contains padding. With a similar technique to prepacking, we can bin-pack the KV caches of larger batch sizes with varying lengths into smaller batch sizes at generation time, saving memory that would be otherwise wasted on padding. We present preliminary results using a vanilla implementation of generation with prepacking and Llama2 1.3B on a toy batch of size 10, where 9 of the prompts are of length 1 and one prompt is of length 1000. We show the memory usage and generation time (excluding prefilling) for the next 20 tokens in Table 1  ###reference_###. Prepacking uses 56% less peak GPU memory and offers 35% faster generation times. While the use of packing for generation is a promising direction for future work, it is beyond the scope of this paper."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Related Works",
+            "text": ""
+        },
+        {
+            "section_id": "5.2",
+            "parent_section_id": "5",
+            "section_name": "LLM Serving",
+            "text": "A relevant line of work takes a networking perspective on LLMs, in which a model must be “served” to clients that make requests. The core problem LLM serving addresses is the scheduling of inference, creating dynamic schedulers that optimize for throughput and latency. FasterTransformer (NVIDIA, 2021  ###reference_b20###) increases decoding throughput but schedules at the request-level. To address this, Orca  (Yu et al., 2022  ###reference_b31###) proposes iteration-level scheduling which processes requests at finer granularity than a batch. PagedAttention in vLLM  (Kwon et al., 2023  ###reference_b13###) reduces KV-cache memory fragmentation with techniques inspired by virtual memory with paging. More recent and concurrent works such as Sarathi-Serve  (Agrawal et al., 2024  ###reference_b2###) and DistServe  (Zhong et al., 2024  ###reference_b33###) optimize a trade-off involving pre-filling and decoding. In our work, we specifically target pre-filling only. As such, our work directly improves TTFT and is complementary to other works that seek to improve decoding efficiency and throughput while minimizing stalling."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "Conclusion",
+            "text": "We proposed prepacking, a simple and effective approach to optimize the prefilling computation for LLMs during inference. Our evaluation on typical datasets with varying prompt lengths demonstrates significant speedups compared to standard prefilling computation in Huggingface’s implementation. As language models continue to scale and support longer context lengths, addressing the inefficiencies associated with prefilling computation becomes crucial for optimizing inference speed and computational resource allocation. Prepacking provides a promising solution to this challenge, enabling more efficient inference for prompts with varying lengths.\nIn the future, we plan to explore more complex decoding strategies post-prefilling that also incorporate bin packing for further increase in throughput."
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "Appendix",
+            "text": ""
+        },
+        {
+            "section_id": "8",
+            "parent_section_id": null,
+            "section_name": "Mean GPU utilization comparison",
+            "text": "###figure_10###"
+        },
+        {
+            "section_id": "9",
+            "parent_section_id": null,
+            "section_name": "Dataset length distribution statistics",
+            "text": ""
+        }
+    ]
+}

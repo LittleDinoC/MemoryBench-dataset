@@ -1,0 +1,126 @@
+{
+    "title": "Unveiling Key Aspects of Fine-Tuning in Sentence Embeddings: A Representation Rank Analysis",
+    "abstract": "The latest advancements in unsupervised learning of sentence embeddings predominantly involve employing contrastive learning-based (CL-based) fine-tuning over pre-trained language models. In this study, we analyze the latest sentence embedding methods by adopting representation rank as the primary tool of analysis. We first define Phase 1 and Phase 2 of fine-tuning based on when representation rank peaks. Utilizing these phases, we conduct a thorough analysis and obtain essential findings across key aspects, including alignment and uniformity, linguistic abilities, and correlation between performance and rank. For instance, we find that the dynamics of the key aspects can undergo significant changes as fine-tuning transitions from Phase 1 to Phase 2. Based on these findings, we experiment with a rank reduction (RR) strategy that facilitates rapid and stable fine-tuning of the latest CL-based methods. Through empirical investigations, we showcase the efficacy of RR in enhancing the performance and stability of sentence embedding methods.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "Learning sentence embeddings, which refer to the vectorized representations reflecting the semanticity of given textual inputs, is an essential task in the field of natural language processing (NLP). Contrastive Learning-based (CL-based) models have emerged as predominant approaches in the field of sentence embedding (Chuang et al., 2022; Jiang et al., 2022b; Wu et al., 2022a; Zeng et al., 2022; Wu et al., 2021; Zhang et al., 2022; Jiang et al., 2022a; Klein and Nabi, 2022).\n\nContrastive learning has showcased remarkable performance across various domains, including visual self-supervised learning (Chen et al., 2020) and multi-modal learning (Radford et al., 2021). Consequently, numerous studies have focused on deepening our understanding of contrastive learning. However, contrastive learning for sentence embedding is distinct in that it is employed as a fine-tuning method on a pre-trained language model. A pre-trained language model already possesses a range of natural language processing capabilities (Devlin et al., 2018; Hewitt and Manning, 2019). Therefore, fine-tuning must ensure the preservation of linguistic abilities beneficial for sentence embedding while simultaneously reducing the contrastive loss, which directly impacts the Semantic Textual Similarity (STS) task performance. When fine-tuning with contrastive loss, the embeddings must be adequately represented to enable cosine similarity, the predominant metric for utilizing and evaluating semantic embeddings, to serve effectively as the primary tool for semantic analysis.\n\nDespite these distinctions, most of the existing studies have primarily focused on enhancing STS performance and have provided only limited analysis directly related to their proposed methods. Recently, there has been a notable emphasis on utilizing representation rank for the analysis of deep learning models (Zhuo et al., 2023; Garrido et al., 2023; Kim et al., 2023). Inspired by these recent works, we conduct an in-depth analysis of CL-based fine-tuning by thoroughly investigating representation rank and several key aspects closely related to it. Specifically, we examine uniformity and alignment, linguistic abilities, and the correlation between STS performance and rank. All these key aspects are analyzed in conjunction with Phase 1 and Phase 2 of fine-tuning, which are defined based on when representation rank peaks during the fine-tuning process. We observe and report a strong linkage with representation rank for all the key aspects.\n\nMotivated by these strong findings, we conduct experiments incorporating a rank regularization approach, specifically Rank Reduction (RR) regularizer, during the training of CL-based models. The experimental results highlight the effectiveness of RR in reducing rank, leading to increased sentence embedding performance and enhanced stability. Indeed, various CL-based models have demonstrated a trend towards decreasing rank and increasing performance in their evolution, as illustrated in Figure 1.\n\nThis study enhances our understanding of contrastive learning-based fine-tuning of language models through representation rank analysis. Our analysis relies on defining two distinct phases of fine-tuning process, wherein key aspects can be affected in opposite manners in the two phases. We demonstrate adjusting rank is effective for performance enhancement and straightforward to implement."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Background and Related Works",
+            "text": ""
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "Contrastive Learning-Based Models",
+            "text": ""
+        },
+        {
+            "section_id": "2.1.2",
+            "parent_section_id": "2.1",
+            "section_name": "2.1.2 Models Adopting the Framework of SimCSE",
+            "text": "Various CL-based models have been proposed to analyze the relationship between representational rank and sentence embedding performance. Below is a brief description of some models selected based on performance and reproducibility.\n\nESimCSE (Wu et al., 2021) addresses length bias between positive sentence pairs by repeating parts of the input text and employing momentum contrast to increase the number of negative pairs. Through these strategies, ESimCSE effectively mitigates length bias while improving sentence embedding performance.\n\nInfoCSE (Wu et al., 2022b) introduces an additional masked language model architecture to make the [CLS] representation of the model aggregate more information. This model, utilizing an auxiliary objective, demonstrates effectiveness and transferability in sentence embedding tasks."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Representation Rank",
+            "text": ""
+        },
+        {
+            "section_id": "2.2.1",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.1 Measuring and Regularizing Representation Rank",
+            "text": "Conventionally, the representation rank is determined by counting the number of largest singular values that capture a substantial portion of total singular value energy in the representation matrix, where  denotes a stack of representations. The variables  and  represent the batch size and the dimension of the representation, respectively. Throughout this study, we employ this energy-based measurement for the quantification of rank.\n\nWhile the energy-based rank is intuitive and useful for analysis, the discrete nature of rank measurement presents challenges in its direct application for regularization purposes. To address this challenge, we adopt the effective rank (Roy and Vetterli, 2007) as an approximation of the rank, defined as where  are the eigenvalues of , , and . Note that  and .\n\nIn our study, we utilize the logarithm of Eq. 2 for the purpose of training. This choice is motivated by the efficacy demonstrated in Kim et al. (2023)."
+        },
+        {
+            "section_id": "2.2.2",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.2 Rank and Contrastive Learning",
+            "text": "Recently, the rank of representation has been studied for many deep learning research topics, as it directly reflects the dimensionality utilized by the representation. In Jing et al. (2021), it has been observed that contrastive learning is susceptible to the phenomenon of dimensional collapse, wherein representation vectors tend to concentrate within a lower-dimensional subspace rather than spanning the entirety of the available embedding space. In Garrido et al. (2023), rank of representation is identified as a robust predictor of the downstream performance. For self-supervised learning, investigations such as those presented in Hua et al. (2021) and Kim et al. (2023) have presented findings indicating that increasing rank of a representation can contribute to the enhancement of performance in self-supervised learning. In the broader research domain of unsupervised representation learning, Zhuo et al. (2023) have revealed a phenomenon wherein the training dynamics of rank for pre-training vision tasks experience a rapid decrease followed by an increase. In contrast, we have found an opposite trend for CL-based fine-tuning, as we will elaborate in Section 3. Research on rank, as described, has predominantly occurred within the vision field and has been confined to models trained from scratch. In this study, we study rank of CL-based language models trained through fine-tuning."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Key Aspects of Fine-Tuning",
+            "text": "In this section, we analyze key aspects of fine-tuning language models in sentence embeddings. We commence our analysis by visualizing fine-tuning dynamics of validation performance and representation rank. While the validation performance tends to improve with fine-tuning, representation rank increases sharply initially and then begins to decline as the fine-tuning progresses.\n\nThe fine-tuning dynamics can be evidently divided into two phases based on rank. We define Phase 1 as the initial phase that spans from the onset of training to the point where the rank reaches its maximum value. The subsequent phase, defined as Phase 2, covers the period extending beyond the conclusion of Phase 1 until the model achieves its best validation performance. It is noted that the final model is selected at the conclusion of Phase 2, commonly referred to as early stopping, even though the training continues until the pre-determined length of one epoch.\n\nBased on the two distinct phases, we explore the key aspects of fine-tuning in the following."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Alignment and Uniformity",
+            "text": "Contrastive loss optimizes two distinct properties of representation (Wang and Isola, 2020): alignment and uniformity. To quantify these properties, we employ the formula introduced in Decoupled Contrastive Learning (DCL) (Yeh et al., 2022), which has been utilized for the training dynamics analysis of sentence embeddings in recent work (Nie et al., 2023).\n\nIn Figure 3, a significant improvement in uniformity is observed during Phase 1, followed by a stabilizing trend in Phase 2. Conversely, there is a significant deterioration in alignment during Phase 1, succeeded by a moderate improvement trend in Phase 2. This observation clearly indicates that the contrastive loss prioritizes enhancing uniformity over alignment during Phase 1. It suggests that BERT embeddings are initially far from being uniformly distributed, and fine-tuning focuses on improving uniformity such that the cosine similarity measure, used as the metric of sentence embedding, can function effectively. Once uniformity is sufficiently improved in Phase 1, fine-tuning transitions to Phase 2, focusing on recovering alignment while maintaining uniformity.\n\nRank is related to uniformity. For example, when the autocorrelation matrix of representation is an identity matrix, it is trivial to show that both representation rank and uniformity are maximized. Also, it can be observed in Phase 1 that the rank in Figure 2 and the uniformity loss in Figure 3 undergo steep adjustments with almost reversed shapes. This further emphasizes the strong relationship between rank and uniformity. Rank is also closely related to alignment. In Phase 2, rank exhibits a very similar trend to alignment, with both steadily returning towards their original values before fine-tuning commenced."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Linguistic Abilities",
+            "text": "The purpose of fine-tuning a language model is to leverage the language model’s pre-learned linguistic abilities. However, due to the use of cosine similarity as the measure of sentence embedding, fine-tuning with contrastive loss becomes imperative. For the case of BERT, it becomes essential to enhance uniformity through fine-tuning despite the possibility of negatively affecting BERT’s linguistic abilities.\n\nTo explore linguistic aspects, we followed the methodology of Conneau et al. (2018) and utilized the SentEval toolkit to investigate training dynamics of ten different linguistic abilities. Based on the observed trends in training dynamics, we grouped the ten probing tasks into three categories, as presented in Figure 4.\n\nThe first group (Figure 4(a)) consists of three tasks that exhibit deterioration in Phase 1 followed by recovery in Phase 2. They are Length (number of tokens), Depth (depth of sentence structure trees), and TopConstituents (the grammatical structure of sentences), and all three are closely related to the performance of sentence embedding. We emphasize that the worst performance occurs at or near the boundary between Phase 1 and Phase 2 for the three linguistic abilities, indicating a strong correlation with representation rank. The trend of deterioration followed by recovery was also observed for alignment, where the deterioration occurs while uniformity sharply improves.\n\nThe second group (Figure 4(b)) consists of three tasks that exhibit an upward performance trend in both Phase 1 and Phase 2. They are WordContent (deducing words from sentence representations), SubjNumber, and ObjNumber (matching the number of subjects and objects in sentence clauses, respectively), and all three are intimately related to the sentence embedding task. These three linguistic abilities do not deteriorate in Phase 1 despite uniformity’s sharp improvement, suggesting that the three do not form a trade-off relationship with uniformity.\n\nThe third group (Figure 4(c)) consists of the four remaining tasks. Their performance either deteriorates (BigramShift and CoordinationInversion) or oscillates (Tense and OddManOut) throughout the fine-tuning. Compared to the other six linguistic abilities, these four are less directly associated with the sentence embedding task. For instance, changes in the order of words or clauses within a sentence are likely to have a lesser impact on the semantic information of a sentence in most common use cases of sentence embedding."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "Extreme Correlation between Performance and Rank",
+            "text": "In Sections 3.1 and 3.2, we explored the training dynamics of alignment and uniformity, as well as linguistic abilities, and their association with representation rank through the definition of Phase 1 and Phase 2. In this section, we demonstrate that representation rank is also closely linked to sentence embedding performance.\n\nThe scatter plots illustrating the relationship between representation rank and STS performance are presented in Figure 5 for both Phase 1 and Phase 2. In Phase 1, the correlation between rank and performance is notably strong. This indicates that performance improves as rank increases. In Phase 2, the correlation remains strong but in a reversed manner. This suggests that performance improves as rank decreases. The robust correlation values highlight the potential for enhancing sentence embedding by controlling representation rank, a possibility that we further investigate in the following section."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Experiments – Rank Reduction",
+            "text": "In this section, we introduce a rank regularization strategy that is straightforward to implement. Using this strategy, we demonstrate its ability to consistently enhance both the performance and stability of state-of-the-art sentence embedding methods. Details about the experimental setup and hyperparameter information are available in Appendix A and B."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Regularization of Representation Rank",
+            "text": "Algebraic rank is not differentiable because it is discrete. Instead, effective rank (Roy and Vetterli, 2007) is known as a continuous-value extension that is differentiable. For the implementation of rank regularizer in our work, we follow the practical design provided in Kim et al. (2023) where the exponential function part is dropped from effective rank."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Analysis of Phase-Dependency",
+            "text": "For the two phases identified in Section 3, we investigate the effect of representation rank regularization. Specifically, we explore phase-dependent control over STS-B development set. The investigation results are summarized in Table 1.\n\nIn the table, the single strongest trend we can observe is that promoting rank reduction in Phase 2 is significantly helpful. As evidenced by the exemplary plots provided in Figure 7 of Appendix C, rank reduction during Phase 2 facilitates rapid and stable fine-tuning, resulting in the attainment of best performance swiftly and consistently regardless of the chosen random seed. Apparently, rapid and stable fine-tuning is helpful for improving performance where rank reduction in Phase 2 promotes such a behavior.\n\nFor Phase 1, it is unclear if either rank increase or rank decrease is helpful. This can be because of the steep change in uniformity during Phase 1, where rank regularizing cannot make a steady impact.\n\nOverall, the best performance is achieved when rank is increased in Phase 1 and decreased in Phase 2. However, the best performance is marginally better than 84.13 that is obtained by decreasing rank in both Phase 1 and Phase 2.\n\nBased on the aforementioned analysis, we opt for our rank strategy, which involves reducing rank in both Phase 1 and Phase 2. This strategy simplifies the application of rank regularization as there is no need to distinguish between Phase 1 and Phase 2. Such a distinction necessitates continuous monitoring of rank during fine-tuning, which consequently incurs a computational burden. We name our strategy as RR (Rank Reduction)."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "Performance Improvement",
+            "text": "To investigate the effectiveness of RR, we have applied RR to five CL-based sentence embedding models. The results are shown in Table 2. Performance improvement by RR can be observed for all five models and the visualization of the improvement can be found in Figure 1. Except for ESimCSE, the final rank with RR regularization ends up in a narrow range between 190 and 198.\n\nIn addition to the results in Table 2, we provide two supplementary results in Table 8 of Appendix D. Firstly, we investigate dimensionality dependency by examining three BERT models with hidden state dimensionality of 512, 768, and 1024. Secondly, we investigate two RoBERTa models with dimensionality of 768 and 1024. In all experiments, we consistently observed a performance improvement with RR. The magnitude of improvement was contingent upon the performance of the original model. For models with high initial performance, the improvement was relatively less pronounced. This phenomenon is likely attributed to these models nearing the saturation point of STS performance."
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "Stability Improvement",
+            "text": "Recent studies Jiang et al. (2022a  ###reference_b16###); Zhang et al. (2022  ###reference_b32###) have highlighted an instability concern observed during the training of certain unsupervised models. This concern is characterized by a significant variability in performance depending on the random seed employed. In particular, learning methods that demonstrate instability, even if they achieve high performance for a small subset of selectively chosen seeds, are expected to show inferior overall performance. The instability can also be demonstrated to have a strong correlation with representation rank. In Figure 6  ###reference_###, we are showing a scatter plot between rank and instability for the five CL-based models. The Pearson correlation between the average rank and standard deviation is remarkably high at 0.94, indicating a clear and strong connection. Therefore, adopting RR can be expected to enhance stability. The results of applying RR are shown in Table 3  ###reference_###. For the original models with standard deviation larger than 0.50, RR is effective in improving stability. However, for InfoCSE, stability either deteriorates or remains consistent, likely owing to the already robust stability of the original model."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Discussion",
+            "text": ""
+        },
+        {
+            "section_id": "5.1",
+            "parent_section_id": "5",
+            "section_name": "Justification of Rank Regularization",
+            "text": "In Section 3 ###reference_###, we have explored key aspects of sentence embedding methods, focusing on aspects significantly adjusted during fine-tuning, such as rank regularization. This choice is advantageous for enhancing performance in sentence embedding tasks.\n\nLinguistic abilities were explored in Section 3.2 ###reference_###. It was discovered that certain probing tasks are directly related to the performance of sentence embedding. Consequently, leveraging probing tasks for enhancement appears logical. However, utilizing probing tasks necessitates human labeling, which contradicts the objective of unsupervised learning. Additionally, employing probing tasks carries a degree of risk, as it has been reported that different encoder architectures trained with the same objective can produce linguistically distinct embeddings (Conneau et al., 2018 ###reference_b10###)."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "Conclusion",
+            "text": "The latest advancements in sentence embedding methods typically leverage contrastive learning as the fine-tuning method. Through our analysis of various key aspects of these CL-based models, we have shown that representation rank can play a pivotal role not only in analysis but also in regularization of the models."
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "Limitations",
+            "text": "In this study, we did not provide a theoretical explanation for why CL-based models perform better at lower ranks, which remains a limitation of our research. Hence, it would be beneficial for future investigations to explore the theoretical relationship between rank and performance. Furthermore, given that the primary objective of this study is to conduct an analysis of prior works and enhance them accordingly, our study is not susceptible to potential risks."
+        }
+    ]
+}

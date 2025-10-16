@@ -1,0 +1,102 @@
+{
+    "title": "ISDS-NLP at SemEval-2024 Task 10: Transformer based neural networks for emotion recognition in conversations",
+    "abstract": "This paper outlines the approach of the ISDS-NLP team in the SemEval 2024 Task 10: Emotion Discovery and Reasoning its Flip in Conversation (EDiReF). For Subtask 1 we obtained a weighted F1 score of 0.43 and placed 12 in the leaderboard. We investigate two distinct approaches: Masked Language Modeling (MLM) and Causal Language Modeling (CLM). For MLM, we employ pre-trained BERT-like models in a multilingual setting, fine-tuning them with a classifier to predict emotions. Experiments with varying input lengths, classifier architectures, and fine-tuning strategies demonstrate the effectiveness of this approach. Additionally, we utilize Mistral 7B Instruct V0.2, a state-of-the-art model, applying zero-shot and few-shot prompting techniques. Our findings indicate that while Mistral shows promise, MLMs currently outperform them in sentence-level emotion classification.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "Task 10 from SemEval 2024 competition Kumar et al. (2024  ###reference_b9###) addresses the complex challenge of identifying the emotions within dialogues (English and Hindi). This task comprises two primary objectives: firstly, assigning an emotion label to each utterance within a dialogue, and secondly, discerning the trigger utterance or utterances responsible for an emotion-flip within the dialogue Kumar et al. (2022  ###reference_b11###). Emotions play a crucial role in human interaction and one can understand more from a text if one knows the underlying sentiment of the writer. In contexts where disagreements may arise, such as customer service platforms, virtual assistant chats or forums, identifying trigger utterances for emotion flips can help mediate conflicts and prevent escalation. A chatbot dealing with an angry customer would benefit from knowing how to speak in order to generate empathetic responses. If it knows that the chatbot’s current sentence can trigger an emotion flip from neutral to anger, the chatbot should refine it, or if the emotion flip is from anger to joy, the chatbot should be more confident in such a response in the future.\nBoth types of models we tried for Subtask 1 were based on transformers. The first one used BERT-like models and we achieved the best accuracy with them, while the second one is a state of the art causal model (Mistral, Jiang et al. (2023  ###reference_b6###)) that was tested in zero-shot and few-shot settings with poorer results.\nAlthough in the first task our system worked well, placing 12th in the leaderboard, the other 2 tasks were much harder and we placed 14th on the second subtask. We believed that with a better strategy to prevent overfitting (like under or over-sampling), our system would have improved. Our code is open source and available to use on GitHub  ###reference_2024-task-10###."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Background",
+            "text": "The competition had 3 subtasks explained in Figure 1  ###reference_### and we participated in all of them with the best results on subtask 1 where we placed 12th with an F1 score of 0.43.\n###figure_1###"
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "Dataset",
+            "text": "The dataset contains English and Hindi code-mixed conversations for Subtask 1 and 2 and English only conversations for Subtask 3 (Table 1  ###reference_###). The dataset is quite small, except for the training dataset for Subtask 2 and 3. If we were to combined them for Subtask 1, our F1 score would reach 0.97, but it wasn’t allowed. This fact shows that with more data our model would do really well. The dataset is based on MELD, a known emotion recognition dataset, which was then augmented with triggers for the emotion-flip task.\nThere were 8 distinct emotions to predict: neutral, anger, surprise, fear, joy, sadness, disgust, and contempt. By far the most predominant emotion is neutral, followed by joy and anger (Figure 2  ###reference_###). If we look at Subtask 2, most often the emotion flips are from neutral to joy or anger (Figure 3  ###reference_###).\n###figure_2### ###figure_3###"
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "System overview",
+            "text": "We tried two approaches, both of them based on transformer architecture: Masked Language Modelling and Casual Modelling. We chose these two architectures because of their recent successes in NLP."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Masked Language Modelling",
+            "text": "We used pre-trained BERT-like models in a multilingual setting so that it can tokenise Hindi sentences. These pre-trained models will give us the features from sentences and then we pass them through a classifier which will do the prediction for each task Figure 4  ###reference_###.\n###figure_4###"
+        },
+        {
+            "section_id": "3.1.1",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.1 Input",
+            "text": "Analysis of dialogue sentences reveals a predominantly short length, with a sharp decline in frequency after 30 tokens (see Figure 5  ###reference_###). To optimize performance, various maximum sequence lengths were tested, with 55 tokens yielding the best results (Figure 6  ###reference_###). Data preprocessing, (such as lemmatization, removing punctuation or stopwords) didn’t help the model learn better so we kept the input as is. Probably this is because punctuation and stopwords contain useful information that the models is able to learn.\n###figure_5### ###figure_6###"
+        },
+        {
+            "section_id": "3.1.2",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.2 Output",
+            "text": "Selecting the optimal hidden state layer is crucial for leveraging the pre-trained model’s results. Our experiments demonstrated that using the final layer’s output yielded the strongest performance, with accuracy declining in earlier layers. For MLM-type models, the [CLS] token encodes the features, which is what we pass to our classification layer.\nAmong various classifiers tested (Table 2  ###reference_###), fully connected layers excelled, likely due to their ability to model complex, non-linear relationships. The top-performing model employed a fully connected layer with 0.5 dropout and a Softmax activation function."
+        },
+        {
+            "section_id": "3.1.3",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.3 Fine-tuning",
+            "text": "The large pre-trained language models we employed offer a robust foundation for understanding language in general. Through fine-tuning, we adapt them to the nuances of our emotion recognition task. Inspired by the strategy presented in Sun et al. (2020  ###reference_b12###), we initially train only the classifier with a larger learning rate (5e-5) and a warm-up period of 10,000 steps over ’k’ epochs (we tried a range of ’k’ from 1 to 10). Subsequently, we fine-tune both the classifier and the transformer’s final layer using a smaller learning rate (2e-5). Our goal in freezing the transformer weights at first, and then training them with a reduced learning rate, is to minimize the risk of overfitting."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Causal Modelling",
+            "text": "Given the success of generative models we also tried Mistral 7B Instruct V0.2 which is believed to be state of the art in its category of models Jiang et al. (2023  ###reference_b6###). These type of LLMs have had success in a large number of NLP tasks, but seem to still lag Masked Language Models in sentence classification."
+        },
+        {
+            "section_id": "3.2.1",
+            "parent_section_id": "3.2",
+            "section_name": "3.2.1 Prompting",
+            "text": "In Causal Modelling, how you prompt the model significantly influences its performance. We tested different prompting strategies in both zero-shot and few-shot settings:\nZero-Shot Learning: Here, we provide the model with a single example and ask it to predict the emotion without any additional references. For zero-shot learning the best prompting technique was: \"[INS] Given the following sentence: {sentence}. ### Predict which emotion is expressed. Chose one of the following options: neutral, anger, surprise, fear, joy, sadness, disgust, and contempt. Answer in one word only. ### Answer: [\\INS]\"\nFew-Shot Learning: In this setting, we give the model several examples – one for each emotion – along with their corresponding labels. This leverages the model’s in-context learning ability, potentially boosting its performance for unseen samples. For few-shot learning the best prompting technique was: \"[INS] This is an example of a sad sentence: {sentence} {repeat for every emotion}. ### Predict the emotion of the following sentence: sentence. Chose one of the following options: neutral, anger, surprise, fear, joy, sadness, disgust, and contempt. Answer in one word only. ### Answer: [\\INS]\""
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Experimental setup",
+            "text": ""
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Data Split Strategy",
+            "text": "We employed a classic data split approach:\nInitial Development: We combined the training and development sets and shuffled the data. Subsequently, we used 70% for training, 10% for validation, and the remaining 20% as a held-out test set.\nCompetition Test Set Release: Upon the competition’s test set release, we directly evaluated our models using the platform. To maximize training data, we trained on the combined training set with a 20% validation split.\nFinal Model: Once we selected our best model, we re-trained it on the entire dataset without validation. This re-training didn’t yield significant improvements"
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Subtask 1",
+            "text": "We’ll focus on Subtask 1, where we achieved strong results. The key hyperparameters used:\nBatch Size: A batch size of 64 provided the best balance. Smaller sizes hurt performance, while larger sizes exceeded our memory constraints.\nFine-Tuning: We trained for 4 epochs with frozen model weights, followed by 3 epochs with only the last layer unfrozen (as detailed in section 3.1.3  ###reference_.SSS3###).\nClassifier: Our classifier used 128 neurons, 0.5 dropout, and a softmax activation.\nOptimization: We used cross-entropy loss, the AdamW optimizer, and experimented with different learning rates (see section 3.1.3  ###reference_.SSS3###).\nEvaluation: We measured performance using the MulticlassF1Score with 8 classes and ’macro’ averaging."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Results",
+            "text": "Our top-performing model (Table 3  ###reference_###) was a fine-tuned FacebookAI/xlm-roberta-large Conneau et al. (2019  ###reference_b2###). This highlights the superiority of fine-tuned Masked Language Models (MLMs) over Mistral for sentence classification tasks. The results suggest that smaller Causal models remain less effective than fine-tuned MLMs in this domain. We also see that few-shot Mistral is worse than zero-shot, probably because too much data in the prompt confuses the model.\nIn terms of number of epochs, our best model was overfitting when finetuned for too many epochs (Table 4  ###reference_###) and we finally trained for 4 + 3 epochs."
+        },
+        {
+            "section_id": "5.1",
+            "parent_section_id": "5",
+            "section_name": "Error analysis",
+            "text": "Our confusion matrix (Figure 7  ###reference_###) reveals that the model overpredicts the ’neutral’ emotion, likely due to its prevalence in the training data. This created a bias, leading the model to misclassify instances of other emotions as ’neutral’. While we attempted to mitigate this with class weights in the loss function, it proves insufficient. In the future, we should explore more robust techniques like oversampling or undersampling to address the class imbalance.\n###figure_7### As seen in the emotion accuracy chart (Figure 8  ###reference_###), the model performs best on the dominant ’neutral’ class, along with well-represented emotions like ’joy’ and ’sadness’. Conversely, the model struggles to predict the ’disgust’ emotion, which aligns with its under-representation in the training data. This suggests a direct correlation between dataset frequency and model proficiency for each emotion.\n###figure_8###"
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "Conclusion",
+            "text": "Overall, our system achieved encouraging results in Subtask 1, despite exhibiting some overfitting for dominant labels. While performance on the emotion-flip detection tasks (Subtasks 2 and 3) highlights areas for improvement, we still placed in the first half of the leaderboard. Looking ahead, we plan to investigate hybrid transformer-LSTM architectures for a more nuanced understanding of emotion-flip triggers. Additionally, enriching the data by incorporating a broader conversational context through multi-turn analysis could enhance our model’s capabilities. Not least, even though we tried Mistral, there are newer causal models like Mixtral Jiang et al. (2024  ###reference_b7###) and Solar Kim et al. (2023  ###reference_b8###) which could perform better at this type of task."
+        }
+    ]
+}

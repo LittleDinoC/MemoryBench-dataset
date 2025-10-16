@@ -1,0 +1,102 @@
+{
+    "title": "Blended RAG: Improving RAG (Retriever-Augmented Generation) Accuracy with Semantic Search and Hybrid Query-Based Retrievers",
+    "abstract": "Retrieval-Augmented Generation (RAG) is a prevalent approach to infuse a private knowledge base of documents with Large Language Models (LLM) to build Generative Q&A (Question-Answering) systems. However, RAG accuracy becomes increasingly challenging as the corpus of documents scales up, with Retrievers playing an outsized role in the overall RAG accuracy by extracting the most relevant document from the corpus to provide context to the LLM. In this paper, we propose the ’Blended RAG’ method of leveraging semantic search techniques, such as Dense Vector indexes and Sparse Encoder indexes, blended with hybrid query strategies. Our study achieves better retrieval results and sets new benchmarks for IR (Information Retrieval) datasets like NQ and TREC-COVID datasets. We further extend such a ’Blended Retriever’ to the RAG system to demonstrate far superior results on Generative Q&A datasets like SQUAD, even surpassing fine-tuning performance.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "RAG represents an approach to text generation that is based not only on patterns learned during training but also on dynamically retrieved external knowledge. This method combines the creative flair of generative models with the encyclopedic recall of a search engine. The efficacy of the RAG system relies fundamentally on two components: the Retriever (R) and the Generator (G), the latter representing the size and type of LLM.\nThe language model can easily craft sentences, but it might not always have all the facts. This is where the Retriever (R) steps in, quickly sifting through vast amounts of documents to find relevant information that can be used to inform and enrich the language model's output. Think of the retriever as a researcher part of the AI, which feeds the contextually grounded text to generate knowledgeable answers to Generator (G). Without the retriever, RAG would be like a well-spoken individual who delivers irrelevant information."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "II Related Work",
+            "text": "Search has been a focal point of research in information retrieval, with numerous studies exploring various methodologies. Historically, the BM25 (Best Match) algorithm, which uses similarity search, has been a cornerstone in this field, as explored by Robertson and Zaragoza (2009).[1  ###reference_b1###]. BM25 prioritizes documents according to their pertinence to a query, capitalizing on Term Frequency (TF), Inverse Document Frequency (IDF), and Document Length to compute a relevance score.\nDense vector models, particularly those employing KNN (k Nearest Neighbours) algorithms, have gained attention for their ability to capture deep semantic relationships in data. Studies by Johnson et al. (2019) demonstrated the efficacy of dense vector representations in large-scale search applications. The kinship between data entities (including the search query) is assessed by computing the vectorial proximity (via cosine similarity etc.). During search execution, the model discerns the ’k’ vectors closest in resemblance to the query vector, hence returning the corresponding data entities as results. Their ability to transform text into vector space models, where semantic similarities can be quantitatively assessed, marks a significant advancement over traditional keyword-based approaches.[2  ###reference_b2###]\nOn the other hand, sparse encoder based vector models have also been explored for their precision in representing document semantics. The work of Zaharia et al. (2010) illustrates the potential of these models in efficiently handling high-dimensional data while maintaining interpretability, a challenge often faced in dense vector representations. In Sparse Encoder indexes the indexed documents, and the user’s search query maps into an extensive array of associated terms derived from a vast corpus of training data to encapsulate relationships and contextual use of concepts. The resultant expanded terms for documents and queries are encoded into sparse vectors, an efficient data representation format when handling an extensive vocabulary."
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "II-A Limitations in the current RAG system",
+            "text": "Most current retrieval methodologies employed in Retrieval-Augmented Generation (RAG) pipelines rely on keyword and similarity-based searches, which can restrict the RAG system’s overall accuracy. Table 1 provides a summary of the current benchmarks for retriever accuracy.\nDataset\nBenchmark Metrics\nNDCG@10\np@20\nF1\nNQDataset\nP@20\n0.633\n86\n79.6\nTrec Covid\nNDCG@10\n80.4\nHotpotQA\nF1 , EM\n0.85\nWhile most of prior efforts in improving RAG accuracy is on G part, by tweaking LLM prompts, tuning etc.,[9] they have limited impact on the overall accuracy of the RAG system, since if R part is feeding irreverent context then answer would be inaccurate. Furthermore, most retrieval methodologies employed in RAG pipelines rely on keyword and similarity-based searches, which can restrict the system's overall accuracy.\nFinding the best search method for RAG is still an emerging area of research. The goal of this study is to enhance retriever and RAG accuracy by incorporating Semantic Search-Based Retrievers and Hybrid Search Queries."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "III Blended Retrievers",
+            "text": "For RAG systems, we explored three distinct search strategies: keyword-based similarity search, dense vector-based, and semantic-based sparse encoders, integrating these to formulate hybrid queries. Unlike conventional keyword matching, semantic search delves into the nuances of a user’s query, deciphering context and intent. This study systematically evaluates an array of search techniques across three primary indices: BM25[3  ###reference_b3###] for keyword-based, KNN[4  ###reference_b4###] for vector-based, and Elastic Learned Sparse Encoder (ELSER) for sparse encoder-based semantic search.\n###figure_1### BM25 Index: The BM25 index is adept at employing full-text search capabilities enhanced by fuzzy matching techniques, laying the groundwork for more sophisticated query operations.\nDense Vector Index: We construct a dense vector index empowered by sentence transformers. It identifies the proximity of vector representations derived from document and query content.\nSparse Encoder Index: The Sparse EncodeR Retriever Model index is an amalgam of semantic understanding and similarity-based retrieval to encapsulate the nuanced relationships between terms, thereby capturing a more authentic representation of user intent and document relevance."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "III-A Methodology",
+            "text": "Our methodology unfolds in a sequence of progressive steps, commencing with the elementary match query within the BM25 index. We then escalate to hybrid queries that amalgamate diverse search techniques across multiple fields, leveraging the multi-match query within the Sparse Encoder-Based Index. This method proves invaluable when the exact location of the query text within the document corpus is indeterminate, hence ensuring a comprehensive match retrieval.\nThe multi-match queries are categorized as follows:\nCross Fields: Targets concurrence across multiple fields\nMost Fields: Seeks text representation through different lenses across various fields.\nBest Fields: Pursues the aggregation of words within a singular field.\nPhrase Prefix: Operates similarly to Best Fields but prioritizes phrases over keywords.\nAfter initial match queries, we incorporate dense vector (KNN) and sparse encoder indices, each with their bespoke hybrid queries. This strategic approach synthesizes the strengths of each index, channeling them towards the unified goal of refining retrieval accuracy within our RAG system. We calculate the top-k retrieval accuracy metric to distill the essence of each query type.\nIn Figure 1, we introduce a scheme designed to create Blended Retrievers by blending semantic search with hybrid queries."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "III-B Constructing RAG System",
+            "text": "From the plethora of possible permutations, a select sextet (top 6) of hybrid queries—those exhibiting paramount retrieval efficacy—were chosen for further scrutiny. These queries were then subjected to rigorous evaluation across the benchmark datasets to ascertain the precision of the retrieval component within RAG. The sextet queries represent the culmination of retriever experimentation, embodying the synthesis of our finest query strategies aligned with various index types. The six blended queries are then fed to generative question-answering systems. This process finds the best retrievers to feed to the Generator of RAG, given the exponential growth in the number of potential query combinations stemming from the integration with distinct index types.\nThe intricacies of constructing an effective RAG system are multi-fold, particularly when source datasets have diverse and complex landscapes. We undertook a comprehensive evaluation of a myriad of hybrid query formulations, scrutinizing their performance across benchmark datasets, including the Natural Questions (NQ), TREC-COVID, Stanford Question Answering Dataset (SqUAD), and HotPotQA."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "IV-A Retriever Benchmarking",
+            "text": "Now that we have identified the best set of combinations of Index + Query types, we will use these sextet queries on IR datasets for benchmarking using NDCG@10 scores (Normalised Discounted Cumulative Gain metric)."
+        },
+        {
+            "section_id": "4.1.3",
+            "parent_section_id": "4.1",
+            "section_name": "IV-A3 SqUAD Dataset Benchmarking",
+            "text": "The SqUAD (Stanford Question Answering Dataset) [9  ###reference_b9###] is not an IR dataset, but we evaluated the retrieval accuracy of the SquAD dataset for consistency. Firstly, we created a corpus from the SqUAD dataset using the title and context fields in the dataset. Then, we indexed the corpus using BM25, dense vector, and Sparse Encoder. The top-k (k=5,10, and 20) retrieval accuracy results for the SqUAD dataset are calculated. Table III illustrates that for SQuAD, dense vector (KNN)-based semantic searches achieve higher accuracy than sparse vector-based semantic searches and traditional similarity-based searches, particularly for top-k retrieval performance with k values of 5, 10, and 20. (See Appendix for more details)"
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "IV-B Summary of Retriever Evaluation",
+            "text": "We evaluated the retrieval accuracy using our approach, quantified by Top-k metrics across NQ, TREC-COVID, SQUAD, and CoQA datasets. This synopsis demonstrates the capability of our Blended Retrieval methodology within diverse informational contexts. Key observations are enhanced retrieval accuracy in all datasets except for CoQA. This enhancement is attributable to the capability of our hybrid queries to effectively utilize available metadata to source the most pertinent results. Implementing dense vector-based (KNN) semantic search results in a marked improvement over keyword-based search approaches. Employing semantic search-based hybrid queries realizes better retrieval precision compared to all conventional keyword-based or vector-based searches. Furthermore, it is discernible that the Sparse Encoder-based semantic search, when amalgamated with the ’Best Fields’ hybrid query, often provides superior results than any other method."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "RAG Experimentation",
+            "text": "From the retriever evaluation experiments, we know the best retriever, i.e., the best combination of indices + query. In this section, we extend this knowledge to evaluate the RAG pipeline. To avoid the effect of LLM size or type, we perform all experiments using FLAN-T5-XXL."
+        },
+        {
+            "section_id": "5.1",
+            "parent_section_id": "5",
+            "section_name": "RAG Evaluation on the SqUAD Dataset",
+            "text": "SqUAD is a commonly bench-marked dataset for RAG systems or Generative Q&A using LLMs. Our study juxtaposes three variations of the RAG pipeline from prior work using the evaluation metrics of Exact Match (EM) and F1 scores to gauge the accuracy of answer generation, as well as Top-5 and Top-10 for retrieval accuracy.\nRAG-original [11  ###reference_b11###]: This variant, a model fine-tuned on the Natural Questions dataset, has been appraised without domain-specific adaptation.\nRAG-end2end [11  ###reference_b11###]: As an extension of RAG-original, this model undergoes additional fine-tuning, tailored for domain adaptation to the SQuAD.\nBlended RAG: Distinctively, our Blended RAG variant has not undergone training on the SQuAD dataset or any related corpora. It harnesses an optimized amalgamation of field selections and hybrid query formulations with semantic indices to feed LLMs to render the most precise responses possible.\n###table_2### Model/Pipeline\nEM\nF1\nTop-5\nTop-20\nRAG-original\n28.12\n39.42\n59.64\n72.38\nRAG-end2end\n40.02\n52.63\n75.79\n85.57\nBlended RAG\n57.63\n68.4\n94.89\n98.58\nConsequently, as shown in Table IV, our Blended RAG showcases enhanced performance for Generative Q&A with F1 scores higher by 50%, even without dataset-specific fine-tuning. This characteristic is particularly advantageous for large enterprise datasets, where fine-tuning may be impractical or unfeasible, underscoring this research’s principal application."
+        },
+        {
+            "section_id": "5.2",
+            "parent_section_id": "5",
+            "section_name": "RAG Evaluation on the NQ Dataset",
+            "text": "Natural Questions (NQ) is another commonly studied dataset for RAG. The Blended RAG pipeline, utilizing zero-shot learning, was evaluated to ascertain its efficacy against other non-fine-tuned models. The assessment focused on the following metrics: Exact Match (EM) and F1 Score.\n\n###table_3### Model/Pipeline\nEM\nF1\nGLaM (Oneshot)[12  ###reference_b12###]\n26.3\nGLaM (Zeroshot)[12  ###reference_b12###]\n24.7\nPaLM540B (Oneshot)[13  ###reference_b13###]\n29.3\nBlended RAG (Zeroshot)\n42.63\n53.96\n\nBlended RAG (Zero-shot): Demonstrated superior performance with an EM of 42.63, improving the prior benchmark by 35%."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "VI Discussion",
+            "text": "While RAG is a commonly used approach in the industry, we realized during the course of this study that various challenges still exist, like there are no standard datasets on which both R (Retriever) and RAG benchmarks are available. Retriever is often studied as a separate problem in the IR domain, while RAG is studied in the LLM domain. We thus attempted to bring synergy between the two domains with this work. In this section, we share some learning on limitations and appropriate use of this method."
+        },
+        {
+            "section_id": "6.1",
+            "parent_section_id": "6",
+            "section_name": "VI-A Trade-off between Sparse and Dense Vector Indices",
+            "text": "The HotPotQA corpus presents substantial computational challenges with 5M documents, generating a dense vector index to an approximate size of 50GB, a factor that significantly hampers processing efficiency. Dense vector indexing, characterized by its rapid indexing capability, is offset by a relatively sluggish querying performance. Conversely, sparse vector indexing, despite its slower indexing process, offers expeditious querying advantages. Furthermore, a stark contrast in storage requirements is observed; for instance, the sparse vector index of the HotPotQA corpus occupied a mere 10.5GB as opposed to the 50GB required for the dense vector equivalent.\nIn such cases, we recommend sparse encoder indexes. Furthermore, for enterprises with this volume, we found it better to use multi-tenancy with federated search queries."
+        },
+        {
+            "section_id": "6.2",
+            "parent_section_id": "6",
+            "section_name": "VI-B Blended Retrievers without Metadata",
+            "text": "When datasets are enriched with metadata or other relevant informational facets, they improve the efficacy of blended retrievers. Conversely, for datasets devoid of metadata, such as CoQA, it is not as impressive.\n###figure_5### The absence of metadata in the CoQA dataset resulted in hybrid queries offering no improvement over basic queries. This limitation underscores the critical role of metadata in enhancing the efficacy of complex query structures. However, Sparse Encoder-based semantic searches still yield the most favorable outcomes than traditional methods.\nAdditionally, we would like to note that while NDCG@10 scores for Retriever and F1,EM scores for RAG are commonly used metrics, we found them to be poor proxies of Generative Q&A systems for human alignment. Better metrics to evaluate the RAG system is a key area of future work."
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "VII Conclusion",
+            "text": "Blended RAG pipeline is highly effective across multiple datasets despite not being specifically trained on them. Notably, this approach does not necessitate exemplars for prompt engineering which are often required in few-shot learning, indicating a robust generalization capability within the zero-shot paradigm. This study demonstrated:\nOptimization of R with Blended Search: Incorporating Semantic Search, specifically Sparse Encoder indices coupled with ’Best Fields’ queries, has emerged as the superior construct across all, setting a new benchmark of 87% for Retriever Accuracy on TREC-COVID.\nEnhancement of RAG via Blended Retrievers: The significant amplification in retrieval accuracy is particularly pronounced for the overall evaluation of the RAG pipeline, surpassing prior benchmarks on fine-tuned sets by a wide margin. Blended RAG sets a new benchmark at 68% F1 Score on SQUAD and 42% EM Score on NQ dataset; for non-tuned Q&A systems.\nThe empirical findings endorse the potency of Blended Retrievers in refining RAG systems beyond focusing on LLM size & type, getting better results with relatively smaller LLM and thus setting a foundation for more intelligent and contextually aware Generative Q&A systems."
+        }
+    ]
+}

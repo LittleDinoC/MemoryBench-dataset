@@ -1,0 +1,162 @@
+{
+    "title": "Navigating WebAI: Training Agents to Complete Web Tasks with Large Language Models and Reinforcement Learning",
+    "abstract": "Recent advancements in language models have demonstrated remarkable improvements in various natural language processing (NLP) tasks such as web navigation. Supervised learning (SL) approaches have achieved impressive performance while utilizing significantly less training data compared to previous methods. However, these SL-based models fall short when compared to reinforcement learning (RL) approaches, which have shown superior results. In this paper, we propose a novel approach that combines SL and RL techniques over the MiniWoB benchmark to leverage the strengths of both methods. We also address a critical limitation in previous models’ understanding of HTML content, revealing a tendency to memorize target elements rather than comprehend the underlying structure. To rectify this, we propose methods to enhance true understanding and present a new baseline of results. Our experiments demonstrate that our approach outperforms previous SL methods on certain tasks using less data and narrows the performance gap with RL models. This study sets a new direction for future web navigation and offers insights into the limitations and potential of language modeling for computer tasks.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "1. Introduction",
+            "text": "Neural networks have been used to complete web navigation tasks using multimodal inputs such as Humphrey et al. which combined visual and text inputs from a web page. Others focused on pure text and expanded over instruction mapping methods but were very constrained in their language understanding tasks. The application of language models showed greater capabilities in completing computer tasks but were all largely constrained to their environment and had poor transfer abilities. Lately, the Cambrian explosion of large language models opened the way for more capable models requiring less data and offering better transfer capabilities. Even though they achieved noteworthy results over different web navigation benchmarks, we highlight in this work that they are in fact more limited than previously claimed. We propose several approaches to rectify some of their issues with memorizing information and highlight the challenges of combining LLMs with a joint multimodal representation of their environment.\n\nOur research primarily focuses on optimizing small-scale models such as grounding them more thoroughly to their environments, in order to benchmark their capabilities before contemplating further scaling. This prioritization aligns with the imperative for fast inference times and adaptability to limited or novel data scenarios. In this paper, we evaluate the limitations of the Miniwob++ benchmark and the recorded episodes used in previous works in order to present different processing paths to correct their shortcomings. We reproduce the previous results obtained in the literature focusing on the applications of LLMs for web navigation and show that they overfit their benchmark and are unable to recover in slight changes in their environments, hampering the claims that they could understand HTML content. We test our techniques on newly trained models that we enhance by devising hierarchical planning abilities. Then, we combine them with a multimodal representation using visual inputs that we trained in a supervised manner, and in a reinforcement learning one over multiple phases. We present the abilities of these models to learn such representations, but they suffer from transfer abilities due to the nature of the architectures used.\n\nThis paper makes several key contributions. First, we provide insights into the capabilities of agents trained in user interactions to adeptly navigate diverse web interfaces. Second, we introduce a more robust evaluation that exposes the shortcomings of these models due to their tendencies to memorize a lot from their environment and how to overcome them. \n\nWe also set more grounded results over the Miniwob++ benchmark by taking into account the tendencies of previous work to overfit by applying attacks to the environment. As we showed that previous works tend to learn the distribution of target elements, we provide directions on how to correct it. Lastly, combined with the improvements over our models we deliver a comprehensive analysis of current methods’ limitations in order to explore more performant architectures, further contributing to the field toward more capable approaches."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "2. Related Work",
+            "text": "Recent advancements in AI-driven web navigation have led to various approaches to enhance intelligent agents’ performance and capabilities. This section highlights key methods and techniques that have shaped this project."
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "2.1. OpenAI Universe",
+            "text": "OpenAI’s Universe, released in 2016, aimed to develop a general-purpose agent for tasks like video games and web navigation, focusing on Miniwob, a framework with over 80 embedded tasks (OpenAI, 2016  ###reference_b23###)(Shi et al., 2017  ###reference_b30###). Miniwob serves as a reinforcement learning environment, allowing controlled experimentation with web navigation complexities."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "2.2. Neural Network Oriented Approaches",
+            "text": "Several neural-network-oriented models have been devised for web navigation. Notably, Humphrey et al.’s CC-Net combines RL with supervised learning, achieving state-of-the-art results on the Miniwob Benchmark but requiring 2.4 million examples (Humphreys et al., 2022  ###reference_b16###). Liu et al.’s Workflow Guided Exploration, which constrains actions during RL training, has also shown promise (Liu et al., 2018  ###reference_b21###).\nOlder works, such as Pasupat et al. (Pasupat et al., 2018  ###reference_b25###), focused on traditional neural network approaches, while He et al.(He et al., 2021  ###reference_b14###) outlined limitations in multimodal environments. These works have identified challenges and achieved successes but still face generalization issues.\nThe tradeoff between exploration and exploitation in RL is a common challenge, often requiring extensive data to converge to optimal solutions. While some models, like CC-Net, approach human capabilities, the need for large amounts of data highlights the importance of investigating more efficient models.\nFigure 1  ###reference_### illustrates the average accuracy of different models over the Miniwob benchmark, comparing training techniques such as SL, RL, combined approaches, and few-shots prompting examples.\n###figure_1###"
+        },
+        {
+            "section_id": "2.3",
+            "parent_section_id": "2",
+            "section_name": "2.3. Large Language Models",
+            "text": "Early works in web navigation with large language models (LLMs) include Nakano’s ’WebGPT’ (Nakano et al., 2022  ###reference_b22###), which used GPT-3 (Brown et al., 2020  ###reference_b9###) as a browsing assistant but was limited by not using raw web content. Yao et al.’s ’WebShop’ (Yao et al., 2023  ###reference_b33###) created an e-commerce environment for language models but faced restrictions in context window and adaptability.\nAttempts to pre-train LLMs on HTML content struggled with benchmarking on classical NLP tasks, limiting their use in web navigation (Aghajanyan et al., 2021  ###reference_b3###). However, breakthroughs like Gur et al.’s work on ”Understanding HTML with Large Language Models” (Gur et al., 2023  ###reference_b13###) demonstrated the potential of LLMs in web content comprehension, surpassing previous supervised learning (SL) approaches with significantly less data.\nKim et al. further showcased the potential of larger LLMs like GPT4 (Kim et al., 2023  ###reference_b17###; OpenAI, 2023  ###reference_b24###) in web navigation tasks through iterative prompting, achieving state-of-the-art baselines in a few-shot manner.\nDespite these advancements, challenges remain in developing efficient and adapTable models for web navigation. Existing methods often require extensive training data and may struggle with fast inference times, highlighting the need for smaller, more capable models."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "3. Methods",
+            "text": "Our methodology addresses the limitations in previous large language models (LLMs) for web navigation using the Miniwob benchmark. We begin by describing the environment and dataset, then move to model design in two stages. In the first stage, we analyze various T5-based models, fine-tuning them with hierarchical planning techniques to overcome identified limitations. In the second stage, we integrate the best-fine-tuned model with a multimodal neural network, using both supervised learning (SL) and reinforcement learning (RL) to enhance performance and adaptability. We also conduct an ablation study to understand the models’ inner workings and identify areas for improvement. Our approach emphasizes assessing performance at a small scale before integrating additional techniques."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "3.1. Miniwob++ Benchmark and Datasets",
+            "text": "The Miniwob++ benchmark (Liu et al., 2018) offers over a hundred web-based environments, simulating web exploration scenarios. We utilize thirteen thousand human-made demonstrations provided by the Farama Foundation, enabling supervised training. The benchmark’s alignment with existing research and compatibility with reinforcement learning (RL) through the gymnasium (previously GYM) environment (Brockman et al., 2016) and techniques makes it suitable for our study.\n\nOur datasets include HTML and Document Object Models (DOM) elements parsed as dictionaries, with unique reference numbers (’ref’) for identification. We also process mouse interaction data into two actions: ’click’ or ’type_text’. Unlike previous works (Humphreys et al., 2022), we concatenate adjacent typing actions into single actions. This approach aligns with Gur et al. (Gur et al., 2023), using only two separate actions for efficiency and ease of implementation.\n\nOur methodology processes and fine-tunes data from the Miniwob benchmark for web navigation tasks. We create a hierarchical T5 model by identifying sub-tasks within episodes and translating high-level instructions into actionable plans (Branavan et al., 2009). The model is then fine-tuned for planning and action tasks (Vogel and Jurafsky, 2010)."
+        },
+        {
+            "section_id": "3.1.1",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.1. Episode Processing for Action History Extraction",
+            "text": "We process episodes to extract action history, following key steps as seen in Figure 5. The main steps consist of removing duplicate actions, and retaining only the last occurrence. Unnecessary actions, such as clicks on the element, are discarded. Only the last keydown action for each targeted element is retained, with specific cases considered for various interactions. Manual adjustments are made if needed. To address task distribution imbalance, we down-sample 150 episodes in over-represented task suites, as seen in Figure 15.\n\nInfer Model Plan: Devise a plan for the following instruction: 'Click the menu button, and then find and click on the item labeled next' \nSubtasks = ['Click menu button', 'find an item labeled next', 'click on the next icon']\nLoop through the subtasks utterances and infer model: {Action History, subtask utterance, DOM}  {Action output, reference, keydown string, boolean final state}\nPerform action of the Miniwob environment: Perform action, check if the episode is terminated, and reward"
+        },
+        {
+            "section_id": "3.1.2",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.2. Task Planning Dataset",
+            "text": "We identify and transform various types of sub-actions, such as clicking or selection-based actions. A general function targets each Miniwob episode to produce a list of sub-tasks based on observed interactions. Specific challenges in tasks like flight booking or email forwarding are addressed, with some episodes dropped to ensure clarity. The complexity of some tasks suggests that larger pre-trained language models may perform better.\n\nHere are two examples of the translation between Miniwob utterances and an action sequence for the hierarchical planning task:\nExample 1:\nUtterance: ”Departure City”:”Philadelphia”,”Destination City”:”Charlotte”,”Ticket Type”:”Return flight”,”Departure Day”:4,”Returning Day”:26,”Passengers”:2\nAction sequence: Select Departure City Philadelphia; Select Destination City Charlotte; Select the Departure Day to 4;\nExample 2:\nUtterance: Expand the section below and click submit.\nAction sequence: Expand the section below; click submit;\n\nThe final dataset is composed of over eight thousand action episodes, and in Figure 15 ###reference_### we describe the number of examples per task. The second dataset regarding task planning instruction contains 10,960 episodes."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "3.2. Models",
+            "text": "In this section, we delve into an array of models designed to tackle web navigation tasks, featuring the WebN-T5 model as our cornerstone, which is based on the T5 architecture and has demonstrated superior performance due to its bi-directional attention encoder (Raffel et al., 2020 ###reference_b26###; Gur et al., 2023 ###reference_b13###). Alongside WebN-T5, we explore variations such as T5-Hierarchy (T5H) fine-tuned for hierarchical tasks, and our hybrid model, CC-NeT5, which combines elements from both T5 and CC-Net by Humphrey et al. (Humphreys et al., 2022 ###reference_b16###). These models have been trained using different strategies like supervised learning (SL) and reinforcement learning (RL), offering a rich comparative landscape for evaluating their effectiveness and limitations in web navigation."
+        },
+        {
+            "section_id": "3.2.1",
+            "parent_section_id": "3.2",
+            "section_name": "3.2.1. WebN-T5",
+            "text": "We attempt to reproduce the models from ’Understanding Large Language Models’ (Gur et al., 2023) but face challenges with reference numbers and element distribution. As seen in Figure 6, the non-uniform distribution of elements may lead to bias or memorization (Carlini et al., 2023) based on their location, or even worse, entirely over the distribution of the salient elements of the page (Arpit et al., 2017). We conduct an experiment with ordered and randomized references to investigate this issue. To mitigate this, we randomize the reference numbers in all episodes, forcing the models to base predictions on element features.\n\nThe T5 model was fine-tuned using ROUGE loss metrics (Lin, 2004), which measure the overlap between predicted and reference sequences. However, there are limitations:\nROUGE metrics are primarily designed for text summarization or translation, not action sequence prediction.\nThey do not account for the temporal order and structural dependencies in action sequences (Schluter, 2017).\nThus, while ROUGE offers insights into the quality of generated action sequences, it may not fully capture their correctness and effectiveness."
+        },
+        {
+            "section_id": "3.2.2",
+            "parent_section_id": "3.2",
+            "section_name": "3.2.2. WebN-T5 Hierarchical Planning",
+            "text": "We aim to train the agent on lower-level tasks during an episode, addressing observed non-optimal actions in the original WebN-T5 (Gur et al., 2023). The model is fine-tuned to divide tasks hierarchically, proposing a multi-step navigation plan by being trained on both datasets containing the task planning and action episodes using a supervised learning approach."
+        },
+        {
+            "section_id": "3.2.3",
+            "parent_section_id": "3.2",
+            "section_name": "3.2.3. Multimodal Language Model with Reinforcement Learning",
+            "text": "The best multimodal model used over the Miniwob++ benchmark is CC-Net by Humphrey et al. (Humphreys et al., 2022) which achieved human-level performance by using reinforcement learning. Their model used a PPO-based algorithm (Schulman et al., 2017), V-MPO (Song et al., 2019), for reinforcement learning (RL) which aims to improve performance without requiring extensive exploration. We used a similar learning approach, except that our model architecture combines a CC-Net-inspired model with a fine-tuned T5 model for the hierarchical planning task detailed earlier. The motivation behind using reinforcement learning, is that many of the recorded examples are not sufficient in covering the variety of the cases proposed. Some environments require further training, and as the exploration space is very large, a method such as V-MPO is better suited to that perspective.\n\nThe architecture is derived from CC-Net, using a multimodal approach that includes predictions from the fine-tuned T5 model, a screenshot of the current environment, and language information. The architecture details can be seen in Figure 7  and are as follows:\nScreenshot inputs are processed through four RESNET blocks.\nLanguage inputs are embedded and passed through a transformer layer.\nOutputs are fed into a multimodal block, concatenated with previous actions, and processed through an LSTM block.\nThe final layer includes binary variables for action types and tensors for reference numbers and vocabulary indexes.\nWe adapt the architecture to deal with the vanishing/exploding gradient problem and use one-hot encoding for the experiment.\n\nThe design of the CC-NeT5 architecture’s loss function was an iterative process, influenced by the nature of its output layer. The final output layer consists of:\nAction: A binary value represented as a tensor of size 1.\nReference number: A tensor of length 500.\nKeydown text: A tensor of size 8x1591 (8 times our vocabulary size).\n\nInitially, a mean-squared-entropy (MSE) loss function was used, but due to sparse encoding and convergence issues, it was updated to a cross-entropy (CE) loss. This change involved predicting reference numbers and keydown text through a softmax function over each section of the output layer. The final loss function efficiently processes this output, with the action type tensor matched with its corresponding boolean value, and the reference number and keydown text token indexes retrieved from the tokenizer.\n\nWhen using V-MPO, we sample actions from a normalized categorical distribution based on the activation weights of the final layer, where each index represents the token position in our vocabulary. This method allows us to derive a probability distribution for sampling actions during policy inference for exploration. The architecture involves a two-stage process, training the CC-Net-based architecture with V-MPO, while the T5 model remains static. Although the CC-Net part serves as an RL boost to the original T5 model, this approach may have limitations if the original T5 inference is severely flawed.\n\nWe propose a new preset in Gymnasium’s RL environment, reducing the action space to two types and adjusting the observation space. The time limit for episodes is increased to thirty seconds, and a discounted reward is computed to train the models in an RL manner."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "4. Results",
+            "text": "This section analyzes the outcomes of various trained models, including ablation studies, and compares them with existing models. The models are benchmarked on the Miniwob benchmark, focusing on click and typing actions."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "4.1. Model Performances",
+            "text": "Our experiments reveal that the T5-large model, fine-tuned on hierarchical tasks, achieves superior performance. This outperforms the T5-base model. Interestingly, a hybrid approach combining T5-large with a CC-Net-inspired architecture yields notable results in its BC phase. However, this changes after the RL phase, a phenomenon we discuss in subsection 4.4.2 due to a covariate shift towards the T5 model. A comparison of the different models’ performance metrics are presented in Figure 13, including the ablation study over their inputs."
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1. T5-Model Performance",
+            "text": "Fine-tuned T5 models show variable performance. The performance advantage in tasks like 'click-checkboxes-soft' indicates that larger models capitalize better on their pre-trained linguistic skills. \n\nOur replication of WebN-T5 by Gur et al. found that model performance hinges on reference ordering. Training with randomized references improved its performance, validating our randomization process."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2. Evaluation of Original Papers",
+            "text": "Our findings upon reproducing Gur et al.’s work (Gur et al., 2023 ###reference_b13###) reveal memorization tendencies rather than genuine task understanding. Randomizing references resulted in performance drops, questioning the original claims but reaffirming the importance of data randomization in model training."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "4.2. History versus No History",
+            "text": "An ablation study on action history reveals interesting insights. The T5-base model’s performance drops by nearly two percentage points when action history is removed. In contrast, models fine-tuned on hierarchical tasks, such as T5-large, show almost no performance change. This suggests that the hierarchical nature of the task allows the model to plan its actions more effectively, making it less reliant on action history. Furthermore, the randomization of references seems to make the model less dependent on previous sequences, providing another layer of resilience to the removal of action history."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "4.3. Hierarchical Planning Improvements",
+            "text": "Fine-tuning a model over the hierarchical task achieved higher results than the compared WebN-based models. The following T5 sizes have been fine-tuned which are T5-base and T5-large. The original WebN achieved notable performance over WebT5-large, and the reproduced T5-base size performance, highlighting that hierarchical planning is an important component of these models. The ablation study over the action history outlined a decrease in performance over the T5-base model for hierarchical planning and over the T5-large. This is much less than the reported decrease by the original WebN-T5-large and WebN-T5-3B models showing that hierarchical planning is less sensitive to the action history as it tries to solve the episode by following an original plan step by step. Nonetheless, we do observe significant rates of failures in complicated episodes, or when the environment changes as the agent follows the original plan as seen in detail in Figures 13(a) and 13(b)."
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "4.4. Performance of Combining T5 and CC-Net",
+            "text": "The combination of T5 and CC-Net was explored in two phases: supervised learning (SL) and reinforcement learning (RL), with ablation studies conducted in both."
+        },
+        {
+            "section_id": "4.4.1",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.1. Results of Supervised Learning Phase",
+            "text": "Ablation studies revealed that the model was heavily dependent on the T5-large model, with complete failure when T5’s output was removed. Interestingly, the removal of visual inputs sometimes improved performance as seen in Figure 14(a)  ###reference_.sf1###, indicating a complex interaction between modalities. Overall, the results showed that the model learned a multimodal representation but was mainly reliant on the T5-large model."
+        },
+        {
+            "section_id": "4.4.2",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.2. Results of Reinforcement Learning Phase",
+            "text": "The RL phase was further analyzed through ablation studies, which confirmed the model’s continued dependence on the T5-large model. Several factors may have contributed to the observed outcomes, including the model’s inherent complexity, sensitivity to hyperparameter tuning, the nature of the RL environment, and possible covariate shift between SL and RL phases. These challenges highlight the intricacies of RL training and the need for careful analysis and tuning."
+        },
+        {
+            "section_id": "4.5",
+            "parent_section_id": "4",
+            "section_name": "4.5. Benchmarking Results",
+            "text": "The model was benchmarked on a subset of Miniwob tasks, focusing on 40 out of 80 available tasks. The results showed competitive performance with previous supervised learning methods while using less training data. A key finding was the tendency of previous models to memorize rather than understand the distribution of target elements. This work offers a more robust and reliable assessment of performance."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "5. Discussion and Limitations",
+            "text": "Models trained solely on Miniwob are proficient but lack transferability to diverse web tasks. Pretrained models like T5 have limitations in input context and are prone to overfitting. Our approach in Miniwob++ establishes a more realistic baseline, albeit sometimes lower than prior works (Ziegler et al., 2020  ###reference_b34###; Christiano et al., 2017  ###reference_b11###), but we showed it is more grounded to its environment.\nPerformance evaluation needs to be multifaceted, incorporating metrics beyond task accuracy, such as generalization abilities. Models remain data-intensive and susceptible to memorization; alternative approaches like RLHF should be explored (Ziegler et al., 2020  ###reference_b34###; Christiano et al., 2017  ###reference_b11###).\nDespite their limitations, large pre-trained models still perform best, but intermediate-sized models remain under-explored. Small models excel in task-constrained settings but struggle with complexity, while large models offer better generalization but are often overqualified for tasks they solve (Hoffmann et al., 2022  ###reference_b15###; LeCun, 2023  ###reference_b19###). The integration of multimodal approaches, like ours with T5, reveals tokenization discrepancies that need optimization (Hoffmann et al., 2022  ###reference_b15###; LeCun, 2023  ###reference_b19###), and training improvements may include randomizing DOM elements and using ablated inputs to focus on content rather than pattern memorization.\nWeb navigation automation involves critical ethical and legal aspects that demand attention. Ensuring user privacy is paramount, requiring secure data handling and compliance with regulations like GDPR (European Parliament and Council of the European\nUnion, [n. d.]  ###reference_b12###). The growing capability of large language models to mimic humans raises ethical concerns about impersonation (Baudrillard, 1981  ###reference_b6###), outpacing traditional identifiers like the Turing test (Ayesh, 2019  ###reference_b5###). Finally, clear accountability must be established to navigate complex liability issues, including potential violations of copyright laws and data protection policies. These challenges highlight the need for robust regulations and well-defined licensing agreements."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "6. Conclusion",
+            "text": "Automating web navigation tasks offers many benefits but also presents significant challenges. Our behavioral cloning and hierarchical planning models set a more grounded performance baseline by mitigating overfitting tendencies commonly seen in large language models (LLMs). While the fine-tuned multimodal model excelled in behavioral cloning, its reinforcement learning phase was hindered by covariate shift due to architectural limitations. We highlight the need for further exploration in multimodal architecture design and the potential of fine-tuned LLMs. \n\nThis work emphasizes the importance of understanding the limitations of LLMs over web navigation tasks, exploring optimal architectures, and considering ethical implications. While large models excel in few-shot scenarios, smaller models are efficient for known environments. The exploration of intermediate sizes and multimodal models offers promising opportunities. Pre-processing techniques can alleviate some issues, but further efforts are needed for more capable models. Ethical considerations, including misuse, impersonation, and accountability, must be addressed to ensure the safety and integrity of the web. This work contributes by highlighting these challenges and proposing techniques to overcome them, paving the way for future advancements in the field."
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "7. Appendix",
+            "text": "###figure_16### ###table_1###"
+        }
+    ]
+}

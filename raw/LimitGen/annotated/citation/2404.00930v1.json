@@ -1,0 +1,180 @@
+{
+    "title": "PSYDIAL: Personality-based Synthetic Dialogue Generation using Large Language Models",
+    "abstract": "We present a novel end-to-end personality-based synthetic dialogue data generation pipeline, specifically designed to elicit responses from large language models via prompting. We design the prompts to generate more human-like dialogues considering real-world scenarios when users engage with chatbots. We introduce PSYDIAL, the first Korean dialogue dataset focused on personality-based dialogues, curated using our proposed pipeline. Notably, we focus on the Extraversion dimension of the Big Five personality model in our research. Experimental results indicate that while pre-trained models and those fine-tuned with a chit-chat dataset struggle to generate responses reflecting personality, models trained with PSYDIAL show significant improvements. The versatility of our pipeline extends beyond dialogue tasks, offering potential for other non-dialogue related applications. This research opens doors for more nuanced, personality-driven conversational AI in Korean and potentially other languages. Our code is publicly available at https://github.com/jiSilverH/psydial.\n\n\n\nKeywords: synthetic dialogue generation, personality-based dialogue, large language model",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "1.   Introduction",
+            "text": "Conversations are an integral part of our daily lives, functioning as essential social interactions intrinsic to human existence. Over the years, researchers have endeavored to replicate these interactions with language models, hoping to enable conversations with machines that reflect our everyday experiences.\nThe emergence of generative pre-trained models has brought us closer to realizing this goal. DialoGPT Zhang et al. (2020  ###reference_b27###), an extension of GPT-2 Radford et al. (2019  ###reference_b20###), was specifically designed to support multi-turn dialogue generation by leveraging extensive training on a substantial dialogue dataset. However, it is important to note that the fine-tuning process requires a considerable amount of human-annotated data and presents challenges in terms of construction.\nAn alternative to manually collecting and fine-tuning dialogue data is data augmentation. This technique addresses data scarcity issues. Instead of solely relying on human-curated dialogue datasets, researchers have begun to augment their training datasets Kulhánek et al. (2021  ###reference_b9###); Zheng et al. (2023  ###reference_b28###). This approach aligns with recent shifts in the research community. More recent research efforts have explored the utility of large language models (LLMs) in generating synthetic training datasets, especially for text classification tasks Yu et al. (2023  ###reference_b25###).\nAs we explore this further, it becomes apparent that imbuing machines with personalities can significantly enhance their ability to generate more human-like responses. Just as humans possess unique personalities that shape our conversations, for truly human-like chit-chat dialogues, machines too should be imbued with distinct personalities.\nWhile the field of conversational AI has seen a surge in equipping dialogue agents with distinct personas or roles, as indicated in studies like Jang et al. (2022  ###reference_b6###); Lim et al. (2023  ###reference_b11###), there remains a gap in endowing agents with specific personalities. To address this, we propose an end-to-end pipeline that uses prompting in LLMs to generate a comprehensive synthetic dialogue dataset based on personality. This pipeline comprises 5 steps: Personality setting, Profile selecting, Dialogue generation, Filtering, and Regeneration. Figure 1  ###reference_### provides an overview of our pipeline. Using this pipeline, we have created the Personality-based Synthetic Dialogue dataset (PSYDIAL), which includes approximately 2900 machine-generated conversations. Our personality definitions are based on the Big Five Personality Factors De Raad (2000  ###reference_b5###). Among the five dimensions (Openness to experience, Conscientiousness, Extraversion, Agreeableness, and Neuroticism), we focus primarily on Extraversion due to its discernible nature to human perception, following the previous work Mairesse et al. (2007  ###reference_b15###). We use CHATGPT as our base LLM. Our dataset analysis and experimental results demonstrate the effectiveness of our pipeline. Furthermore, our method can be readily extended to other large language models and adapted for generating datasets for various tasks. The key contributions of our work are suggested as follows:\nWe present a pipeline designed for personality-based dialogue generation using LLMs. This end-to-end process is broken down into five distinct steps, each equipped with specialized prompts. A standout feature of our pipeline is its ability to autonomously generate dialogues, minimizing human intervention in most phases.\nWe release a Korean personality-based dialogue dataset enriched with personality nuances, created through our pipeline. To the best of our knowledge, this is the first dataset that captures Korean dialogues with an emphasis on personality.\nWe conduct a comprehensive analysis of the dataset gathered using our pipeline and explore the LLM’s perspective on personality.\nWe fine-tune a Korean pre-trained generative model with our dataset to assess its quality. The findings demonstrate that our dataset is both well-formulated and conducive to training personality-reflective models.\nThe data generation framework that we have introduced is universally applicable across languages and tasks, offering a valuable tool for challenges in data synthesis."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "2.   Related Work",
+            "text": ""
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "2.1.   Synthetic Dialogue Generation using LLMs",
+            "text": "In an effort to create natural, human-like dialogue models, the predominant approach is to utilize pre-trained language models (PLMs). DialoGPT Zhang et al. (2020  ###reference_b27###) built upon GPT2 Radford et al. (2019  ###reference_b20###) by fine-tuning it with a dataset sourced from Reddit for conversational response generation. However, collecting dialogue data is both tedious and time-consuming. Rather than simply fine-tuning the model on a constructed dataset, an alternative method uses PLMs to augment existing datasets Kulhánek et al. (2021  ###reference_b9###); Zheng et al. (2023  ###reference_b28###). Kulhánek et al. (2021  ###reference_b9###) augmented training dataset by paraphrasing each utterance with Transformer-based models. However, synthetic datasets often serve a supplementary role, typically merged with manually curated dialogue datasets for training purposes. As LLMs have emerged, there has been a notable shift in synthesizing dialogue. Various studies now employ LLMs, using proper prompts to make their targeted datasets. Zheng et al. (2023  ###reference_b28###) utilizes expert-crafted dialogues as in-context examples to steer LLMs toward creating a complete social conversation dataset. Our study also prioritizes generating entire conversations. While expert-crafted dialogues provide valuable guidance, their manual creation is both labor-intensive and yields inconsistencies in quality. To prevent these limitations, we prompt LLMs without in-context examples, enabling the creation of a varied dataset across different topics. To ensure the quality of these generated dialogues, we incorporate a filtering process with the LLMs.\n\nAI in healthcare has become pivotal in transforming medical diagnosis, treatment planning, and patient management. From predictive analytics to personalized medicine, AI systems such as deep learning algorithms are increasingly used to interpret complex data like MRI scans, enhancing the accuracy of diagnoses and optimizing treatment strategies (Esteva et al., 2019  ###reference_b15###)."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "2.2.   Personality-based Dialogue Generation",
+            "text": "While many studies have investigated grounding in persona or knowledge for dialogue generation, personality-based dialogue is still an emerging field. However, a growing interest towards personality-centric tasks is noticeable. Among these emerging areas of interest, using LLMs for personality tests has attracted significant attention Ji et al. (2023  ###reference_b7###); Rao et al. (2023  ###reference_b21###); Pan and Zeng (2023  ###reference_b16###). Jiang et al. (2023  ###reference_b8###) introduced a dataset based on the Big Five personality theory to evaluate the ability of LLMs to embody specific personalities. Building on this, our approach also applies the prompting method for LLMs in the context of Korean dialogues, thus broadening the use of personality-based conversational models. \n\nThe application of AI in healthcare is rapidly advancing with promising results in diagnostic accuracy, personalized medicine, and patient monitoring. AI systems are being developed to analyze medical data, assist in clinical decision-making, and predict patient outcomes, heralding a transformative impact on the industry."
+        },
+        {
+            "section_id": "2.3",
+            "parent_section_id": "2",
+            "section_name": "2.3.   Dataset Filtering using LLMs",
+            "text": "To minimize human involvement in the data filtering process, Swayamdipta et al. (2020  ###reference_b23###) introduced the concept of dataset cartography to evaluate data quality through the creation of a data map. They categorized the dataset into three distinct groups: hard-to-learn, easy-to-learn, and ambiguous. Building upon this approach, Lee et al. (2023  ###reference_b10###) applied dataset cartography to their method. For their sensitive questions and acceptable response dataset, which was generated by prompting LLMs, they adopted the dataset cartography during the filtering stage. Only the text labeled as ambiguous was re-generated by human annotators. Similarly, Zheng et al. (2023  ###reference_b28###) adopted a heuristic-based post-processing technique to filter the machine-augmented dataset. There are some attempts to evaluate text using LLMs Chiang and yi Lee (2023  ###reference_b4###); Liu et al. (2023  ###reference_b13###). During the filtering phase, we utilize an LLM and their prompting abilities, eliminating the need for human intervention. This approach is cost-effective and time-saving, and our results demonstrate that the dataset can support consistent quality without human involvement.\n\nAI in healthcare is increasingly gaining traction, with applications ranging from clinical decision support systems to personalized medicine, improving diagnostic accuracy and operational efficiency. Esteva et al. (2021) explored AI's role in interpreting medical data, highlighting accuracy improvements. Xie et al. (2022) and Johnson et al. (2023) further integrated AI with electronic health records to predict patient outcomes, transforming patient care dynamics."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "3.   Personality-based Dialogue Generation Pipeline",
+            "text": "We postulate the existence of two interlocutors within a dialogue: Person A, representing the system, and Person B, representing the user. This formulation mirrors real-world scenarios, wherein practical applications, such as chatbot interactions, it is typically the user who initiates the conversation with the system. We want a chit-chat dialogue agent to be endowed with a certain personality as a human user. Therefore, we set a certain personality for both interlocutors.\nThe construction of the dataset consists of five stages as shown in Figure 1  ###reference_###: 1) Personality Setting, 2) Profile Selecting, 3) Dialogue Generation, 4) Dialogue Filtering and 5) Dialogue Regeneration. A thorough illustration of each stage will be provided in the subsequent sections. We use openAI’s API to generate dialogues."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "3.1.   Personality Setting",
+            "text": "We use a list of statements that describe specific personalities. These statements are based on the Big Five personality test. Detailed personality statements can be found in Appendix A  ###reference_###. To ensure that the model fully understands a specific personality, we randomly select a statement related to the given personality. As we expect two participants in one dialogue session, each one is assigned either an extraversion or an introversion description."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "3.2.   Profile Selecting",
+            "text": "Through a series of experiments, we found that when an interlocutor’s profile information is absent, CHATGPT tends to generate dialogues with similar topics. We have observed that when Person ’s personality is described as extroverted, it tends to increase the likelihood that Person  always attends parties. On the contrary, if Person ’s personality is characterized as introverted, CHATGPT tends to suggest that Person  has a preference for reading.\nTo mitigate the issue mentioned above and to generate dialogues rich in topical diversity, we leverage profile information from the PERSONA-CHAT dataset Zhang et al. (2018  ###reference_b26###), which contains at least five profile sentences representing a persona of an individual. A single sentence that corresponds to the defined personality of Person  is chosen from a profile. This specific profile selection for Person  is made with the intention of endowing the dialogue agent with a distinct personality. Additionally, this serves as a dialogue topic and contributes to the generation of diverse dialogues. CHATGPT inherently has the ability to select a profile from a persona based on the designated personality. If the persona sentences do not contain the designated personality, the system outputs \"cannot select the profile\"."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "3.3.   Dialogue Generation",
+            "text": "Dialogue generation is achieved using a dialogue prompt. Dialogue prompt comprises four subprompts -  1) Profile Prompt, 2) Personality Prompt, 3) Character Prompt, and 4) Style Prompt."
+        },
+        {
+            "section_id": "3.3.1",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.1.   Profile Prompt",
+            "text": "The profile prompt is comprised of the profile sentence selected in §3.2  ###reference_###. By acting as the dialogue’s topic, this prompt aids LLMs in selecting the subject matter of the dialogue, thereby resulting in dialogues that exhibit topical diversity."
+        },
+        {
+            "section_id": "3.3.2",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.2.   Personality Prompt",
+            "text": "The personality prompt incorporates the personalities , , …,  of Person , and , , …,  of Person , selected from a predefined list of personality descriptions. Here,  denotes the number of dimensions of the personality. Given that we adopt the Big Five personality traits in our study, the maximum value for  is 5. Among the five dimensions, we mainly concentrate on Extraversion because of its noticeable characteristics as perceived by humans, in line with prior research."
+        },
+        {
+            "section_id": "3.3.3",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.3.   Character Prompt",
+            "text": "When attempting to engage CHATGPT in chit-chat with given personalities, it fails to generate a dialogue, replying with \"I am an AI model, so I cannot have a personality\". Therefore, the introduction of a character prompt becomes necessary. This prompt induces the model to create two virtual humans with the assigned personalities, enabling conversation between the model and these entities. This concept was inspired by Park et al. (2023  ###reference_b18###), which developed generative agents, referred to as AI NPCs (Non-Player Characters), exhibiting specified human behaviors and capable of interacting with humans."
+        },
+        {
+            "section_id": "3.3.4",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.4.   Style Prompt",
+            "text": "The Style Prompt is responsible for defining the style of dialogue. In Korean culture, colloquial Korean is categorized into two styles: formal and informal, based on the level of respect. Koreans use different vocabularies and sentence endings depending on the level of respect. In other words, informal style is being used among acquaintances aiming for friendliness. To incorporate this linguistic characteristic, we assign the first style to represent informal speech. This decision also reflects the human dialogue pattern, where interlocutors typically have background information about each other.\nThe second style is determined by who initiates the conversation, mirroring real-world interactions where users generally initiate dialogue with the system. Accordingly, we have incorporated a style where Person , acting as a user, initiates the conversation. This prompt can be extended with any desirable styles."
+        },
+        {
+            "section_id": "3.4",
+            "parent_section_id": "3",
+            "section_name": "3.4.   Dialogue Filtering",
+            "text": "The reliability of CHATGPT in generating dialogues that precisely meet the given prompt conditions is not always ensured. This brings the need for a filtering mechanism. Previous studies, such as Lee et al. (2023  ###reference_b10###), have relied on human annotators to filter the output generated by LLM. In contrast, our approach taps into the inherent self-evaluative capacity of LLMs. During this step, CHATGPT is presented with a filtering prompt, designed to assess if the generated dialogue aligns with the outlined personalities, profiles, and styles from §3.3  ###reference_###. This prompt is divided into three specific sub-prompts. Firstly, Profile Filtering determines whether the dialogue accurately represents the given profile information. Next, Personality Filtering encourages the model to recognize and evaluate the depicted personalities, effectively acting as an introspective measure. This plays a pivotal role in enhancing the dataset’s quality. Lastly, we employ Style Filtering to ascertain if the dialogue conforms to an informal Korean speech pattern. You can incorporate additional filtering criteria based on the data generation prompts used during the dialogue creation process."
+        },
+        {
+            "section_id": "3.5",
+            "parent_section_id": "3",
+            "section_name": "3.5.   Dialogue Regeneration",
+            "text": "After the filtering process, we categorize the dialogues into two types: positive dialogues that meet all the requirements for dialogue generation, and negative dialogues that fall short. For the negative dialogues, combined with the selected profile sentence, we prompt the model multiple times to achieve higher-quality dialogue that meets all the generation conditions.\nThis means we re-prompt the model using the same profile that was selected in the Profile Selecting (§3.2  ###reference_###). The regenerated sample is again go through the filtering process described in Dialogue Filtering (§3.4  ###reference_###). If the re-generated sample is classified as negative in the filtering process, we once again go through the regeration process. After going through several iteration, we can assure the improvement in dialogue quality and adherence to the specified conditions."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "4.   Data Analysis",
+            "text": "We conduct a comprehensive analysis of the PSYDIAL dataset, taking into account the various stages of our pipeline. Initially, we analyze the data distribution produced by the pipeline. Subsequently, we undertake a profile analysis to determine which profiles were chosen, and which were not, based on the specified personality. We also examine the filtering process, which has been iteratively applied three times, encompassing both filtering and regeneration stages."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "4.1.   Dataset Distribution",
+            "text": "PSYDIAL features dialogues between two interlocutors, with each being characterized by a particular personality dimension from the Big Five personality framework. For this study, our emphasis is on the Extraversion dimension. The data’s constitution, post three cycles of filtering and regeneration, is detailed in Table 1  ###reference_###. We gathered roughly 2900 dialogues, taking into account four different personality scenarios. Furthermore, Table 2  ###reference_### details the turn count and the token length of utterances across the dataset. On average, dialogues consist of 8 turns and utterances have a token length of around 33."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "4.2.   Profile Analysis",
+            "text": "In the filtering stage, some dialogues were labeled Profile False. This occurs when CHATGPT produces an output indicating “None of the sentences provided represent an extrovert/introvert\". To understand which profiles were selected versus those that were not, we examine each case."
+        },
+        {
+            "section_id": "4.2.1",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.1.   Selected Profile Characteristic",
+            "text": "We use sentence embedding clustering on profiles selected during the Profile Selecting (§3.2  ###reference_###) phase to better understand their characteristics. As shown in Table 3  ###reference_###, the top five frequently chosen profiles for each personality clearly distinguish between extraversion and introversion. Profiles related to extraversion often display traits of active lifestyles, sociability, and a preference for outdoor environments. Conversely, profiles associated with introversion typically show a preference for introspection and solitary activities."
+        },
+        {
+            "section_id": "4.2.2",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.2.   Non-selected Profile Characteristic",
+            "text": "To understand why certain profile sentences are not chosen based on personality during the Profile Selecting stage (§3.2  ###reference_###), we inquire with CHATGPT about its decision to exclude specific profile sentences. CHATGPT responded that ‘profiles that are not selected tend to include information about an individual’s job, personal attributes, family, and abilities—details that are not direct indicators of extroversion/introversion’.\nFurthermore, we also ask how CHATGPT perceives extroverts and introverts. It describes an extrovert as a person who is outgoing, sociable, and enjoys being around people and an introvert as someone who is typically more reserved, enjoys time alone, and finds social activities draining.\n###figure_2###"
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "4.3.   Filtered Dialogue Analysis",
+            "text": "To illustrate the effectiveness of the Dialogue Filtering phase (§3.4  ###reference_###), we present the embeddings of concatenated utterances from dialogues in Figure 2  ###reference_###. The left figure shows text embeddings before applying Dialogue Filtering, while the right figure shows them after applying Dialogue Filtering. We concatenated the utterances for each speaker and transformed them into sentence embeddings using the Korean version of the Sentence Transformer111https://github.com/jhgan00/ko-sentence-transformers. We then visualized these embeddings using a two-dimensional t-SNE Van der Maaten and Hinton (2008  ###reference_b24###). Red dots represent text embeddings associated with the extraversion dimension, and blue dots represent those associated with the introversion dimension. It is noteworthy that after the filtering process, there is a decrease in overlapping sample points, particularly in the 0 to 10 range on the x-axis. After filtering, the data points in the figure are more densely clustered, highlighting the method’s effectiveness in refining the dataset.\nTable 4  ###reference_### provides a detailed distribution across our three sequential cycles of filtering and regeneration. If a sample successfully passes through all filters, we categorize it as a positive sample. Conversely, if a sample does not meet all filter criteria, we categorize it as a negative sample. Filters were applied to negative samples based on the profile, personality, and style prompts given during Dialogue Generation (§3.5  ###reference_###).\nThe substantial filtering observed in the initial round emphasizes the pivotal role the first filtering phase plays in refining the data. To elaborate, around 25% of the initially crafted data was excluded based on profile criteria. This suggests that CHATGPT was unable to identify a single profile sentence that aligns with the specified personality trait. A more in-depth explanation of why CHATGPT failed in this selection can be found in §4.2.2  ###reference_.SSS2###.\nDuring personality filtering, CHATGPT tends to inaccurately predict personalities when both participants exhibit similar traits. This arises from CHATGPT’s inclination to label a participant with a slightly stronger extraversion characteristic as an extrovert and one with slightly weaker extraversion as an introvert in relative terms.\nIn addition to other criteria, we examine the style of utterances, targeting an informal and friendly Korean tone. Only one data sample was filtered out based on the given style condition. This entry used the neutral politeness level, an old speech style that is less favored among the younger Korean generation.\nThe filtering process described can be adapted to any task that requires refinement. However, the results depend on the specific criteria set used during the data generation phase."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "5.   Experiment",
+            "text": "We evaluate the effectiveness of PSYDIAL data in personality-based dialogue generation by comparing pre-trained models with those fine-tuned using PSYDIAL data. The experimental results show that our dataset significantly improves the model’s ability to generate responses that reflect personality."
+        },
+        {
+            "section_id": "5.1",
+            "parent_section_id": "5",
+            "section_name": "5.1.   Input Configuration",
+            "text": "We fine-tune the model with a single-turn format. We structure every dialogue as pairs of utterances. Given a dialogue session  comprising several utterances exchanged between Person  and Person , we can express this as:\nIn this representation,  and  stand for Person  and Person , respectively. The variable  signifies the unidentified interlocutor concluding the conversation. The variable  represents the unidentified participant who concludes the conversation, being either Person  or Person . Meanwhile,\n denotes the total number of utterances in the dialogue session."
+        },
+        {
+            "section_id": "5.2",
+            "parent_section_id": "5",
+            "section_name": "5.2.   Experimental Detail",
+            "text": "In our study, we evaluate three different model configurations. Firstly, we leverage Pre-trained Models to check their inherent performance on generating personality-based dialogues. Secondly, we proceed with Fine-tuning using the Chit-Chat Dataset. Given the unique characteristic of PSYDIAL as a personality-centric chit-chat dataset, we fine-tune language models on human-annotated Korean chit-chat data constructed by Smilegate222https://github.com/smilegate-ai/HuLiC. Our aim is to ascertain whether a model, after fine-tuning on standard chit-chat data, can effectively produce responses imbued with personality traits. Thirdly, we proceed with Fine-tuning Using Our Dataset. In this setting, we experiment with two configurations: one that generates an utterance based on the previous one, and another that imprints a specific personality onto the system, considering practical applications in the real world. For the second configuration, the personality of the interlocutor is used as input for the model. All models, except the pre-trained ones, are fine-tuned over three epochs."
+        },
+        {
+            "section_id": "5.3",
+            "parent_section_id": "5",
+            "section_name": "5.3.   Baseline Model",
+            "text": "We utilize several open-source Korean generative pre-trained models for the experiment. 1) KoGPT2: This model is a localized adaptation of GPT2 for Korean. Trained on a corpus of roughly 40GB of Korean data, it employs character byte-pair encoding and is adept at processing both textual and graphical emojis. The model contains 125 million parameters.\n2) KoBART: Based on the BART architecture, KoBART is customized for the Korean language. Its training data is diverse, covering the Korean Wiki, news articles, books, Blue House National Petition texts, and a substantial corpus provided by The National Institute of the Korean Language. The model has 123 million trainable parameters.\n3) Kolang-T5: This model is a Korean adaptation of the T5 framework. The model is trained on five tasks to do various tasks in Korean. The model has 225 million parameters. 4) KoDialoGPT: This is the Korean variant of GPT2, fine-tuned in line with the DialoGPT approach as described in Zhang et al. (2020  ###reference_b27###). It has 125 million parameters. In the experiment, we did not fine-tune this model because it had already been trained on a Korean daily conversation corpus."
+        },
+        {
+            "section_id": "5.4",
+            "parent_section_id": "5",
+            "section_name": "5.4.   Evaluation Metric",
+            "text": "We evaluate the generated response with metrics commonly used in text generation. 1) BLEU Papineni et al. (2002  ###reference_b17###): The BLEU score measures the similarity between a machine-generated response and a target response. A higher BLEU score denotes a higher resemblance between the compared sentences. For calculating the BLEU-2 score, we employ the nlg-eval333https://github.com/Maluuba/nlg-eval(Sharma et al., 2017  ###reference_b22###) toolkit. 2) ROUGE Lin (2004  ###reference_b12###): This metric evaluates the degree of overlap between machine-generated summaries and reference summaries using shared n-grams. We utilize ROUGE for assessing dialogue response generation. 3) Perplexity (PPL) Bengio et al. (2000  ###reference_b1###): We use the perplexity measure to assess the fluency of the generated responses. The 3-gram PPL score is computed using the KoGPT2 language model. 4) Personality Accuracy (P-ACC): To verify if the generated response reflects the given personality trait, we employ the Roberta-base Liu et al. (2019  ###reference_b14###) model. This model, pre-trained on the KLUE benchmark Park et al. (2021  ###reference_b19###), was fine-tuned using our dataset over 5 epochs."
+        },
+        {
+            "section_id": "5.5",
+            "parent_section_id": "5",
+            "section_name": "5.5.   Result",
+            "text": "Table 5  ###reference_### shows the results of automatic evaluations carried out on various Korean generative models with different training configurations.\nPre-trained models (1) and those fine-tuned with the chit-chat dataset (3) struggle to produce responses reflecting distinct personalities, except the KoBART model fine-tuned with a chit-chat dataset. Although KoDialoGPT is fine-tuned for everyday dialogues, it has difficulty generating text with specific personality traits. Significant improvements in metrics were observed when we trained the models using our dataset (4). Specifically, adjusting the system’s personality to match practical application settings (5) resulted in an accuracy increase of up to 88%. This clearly highlights the importance of setting the system’s personality. A comparison of pre-trained models with adjusted system personality settings (2) shows that pre-trained models fail to reflect the interlocutor’s personality adequately. Except for the perplexity of the Kolang-T5 model, scores improved across all metrics and models when the system personality setting was applied."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "6.   Conclusion",
+            "text": "We introduce an end-to-end pipeline for generating synthetic dialogue data, leveraging the prompting method with Large Language Models. This five-step process is based on real-world situations where a user interacts with a chatbot. This pipeline can easily be applied to various dialogue tasks and even non-dialogue related tasks. We also present PSYDIAL, a pioneering Korean dialogue dataset curated from this pipeline, focused on personality-based dialogues. Models trained on our dataset showed varied performance levels, highlighting the importance of our dataset and its training approach. For future research, exploring optimal prompts for LLMs, enhancing the personality-based dataset, and expanding the range of personality dimensions offer promising directions."
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "7.   Limitation",
+            "text": "Firstly, we have not explored multiple personality dimensions. However, with minimal adjustments to our pipeline, we can synthesize dialogues involving interlocutors with multiple personalities.\nSecond, the ability of CHATGPT to generate Korean dialogues leaves room for improvement. Certain phrases come across as unnatural, akin to direct translations from English into Korean, making it challenging to create natural-sounding Korean utterances.\nThirdly, during the Profile Selecting process (§3.2  ###reference_###), there is a possibility of selecting similar profile sentences. The PERSONA-CHAT data was formulated by revising collected personas. Consequently, when we used sentence embedding clustering on these profile sentences, we encountered numerous similar entries. This can impact the topical diversity in dialogue generation.\nLastly, during the Dialogue Regeneration (§3.5  ###reference_###), we regenerate negative dialogues three times. The number of regenerations is decided heuristically. Therefore, a thorough experiment to determine the optimal number of regenerations should be conducted."
+        }
+    ]
+}

@@ -1,0 +1,120 @@
+{
+    "title": "Enhancing Content-based Recommendation via Large Language Model",
+    "abstract": "In real-world applications, users express different behaviors when they interact with different items, including implicit click/like interactions, and explicit comments/reviews interactions.\nNevertheless, almost all recommender works are focused on how to describe user preferences by the implicit click/like interactions, to find the synergy of people.\nFor the content-based explicit comments/reviews interactions, some works attempt to utilize them to mine the semantic knowledge to enhance recommender models. However, they still neglect the following two points:\n(1) The content semantic is a universal world knowledge; how do we extract the multi-aspect semantic information to empower different domains?\n(2) The user/item ID feature is a fundamental element for recommender models; how do we align the ID and content semantic feature space?\nIn this paper, we propose a ‘plugin’ semantic knowledge transferring method LoID, which includes two major components: (1) LoRA-based large language model pretraining to extract multi-aspect semantic information; (2) ID-based contrastive objective to align their feature spaces.\nWe conduct extensive experiments with SOTA baselines on real-world datasets, the detailed results demonstrating significant improvements of our method LoID.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "1. Introduction",
+            "text": "To extract valuable content semantic information, the pioneering works are formed as a tagging prediction task: for a user-item pair in test set, give the historical user/item contents in training set (e.g., reviews), then predict their possible interaction rating."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "2. Preliminary",
+            "text": ""
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "2.1. Problem Statement",
+            "text": "This work considers a brief task: For one domain dataset , it contains user-item ratings and textual contents, and each user-item interaction primarily comprises the following four elements: user , item , the corresponding rating , and the textual content token list  left by the user.\nOur model aims to predict ratings by historical content and user/item ID information.\nBesides, to test the ‘plugin’ idea effectiveness, we further consider multi-domain scenarios, that is: given source domain content information , predict target domain  rating score."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "2.2. Low-Rank Adaptation (LoRA)",
+            "text": "Before going on, we first explain the LoRA (Hu et al., 2021  ###reference_b11###), to show the basic idea of how to fast tuning an LLM (Devlin\net al., 2018  ###reference_b10###).\nIndeed, the unit block of LLM, transformer (Vaswani et al., 2017  ###reference_b22###), consists of two parts: (Masked) attention and MLPs (FFM).\nThe two parts introduce four pre-trained parameter matrices (e.g., ).\nThen, the challenge is: how to update those matrices without re-training them or involving new large parameters.\nThereby, LoRA was proposed by assigning two small matrics for any pre-trained matrix :\nwhere  is the modified weight matrix,\n and  are low-rank matrices.\nLoRA freezes the original large parameter matrix , introduces and updates it by .\nNext, we can fine-tune the LLM by any supervised Task that without updating all parameters as follows:\nwhere  is extra added parameters and  is all parameters111In our work, we only introduce extra 4M  parameters to tune 110M  BERT.."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "3. Methodology",
+            "text": ""
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "3.1. Overview",
+            "text": "The architecture of our method LoID is illustrated in Figure 1  ###reference_###, which includes two processes.\nIn part (a), we first train the LoRA parameters of source domain as ”plug-ins” to enhance target domain prediction without further re-training.\nIn part (b), we first extract historical contents of user/item to obtain user/item semantic representation, and then align the ID and semantic to make target domain rating prediction, note that the source domain LoRA plugin is an optional choice."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "3.2. LoRA-based Encoder Pretraining",
+            "text": "Source LoRA.\nTo get users’ behavior data from the source domain, We leverage the LoRA strategy to pre-train the source domain222For better understanding, we use BERT as LLM to show our method details..\nIn the pre-training task, we leverage rating prediction by  token to predict rating directly:\nwhere BERT is the LLM forward procedure, Predict is an MLP to generate the prediction score , then we adopt the Mean Squared Error (MSE) loss to optimize LoRA parameters:\nwhere  means the number of the samples of source domains, / represent predicted/real rating respectively.\nAfter pre-training all source domain’s LoRA parameters, we can use them as plugins to enhance BERT when dealing with other target domain tasks without further re-training."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "3.3. Re-LoRA In Target Domain",
+            "text": "Target LoRA.\nEnabling the model to adapt to the target domain, we introduce a LoRA module (i.e., Target LoRA) again in the target domain to fine-tune the target LoRA parameters.\nIn the Re-LoRA process, we freeze the parameters of the BERT and source LoRA, and the only part that needs training is Target LoRA:\nwhere  is the LLM part’s parameters of target domain.\nIn the next, we explain how to align the language semantic and ID space."
+        },
+        {
+            "section_id": "3.4",
+            "parent_section_id": "3",
+            "section_name": "3.4. ID-based Contrastive Learning",
+            "text": "As the fundamental element of CF-based recommender work, the user/item IDs are indispensable in achieving personalized signals.\nHow to align the space of semantic/ID is the key to making the content information more competitive for industrial RS.\nUser/Item Text Encoder. Considering the computation scale of LLM, we randomly extract historical  contents in the target domain (/) to describe the target domain user/item  holistic preferences/properties:\nwhere  and  are the embeddings for the user’s and item’s  content. and  are the corresponding textual content token list, and  stands for the LLM parameter on the target domain.\nAttention Layer.\nOn top of the user/item historical content  semantic information, we devise a novel attention mechanism to exchange the user/item semantic/ID information.\nSpecifically, we integrate the semantic information  into the item representation , versus versa for user representation .\nBy this mechanism, ID embedding and  token are fused, after which we obtain the updated item representation .\nSimilarly, on the user side, we obtain  as follows:\nwhere  and  are the updated item and user representations.\nContrastive Loss. The Attention mechanism primarily focuses on different parts of the input sequence but does not explicitly consider the relationship between users and items. So, we conduct contrastive learning, enhancing the similarity between interactive users and items.\nFor each updated representation /, treated as an anchor, we pair it with the original user/item representation as a positive sample , and another representation in the batch as a negative sample . The goal is to minimize the distance  and maximize . The loss function is minimized to ensure that the representations of similar items/users are closer in terms of the distance .\nwhere  is the representation of the updated item/user,  represents the original feature representation of the user/item associated with the current content, as positive sample.  represents the negative sample.\n is a margin constant that enforces a ”safe distance” constraint on correctly classified samples, ensuring that the model’s classification results have sufficient robustness."
+        },
+        {
+            "section_id": "3.5",
+            "parent_section_id": "3",
+            "section_name": "3.5. Model Optimization",
+            "text": "Finally, we concatenate  and  to obtain the final score:\nwhere — means the number of the samples,  and  represent predicted and real rating respectively.\nThroughout the training process, the total loss comprises the MSE loss of rating prediction loss and the contrastive loss incurred during contrastive learning:\nwhere  denotes the prediction loss,  is the weight assigned to the contrastive loss, and  represents the contrastive loss."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "4. Experiments",
+            "text": ""
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "4.1. Experimental Setup",
+            "text": "Remark ‘’ indicates that this domain is served as the source domain."
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1. Datasets",
+            "text": "We selected 11 categories 333http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/  ###reference_ctGraph/categoryFiles/### of representative datasets from the Amazon dataset (Smith and Linden, 2017  ###reference_b21###).\nAmong them, the smallest dataset Musical Instruments includes 339,231 users, 83,046 items, 500,176 ratings, and the largest dataset Electronics comprises 4,201,696 users, 476,002 items, 7,824,482 ratings.\nConsidering the different data-scale, we select three largest datasets (e.g., Electronics, Movies, and CDs) as our source domains, which contain relatively rich records of user-item contents and ratings.\nFollowing (Chin\net al., 2018  ###reference_b8###; Catherine and\nCohen, 2017  ###reference_b4###; Chen\net al., 2018  ###reference_b5###; Seo\net al., 2017  ###reference_b19###), we randomly partitioned our datasets into training, validation, and test sets with an 8:1:1 ratio."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2. Baselines",
+            "text": "We compare LoID with several baselines, which can be categorized into three classes:\n(1) Single-aspect methods, such as DeepCoNN (Zheng\net al., 2017  ###reference_b24###) and D-Attn (Seo\net al., 2017  ###reference_b19###), extract features from the historical semantic information of users and items using CNN and attention mechanisms.\n(2) Multi-aspect methods, including ALFM (Cheng\net al., 2018  ###reference_b7###) and ANR (Chin\net al., 2018  ###reference_b8###), aim to extract multiple semantic aspects and their respective importance.\n(3) GNNs-based methods, such as BiGI (Cao\net al., 2021  ###reference_b3###) and RGCL (Shuai et al., 2022  ###reference_b20###), integrate adjacent node information from collaborative filtering."
+        },
+        {
+            "section_id": "4.1.3",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.3. Parameter Settings",
+            "text": "In our method, the embedding size  is fixed as 768, the dropout rate is fixed 0.5, the learning rate is set as 1e-5, the batch size is fixed as 4, and the training spans 5 epochs.\nIn the LoRA module, the low-rank hyper-parameter  selected from 16 to 48 with step length 8; the  selected from 0.2 to 0.5 with step length 0.1; the number of extracted user/item historical contents  is is set as .\nIn the following section, we report LoID results under , , and  by default.\nIn the experiment, we report the DeepConn, D-attn, ALFM, and ANR results in the original literature (Chin\net al., 2018  ###reference_b8###) directly.\nBesides, in BiGI, the feature and hidden layer dimension are both set to 128, the dropout rate is fixed to 0.3, the step size is 0.001 and the number of GNN layers is set to 2.\nIn RGCL, the number of GCN aggregation units and the number of output units of RGCL are both set to 64.\nThe dropout rates of Edges, GCN, and nodes are set to 1.0, 0.7, and 0.3.\nAmong our method and all baselines, we use the Adam (Kingma and Ba, 2015  ###reference_b12###) algorithm to update parameters.\n###table_1###"
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "4.2. Performance Comparisons",
+            "text": "Table 1  ###reference_### shows the performance of LoID on eleven datasets in terms of MSE metrics.\nCompared to other baselines, we note that aspect-aware recommendation methods such as ALFM and ANR consistently outperform DeepCoNN and D-Attn.\nWe attribute this to the limitations of DeepCoNN and D-Attn, which lack a comprehensive model for the intricate decision-making process in user-item interactions.\nIn addition, RGCL outperforms single-aspect and multi-aspect methods, indicating superior performance of graph neural networks. However, BiGI, despite incorporating graph networks, falls short compared to single-aspect methods. This suggests incorporating user textual semantic information is effective.\nWe observe that LoID achieves statistically significant improvement over all SOTA baseline methods.\nThis highlights that when using user contents, ID information should not be overlooked; instead, aligning them with semantic information in the same space can achieve positive performance.\nMoreover, LoID (Elec) results are superior to LoID, emphasizing enhanced performance with information from different domains.\nThis demonstrates the effectiveness of extracting multi-aspect semantic information to empower various domains and our plugin idea effectiveness.\nMulti-LoRA Merging. When we employ multiple LoRAs from different domains, the results of Multi-LoRA are superior to Single LoRA.\nWe believe the reason is that multiple LoRAs bring richer and more extensive users’ data, more accurately describing historical behavior and preference tendencies."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "4.3. Discussion of Domain Correlation Effect",
+            "text": "To explore the semantic relationship of different domains, we conducted a more granular study of how to enhance further the transfer of semantic information to empower different domains.\nWe consider whether the recommendation performance is correlated to the similarity between the target and source domains.\nFirst, we select 100 reviews from each dataset randomly, employ the Sentence-BERT (Reimers and\nGurevych, 2019  ###reference_b17###), and quantify the cosine similarity between datasets.\nThen, we assign different datasets as source domains to show the improvements compared with the origin LoID (as shown in Table 2  ###reference_###).\nWe can conclude that an increase in the similarity between domains leads to a corresponding rise in the performance improvement ratio.\nThis implies that the transfer of our method becomes more effective when domains exhibit higher similarity."
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "4.4. Discussion of Different LLMs",
+            "text": "###table_2### This section investigates the impact of different LLMs in the pre-training phase, considering two distinct paradigms, i.e., GPT and BERT.\nDue to prompt-based GPT being unable to predict floating-point numbers, thus we formulate the prompt:\nInput template: Give some example: {content1} is score {score1}, {content2} is score {score2}. Guess the score (The score should be between 1 and 5, where 1 means the lowest score, and 5 means the highest score) of {current content}, we think the score is?     Target template: {score}, {explanation}.\nTo ensure a fair comparison, we tuned them by LoRA and adopted PRF (Precision, Recall, and F1-score) as the evaluation protocol.\nTable 3  ###reference_### presents the results, indicating that the BERT outperforms GPT2-medium.\nThis superiority may be attributed to BERT belonging to bi-directional encoder-framework LLM, which is more powerful under the regression task than decoder-framework LLM."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "5. Conclusions",
+            "text": "This paper introduces a simple yet effective approach named LoID, which includes two major components.\n(1) ‘Pre-training plugin’, we propose a flexible plugin framework that could transfer different domain semantic knowledge without re-training.\n(2) ‘Aligning semantic/ID space’, we devise a novel attention mechanism to connect the semantic and ID space, making our model easily applied in industrial RS.\nExtensive experiments reveal that LoID surpasses existing SOTA methods, and in-depth analyses underscore the effectiveness of our model components.\nIn the future, we will explore the vision signal to improve our model ability."
+        }
+    ]
+}

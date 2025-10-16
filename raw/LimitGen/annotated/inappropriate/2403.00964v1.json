@@ -1,0 +1,114 @@
+{
+    "title": "MALTO at SemEval-2024 Task 6: Leveraging Synthetic Data for LLM Hallucination Detection",
+    "abstract": "In Natural Language Generation (NLG), contemporary Large Language Models (LLMs) face several challenges, such as generating fluent yet inaccurate outputs and reliance on fluency-centric metrics.\nThis often leads to neural networks exhibiting “hallucinations.”\nThe SHROOM challenge focuses on automatically identifying these hallucinations in the generated text.\nTo tackle these issues, we introduce two key components, a data augmentation pipeline incorporating LLM-assisted pseudo-labelling and sentence rephrasing, and a voting ensemble from three models pre-trained on Natural Language Inference (NLI) tasks and fine-tuned on diverse datasets.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "Natural Language Generation (NLG) models are AI systems that use neural networks to produce human-like text.\nThey have shown significant advancements in recent years, particularly with the advent of transformer-based architectures such as GPT (Generative Pre-trained Transformer) Radford et al. (2018  ###reference_b9###).\nThese models offered unprecedented levels of fluency and coherence in generated text Han et al. (2021  ###reference_b2###).\nHowever, a critical challenge arises: these models can produce linguistically fluent but semantically inaccurate outputs, a phenomenon referred to as hallucination Ji et al. (2023  ###reference_b5###).\nTo address this challenge, the Shared-task on Hallucinations and Related Observable Overgeneration Mistakes (SHROOM) has been proposed at SemEval 2024.\nIn particular, the Shared task aims to address the existing gap in assessing the semantic correctness and meaningfulness of NLG models.\nThe ever-increasing adoption of such models makes it necessary to automatically detect and mitigate semantic hallucinations Huang et al. (2023  ###reference_b4###).\nSome examples to tackle hallucination detection tasks in literature Ji et al. (2023  ###reference_b5###) are:\n(i) Information Extraction and Comparison between a generated text and a ground truth,\n(ii) Natural Language Inference Metrics that express the entailment between generated text and a ground truth or\n(iii) Faithfulness Classification Metrics that leverage upon knowledge-grounded datasets.\nIn this work, we address the SHROOM shared task by introducing an automatic pipeline of hallucination detection through the comparison between a generated text and a ground truth text.\nWe propose enriching the original data available using different augmentation techniques, including LLM-aided pseudo-labeling and sentence rephrasing.\nAdditionally, we suggest using an ensemble of three different approaches, incorporating a simple BERT-based classifier, a model trained through Conditioned Reinforcement Learning Fine Tuning (C-RLFT) Wang et al. (2023  ###reference_b11###), and a sequential model based on iterative fine-tuning.\nWe show how this ensemble benefits from using different, complementary approaches, in particular in terms of recall.\nOur methodology obtained an accuracy of 80.07% in the SemEval-Task 6 SHROOM."
+        },
+        {
+            "section_id": "1.1",
+            "parent_section_id": "1",
+            "section_name": "Dataset",
+            "text": "The dataset available for the SHROOM challenge is a collection of objects.\nEach object represents a solution of a generative language model to either of three tasks: Definition Modeling (DM), Machine Translation (MT), and Paraphrase Generation (PG).\nEach solution has been annotated, based on its contents, as either an hallucination of the generative model or not hallucination by 5 human annotators.\nFor each object, the available information includes (i) the source (src), which is the input text given to the generative language model, (ii) the hypothesis (hyp), which represents the generated textual output of the model, and (iii) the target (tgt) which is the intended reference or “gold” text that the model is supposed to generate.\nAdditionally, the task field indicates the type of task being solved, either DM, MT, or PG. The label, either ‘‘hallucination” or “not hallucination”, is determined through majority voting among five annotators, with p(hal) indicating the proportion of annotators who labeled the data point as a hallucination.\nThe gold (and augmented) data cardinalities are defined in Table 1  ###reference_###.\nThe training dataset comprises 500 instances with gold labels, denoted as , and 30,000 unlabelled instances, referred to as  (10,000 for each of the three tasks).\nThe evaluation split contains 1,500 labelled samples, with 500 instances used for validation () and 1,000 for testing ().\nWe use the validation set for fine-tuning the ensemble layer (refer to Section 2.3  ###reference_###), while the final test set provides overall results (see Section 3  ###reference_###).\nWe further rephrase the original 500 labelled sentence of the training set ( in the table, see Section 2.1.2  ###reference_.SSS2###), while applying weak labelling the 30,000 unlabelled instances (, see Section 2.1.1  ###reference_.SSS1###)."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Methodology",
+            "text": "The main goal of this work is to propose a binary classification model to predict whether the answer to a given query is a hallucination or not.\nFigure 1  ###reference_### presents the main architecture adopted to address this task111The code to replicate the experiments and the results will be released upon acceptance..\n###figure_1### We propose (i) using a data augmentation pipeline (see Section 2.1  ###reference_###) consisting of Large Language Model (LLM)-aided pseudo-labelling and sentence rephrasing and\n(ii) adopting an ensemble model (see Section 2.3  ###reference_###) based on the results of three models, defined as follows:\nBaseline model, a binary classifier based on a semantic-aware embedding (e.g. BERT-based Devlin et al. (2019  ###reference_b1###)).\nThe baseline model is presented in Section 2.2.1  ###reference_.SSS1###\nC-RLFT (Conditioned Reinforcement Learning Fine Tuning Wang et al. (2023  ###reference_b11###)), based on the introduction of pseudo-labels and augmented data, with different weighting schemes based on the quality of each data point.\nWe cover C-RLFT in more detail in Section 2.2.2  ###reference_.SSS2###\nSequential model, based on the iterative fine-tuning of the baseline model with increasingly higher-quality data, as detailed in Section 2.2.3  ###reference_.SSS3###"
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "Data Augmentation",
+            "text": "Due to the scarcity of data, we developed an approach to extend the number of labelled samples we could use to train our models. We specifically leverage two distinct techniques: manual data annotation by a single annotator and sentence rephrasing. Both approaches are based on LLMs and, as such, may themselves be subject to hallucinations or inaccuracies. As detailed next, we mitigate this problem by (1) using the C-RLFT technique Wang et al. (2023  ###reference_b11###), which involves assigning different weights to mixed-quality samples, and (2) with a sequential training that introduces different-quality labels at different training stages."
+        },
+        {
+            "section_id": "2.1.1",
+            "parent_section_id": "2.1",
+            "section_name": "2.1.1 Pseudo Labeling",
+            "text": "As stated in Section 1.1 ###reference_###, only a small fraction of the dataset available is labelled. We introduce additional labels through manual data annotation by a single annotator. Based on the hardware available, we tested several LLM models to assess the reliability of the manually created labels (in terms of accuracy). We identified SOLAR Kim et al. (2023 ###reference_b7###) as being the best-performing model among the pool of candidates. Thus, we leverage it to generate synthetic labels for unlabelled data through a few-shot learning approach. We refer to this augmented dataset as ."
+        },
+        {
+            "section_id": "2.1.2",
+            "parent_section_id": "2.1",
+            "section_name": "2.1.2 Sentence Rephrasing",
+            "text": "We utilized sentence rephrasing based on GPT-4 as an additional data augmentation technique. We do so by rephrasing both the model output and the target output of each gold sample. This approach aims to provide the model with diverse data while maintaining the reliability of the labels. Instead of employing pseudo-labelling, we used manual data annotation by a single annotator for labeling our unlabeled dataset. We refer to this dataset as ."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Models",
+            "text": "We adopt an ensemble of three models, as described below. All models are based on DeBERTa He et al. (2021  ###reference_b3###). More specifically, we use a baseline model that has been fine-tuned in different ways."
+        },
+        {
+            "section_id": "2.2.1",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.1 Baseline",
+            "text": "We employed a baseline model utilizing the DeBERTa encoder pre-trained on the Natural Language Inference (NLI) task, with a binary classification head. We fine-tune this model on the provided classification task using only data with the gold labels available, referred to as .\nThe training approach involved minimizing the Binary Cross Entropy (BCE) loss.\nWe use the probability  as the ground truth instead of the binary label. This is done to better reflect the distribution of votes of the human annotators in the output logits of the model."
+        },
+        {
+            "section_id": "2.2.2",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.2 C-RLFT",
+            "text": "Conditioned Reinforcement Learning Fine Tuning (C-RLFT) is a technique that refines models using coarse-grained reward labels, allowing fine-tuning with both expert and sub-optimal data lacking preference labels.\nIn our specific scenario, we fine-tuned the model by assigning different weights to data based on their label type, i.e., synthetic or gold. The weight assigned to each data sample influences the contribution to the final BCE loss.\nWe define a weighting scheme for the gold dataset , the pseudo-labelled dataset  and the rephrased dataset , as follows:\nWe choose weights . In this way, we aim to assign a higher importance to gold labels due to their reliability. The lowest weight is assigned to the pseudo-labelled points because of the lower quality of the automatically assigned labels. An intermediate weight is given to rephrased sentences due to the higher quality of the ground truth w.r.t. the pseudo-labelled points. The weighted loss is thus defined as follows, for a point  with ground truth , as computed for a binary classifier :"
+        },
+        {
+            "section_id": "2.2.3",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.3 Sequential",
+            "text": "The third model used is based on a sequential strategy that uses both generated and augmented data. We introduce three fine-tuning steps, performed sequentially on the initial model.\nThe model initially underwent fine-tuning using the pseudo-labelled dataset , which is the lowest-quality dataset among the three available. Subsequently, we fine-tuned the resulting model on the rephrased data , which benefits from the original, correct, labels.\nThe final fine-tuning step is then executed on the golden truth dataset .\nThis approach is inspired by curriculum learning  Soviany et al. (2022  ###reference_b10###), with data being ordered by veracity instead of difficulty.\nThis strategy aims to enhance the model’s understanding of the task by starting with a substantial amount of data, including the less reliable synthetic labels, and progressively updating the model parameters with increasingly consistent data. This sequential approach allows the model to first adapt to the task using a broader dataset and then refine its knowledge with the highest quality data available."
+        },
+        {
+            "section_id": "2.3",
+            "parent_section_id": "2",
+            "section_name": "Ensemble",
+            "text": "The final step in the proposed pipeline involves creating an ensemble of results from the previously-introduced techniques, which has already proven to be effective in other NLP tasks Jia et al. (2023  ###reference_b6###); Koudounas et al. (2023  ###reference_b8###). We trained three distinct models (baseline, C-RLFT, sequential) with specific strategies, and we generated their outputs (, , ) on a validation set of previously unseen gold data. We obtain a single result  from the previous ones by using a single-layer network ( and ), as follows:\nThis network is trained to predict a single output from the three models’ predicted probabilities. We trained this network by minimizing a BCE function."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Experimental Results",
+            "text": "This section presents the experimental setup used, and the main results obtained."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Experimental Setup",
+            "text": "The dataset used to train and validate the model is the one made available in the SHROOM challenge’s model agnostic track (refer to Section 1.1  ###reference_###). The augmentations are specified in Section 2.1  ###reference_###.\n###table_1### For the model backbone and synthetic labelling we leverage Huggingface pre-trained models222We use deberta-xlarge and deberta-xlarge-mnli as encoders, TheBloke/SOLAR-10.7B-Instruct-v1.0-GPTQ for pseudo labelling.. We also leverage GPT-4 for sentence rephrasing. All the experiments’ results are obtained based on 5 different runs.\nFor C-RLFT, we identified the best performance for weights ."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Model performance",
+            "text": "We summarize the results obtained on the test set in Table 2  ###reference_###. We report the results in terms of  score, precision and recall on the “Hallucination” class, as well as overall accuracy.\n###table_2### We use as backbone both DeBERTa and a version of DeBERTa that has been fine-tuned on the Machine Natural Language Inference (MNLI) task. Further discussions on the choice of the backbone are presented in Section 3.3  ###reference_###.\nSection 3.4  ###reference_### highlights the result differences for each of the considered strategies and includes additional considerations on the ensemble of the approaches. Finally, we provide qualitative examples of the results in Section 3.5  ###reference_###."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "Backbone impact",
+            "text": "We start by examining the differences between two backbone models, both fine-tuned on the gold data only – these are referred to as the baseline models in Table 2  ###reference_###.\nThere is a notable increase of 0.09 in the  score for the MNLI-fine-tuned model compared to the original DeBERTa. Interestingly, all the proposed DeBERTa-based approaches are still outperformed by the baseline DeBERTa+MNLI-based model (although to a lesser extent). This highlights the close relationship between the tasks of Hallucination Detection and Natural Language Inference."
+        },
+        {
+            "section_id": "3.4",
+            "parent_section_id": "3",
+            "section_name": "Strategies comparisons",
+            "text": "The baseline strategy, which utilizes all available labelled gold data, establishes a lower bound in the expected performance. Both C-RLFT and sequential training exhibit substantial performance improvements.\nRegarding the ensemble strategy, the results in terms of  score outperform individual techniques.\nWe observe a trade-off where the precision of the final result is slightly compromised in exchange for an improved recall. This suggests that the ensemble effectively identifies instances of hallucination overlooked by the standalone approaches. These advantages are consistent across both backbones implementations, with and without the additional MNLI fine-tuning.\nIn a setting where detected hallucinations are shown to the final user with a warning, we argue that the recall is a metric of greater interest (w.r.t. precision). A false negative could be potentially harmful since final users are not warned of the presence of possible hallucinations. A false positive would raise a warning that may be inspected by the final user and safely ignored.\nThe weights learned for the ensemble layer, based on Equation 1  ###reference_###, are , . This shows how both C-RLFT and the sequential models are weighted similarly and more heavily w.r.t. the baseline. The baseline is assigned a non-zero weight: it is considered, although to a lesser extent, in the final vote. The negative bias implies a learned prior: without further knowledge, the initial prediction is of a negative one (i.e., the majority class)."
+        },
+        {
+            "section_id": "3.5",
+            "parent_section_id": "3",
+            "section_name": "Qualitative Example",
+            "text": "Table 3  ###reference_### demonstrates the effectiveness of the applied strategies through some qualitative examples.\nWe specifically showcase the sentences with the minimum (first row) and maximum (second row) errors.\nThe first instance depicts a partial hallucination, attributed to the transliteration of “Sinezubii” instead of the translation “Bluetooth,” which is absent from the translation hypothesis. In the second example, despite a paraphrased similarity between the source and hypothesis, the target introduces an action (“saying”) not present in the source (“doing”). As such, we argue that this might be a case of incorrectly labelled ground truth."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Conclusions",
+            "text": "This work tackles the SHROOM Task 6 challenge at SemEval 2024, focusing on semantic hallucination in NLG models.\nWe propose an automatic pipeline for hallucination detection, utilizing data augmentation and an ensemble of three different methodologies.\nThe ensemble of the approaches obtained an accuracy of 80.07% in the task’s leaderboard.\nParticular attention should also be paid to the results obtained with the novelty method sequential, which was able to outperform the results of the other two methods due to the proposed sequential training."
+        }
+    ]
+}

@@ -1,0 +1,506 @@
+{
+    "2404.00930v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in Healthcare",
+        "ground_truth": "The paper includes irrelevant references to AI in healthcare within the related works section, which distracts from the main arguments and diminishes the overall strength of the conclusions."
+    },
+    "2404.06723v1": {
+        "section_numbers": "2.1",
+        "title": "Multimodal Representation Learning for Health",
+        "element": "AI in Autonomous Vehicles",
+        "ground_truth": "The paper includes irrelevant references to AI in autonomous vehicles within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.08491v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare diagnostics within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.01474v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in music composition",
+        "ground_truth": "The paper contains irrelevant references to AI in music composition within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.10051v2": {
+        "section_numbers": 2,
+        "title": "LLM Watermarking Algorithms",
+        "element": "AI Ethics in Autonomous Decision-Making Systems",
+        "ground_truth": "The paper contains irrelevant references to AI Ethics in Autonomous Decision-Making Systems within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.06275v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in Autonomous Vehicles",
+        "ground_truth": "The paper contains irrelevant references to AI in Autonomous Vehicles within the related works section, detracting from the main arguments and undermining the overall strength of the conclusions."
+    },
+    "2405.12119v1": {
+        "section_numbers": 5,
+        "title": "Related Work",
+        "element": "AI for Autonomous Vehicle Navigation",
+        "ground_truth": "The inclusion of irrelevant references to AI for Autonomous Vehicle Navigation in the related works distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.07117v1": {
+        "section_numbers": "4",
+        "title": "Related work:",
+        "element": "AI in healthcare",
+        "ground_truth": "The paper contains unrelated references to AI in healthcare within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.15485v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in art generation",
+        "ground_truth": "The paper contains irrelevant references to AI in art generation within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.07220v1": {
+        "section_numbers": 2,
+        "title": "II Related Work",
+        "element": "AI ethics in autonomous decision-making systems",
+        "ground_truth": "The paper contains irrelevant references to AI ethics in autonomous decision-making systems within the related works section. This distraction detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.11369v2": {
+        "section_numbers": 1,
+        "title": "Related Works",
+        "element": "AI in music composition",
+        "ground_truth": "The paper contains irrelevant references to AI in music composition within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.07001v3": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in autonomous vehicle navigation",
+        "ground_truth": "The paper contains irrelevant references to AI in autonomous vehicle navigation within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.03608v1": {
+        "section_numbers": 2,
+        "title": "Insights",
+        "element": "AI in Healthcare",
+        "ground_truth": "The paper contains irrelevant references to AI in Healthcare in the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.07142v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare diagnostics within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.01293v1": {
+        "section_numbers": 2,
+        "title": "Background",
+        "element": "AI in healthcare for diagnosis and treatment personalization",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare, specifically regarding diagnosis and treatment personalization, in the related works section. This distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.00752v1": {
+        "section_numbers": 6,
+        "title": "Related Work",
+        "element": "AI ethics and bias in machine learning",
+        "ground_truth": "The paper incorporates irrelevant references to AI ethics and bias in machine learning within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.02088v1": {
+        "section_numbers": 2.2,
+        "title": "Related Work",
+        "element": "AI in agricultural yield prediction",
+        "ground_truth": "The paper contains irrelevant references to AI in agricultural yield prediction within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.10202v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare diagnostics within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.04332v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI for climate modeling",
+        "ground_truth": "The paper contains irrelevant references to AI in climate modeling within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.16552v1": {
+        "section_numbers": 2,
+        "title": "Related work",
+        "element": "AI ethics and fairness in machine learning algorithms",
+        "ground_truth": "The paper contains irrelevant references to AI ethics and fairness in machine learning algorithms within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.06644v1": {
+        "section_numbers": 2,
+        "title": "Related work",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper includes irrelevant references to AI in healthcare diagnostics within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.04376v1": {
+        "section_numbers": 1,
+        "title": "Related Works",
+        "element": "AI in optimizing supply chain logistics",
+        "ground_truth": "The paper contains irrelevant references to AI's role in optimizing supply chain logistics within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.08115v2": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in healthcare for predictive diagnostics",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare for predictive diagnostics within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.00264v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in Robotics",
+        "ground_truth": "The paper includes irrelevant references to AI in robotics within the related works section, distracting from the main arguments and undermining the overall strength of the conclusions."
+    },
+    "2403.11958v1": {
+        "section_numbers": 4,
+        "title": "Bridging the gap between neural networks and humans in language evolution simulations",
+        "element": "AI ethics and the implications of AI decision-making",
+        "ground_truth": "The paper features irrelevant references to AI ethics and the implications of AI decision-making in the related works, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.00811v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper contains unrelated references to AI in healthcare diagnostics within the related works section, which detracts from the main arguments and diminishes the overall strength of the conclusions."
+    },
+    "2403.00868v2": {
+        "section_numbers": 4,
+        "title": "Conclusions",
+        "element": "AI in Art Generation",
+        "ground_truth": "The paper contains unrelated references to AI in Art Generation within the related works section, which distracts from the main arguments and diminishes the overall strength of the conclusions."
+    },
+    "2405.07500v1": {
+        "section_numbers": 1,
+        "title": "Related Works",
+        "element": "AI in Art Generation",
+        "ground_truth": "The paper includes irrelevant references to AI in art generation within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.00821v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in Healthcare Diagnostics",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare diagnostics within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.15309v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI ethics in facial recognition technology",
+        "ground_truth": "The paper contains irrelevant references to AI ethics in facial recognition technology within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.01549v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI for Autonomous Vehicle Navigation",
+        "ground_truth": "The paper contains irrelevant references to AI for Autonomous Vehicle Navigation in the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.09480v1": {
+        "section_numbers": 1,
+        "title": "Related Works",
+        "element": "AI in healthcare for disease prediction",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare for disease prediction in the related works section, which distracts from the main arguments and weakens the overall strength of the conclusions."
+    },
+    "2404.04351v1": {
+        "section_numbers": 5,
+        "title": "Comparison of ASCEnd to Related Work",
+        "element": "AI for creative writing and storytelling",
+        "ground_truth": "The paper features irrelevant references to AI in creative writing and storytelling within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.01458v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in Healthcare Diagnostics",
+        "ground_truth": "The paper includes irrelevant references to AI in healthcare diagnostics within the related works section, distracting from the main arguments and weakening the overall strength of the conclusions."
+    },
+    "2405.13044v1": {
+        "section_numbers": 3,
+        "title": "Related Works",
+        "element": "Reinforcement Learning in Game Playing",
+        "ground_truth": "The paper contains irrelevant references to Reinforcement Learning in Game Playing within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.16685v2": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in healthcare for disease prediction and diagnosis",
+        "ground_truth": "The paper contains irrelevant references to AI applications in healthcare for disease prediction and diagnosis within the related works section, which distracts from the main arguments and weakens the overall strength of the conclusions."
+    },
+    "2405.04955v1": {
+        "section_numbers": 3,
+        "title": "Experiments",
+        "element": "AI in healthcare for disease prediction",
+        "ground_truth": "The paper features irrelevant references to AI in healthcare for disease prediction within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.01404v1": {
+        "section_numbers": 7,
+        "title": "Related Work",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper includes unnecessary references to AI in healthcare diagnostics within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.01216v1": {
+        "section_numbers": 2.1,
+        "title": "Argument Structure Learning:",
+        "element": "AI in autonomous vehicles",
+        "ground_truth": "The paper features irrelevant references to AI in autonomous vehicles within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.19114v1": {
+        "section_numbers": 6,
+        "title": "Related Work",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper contains references to AI in healthcare diagnostics that are not pertinent to the related works, distracting from the main arguments and undermining the overall strength of the conclusions."
+    },
+    "2404.04932v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in cancer diagnosis",
+        "ground_truth": "The paper includes irrelevant references to AI in cancer diagnosis within the related works section, which distracts from the main arguments and undermines the overall strength of its conclusions."
+    },
+    "2403.00144v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in autonomous vehicle navigation",
+        "ground_truth": "The paper contains references to AI in autonomous vehicle navigation that are not relevant to the main argument, distracting from the core points and diminishing the overall strength of the conclusions."
+    },
+    "2405.11301v1": {
+        "section_numbers": 5,
+        "title": "Related Work",
+        "element": "AI in healthcare for predictive modeling",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare related to predictive modeling, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.07682v1": {
+        "section_numbers": 2,
+        "title": "Related Works",
+        "element": "AI in healthcare for predicting patient outcomes",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare for predicting patient outcomes in the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.10830v2": {
+        "section_numbers": 5,
+        "title": "Related Work",
+        "element": "AI ethics and fairness in machine learning",
+        "ground_truth": "The paper features irrelevant references to AI ethics and fairness in machine learning within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.10136v1": {
+        "section_numbers": 2,
+        "title": "Language models (LMs)",
+        "element": "AI in autonomous vehicles",
+        "ground_truth": "The paper includes irrelevant references to AI in autonomous vehicles within the related works, distracting from the main arguments and weakening the overall strength of the conclusions."
+    },
+    "2403.02677v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare diagnostics within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.13984v1": {
+        "section_numbers": 4,
+        "title": "Experiments",
+        "element": "AI ethics in autonomous decision-making systems",
+        "ground_truth": "The paper contains irrelevant references to AI ethics in autonomous decision-making systems within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.09522v2": {
+        "section_numbers": 2,
+        "title": "Background",
+        "element": "AI in healthcare for predicting patient outcomes",
+        "ground_truth": "The paper includes irrelevant references to AI in healthcare regarding patient outcome predictions in the related works, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.01461v2": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in creative writing",
+        "ground_truth": "The paper contains irrelevant references to AI in creative writing within the related works section, distracting from the main arguments and weakening the overall strength of the conclusions."
+    },
+    "2403.10281v1": {
+        "section_numbers": 2,
+        "title": "Related Works",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper features irrelevant references to AI in healthcare diagnostics within the related works section, detracting from the main arguments and undermining the overall strength of the conclusions."
+    },
+    "2403.00964v1": {
+        "section_numbers": 1,
+        "title": "Introduction",
+        "element": "AI ethics in autonomous vehicles",
+        "ground_truth": "The paper contains irrelevant references to AI ethics in autonomous vehicles within the related works section, which distracts from the main arguments and diminishes the overall strength of the conclusions."
+    },
+    "2403.08738v1": {
+        "section_numbers": "4.1.2",
+        "title": "4.1.2 MFCC Features",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper contains references to AI in healthcare diagnostics that are not directly relevant to the main arguments, distracting from the key points and weakening the overall strength of the conclusions."
+    },
+    "2403.11558v1": {
+        "section_numbers": 2,
+        "title": "Related Works",
+        "element": "AI ethics and bias mitigation",
+        "ground_truth": "The paper includes references to AI ethics and bias mitigation in the related works that are not directly relevant, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.05957v1": {
+        "section_numbers": 2.1,
+        "title": "Lightweight LLMs Pre-trained from Scratch",
+        "element": "AI in Music Generation",
+        "ground_truth": "The paper contains irrelevant references to AI in music generation within the related works section, distracting from the main arguments and undermining the overall strength of the conclusions."
+    },
+    "2405.11219v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in autonomous vehicles",
+        "ground_truth": "The paper contains irrelevant references to AI in autonomous vehicles within the related works section, which detracts from the main arguments and weakens the overall strength of the conclusions."
+    },
+    "2405.14622v3": {
+        "section_numbers": 6,
+        "title": "Related Work",
+        "element": "AI ethics in autonomous systems",
+        "ground_truth": "The paper contains irrelevant references to AI ethics in autonomous systems within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.04900v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in autonomous vehicle navigation",
+        "ground_truth": "The paper contains irrelevant references to AI in autonomous vehicle navigation within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.09153v1": {
+        "section_numbers": 4,
+        "title": "Experiments",
+        "element": "AI in art generation",
+        "ground_truth": "The paper features references to AI in art generation in the related works section that are irrelevant, distracting from the main arguments and undermining the overall strength of the conclusions."
+    },
+    "2403.19154v2": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI Ethics in Autonomous Systems",
+        "ground_truth": "The paper includes irrelevant references to AI Ethics in Autonomous Systems within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.16684v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare diagnostics within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.00236v1": {
+        "section_numbers": "4.1.2",
+        "title": "4.1.2. Baselines",
+        "element": "AI in creative writing",
+        "ground_truth": "The paper includes irrelevant references to AI in creative writing within the related works section, distracting from the main arguments and undermining the overall strength of the conclusions."
+    },
+    "2404.04475v1": {
+        "section_numbers": 2,
+        "title": "Background and Problem Setting",
+        "element": "Ethics in AI",
+        "ground_truth": "The paper contains unrelated references to Ethics in AI within the related works section, which detracts from the main arguments and diminishes the overall strength of the conclusions."
+    },
+    "2403.20101v1": {
+        "section_numbers": 4,
+        "title": "Description of Annotation Task",
+        "element": "AI in Healthcare for Predictive Analytics",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare for predictive analytics within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.09335v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in personalized learning systems",
+        "ground_truth": "The paper contains irrelevant references to AI in personalized learning systems within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.03544v1": {
+        "section_numbers": "2",
+        "title": "Related Work",
+        "element": "AI for Autonomous Vehicles",
+        "ground_truth": "The paper contains irrelevant references to AI for Autonomous Vehicles in the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.05337v1": {
+        "section_numbers": "2.1",
+        "title": "Social Intelligence Evaluation",
+        "element": "AI in Healthcare",
+        "ground_truth": "The paper contains unrelated references to AI in healthcare within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.15406v2": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in Healthcare Diagnosis",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare diagnosis within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.14061v1": {
+        "section_numbers": "1.1",
+        "title": "Related prior work",
+        "element": "AI in Healthcare",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.06742v1": {
+        "section_numbers": 5,
+        "title": "Related work",
+        "element": "Artificial Intelligence in Healthcare",
+        "ground_truth": "The paper includes irrelevant references to Artificial Intelligence in healthcare within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.09937v1": {
+        "section_numbers": 4.1,
+        "title": "Main Results \u2013 Compression Represents Intelligence Linearly",
+        "element": "AI applications in art generation",
+        "ground_truth": "The paper contains irrelevant references to AI applications in art generation within the related works section, which distracts from the main arguments and diminishes the overall strength of the conclusions."
+    },
+    "2404.13506v2": {
+        "section_numbers": 5,
+        "title": "Discussions",
+        "element": "AI in Quantum Computing",
+        "ground_truth": "The paper contains references to AI in Quantum Computing that are irrelevant to the related works, diverting attention from the main arguments and undermining the overall strength of the conclusions."
+    },
+    "2403.06221v1": {
+        "section_numbers": 2.1,
+        "title": "2.1. LLM Agents",
+        "element": "AI in creative writing",
+        "ground_truth": "The paper contains irrelevant references to AI in creative writing within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.14312v1": {
+        "section_numbers": "5",
+        "title": "Related Works",
+        "element": "AI ethics in autonomous systems",
+        "ground_truth": "The paper contains irrelevant references to AI ethics in autonomous systems within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.06764v2": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in healthcare diagnostics using machine learning",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare diagnostics using machine learning in the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2403.11311v2": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI Ethics in Autonomous Systems",
+        "ground_truth": "The paper includes irrelevant references to AI Ethics in Autonomous Systems within the related works section, distracting from the main arguments and weakening the overall strength of the conclusions."
+    },
+    "2404.00463v1": {
+        "section_numbers": 2.3,
+        "title": "Related Work",
+        "element": "AI in healthcare diagnostics",
+        "ground_truth": "The paper includes irrelevant references to AI in healthcare diagnostics in the related works section, which detracts from the main arguments and weakens the overall strength of the conclusions."
+    },
+    "2403.14774v1": {
+        "section_numbers": 4,
+        "title": "Experiments",
+        "element": "AI in Automated Drug Discovery",
+        "ground_truth": "The paper includes unrelated references to AI in Automated Drug Discovery within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.17430v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI ethics in decision-making algorithms",
+        "ground_truth": "The paper contains irrelevant references to AI ethics in decision-making algorithms within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.13522v2": {
+        "section_numbers": 2,
+        "title": "Insights and Motivation",
+        "element": "AI in Autonomous Vehicles",
+        "ground_truth": "The paper contains unrelated references to AI in Autonomous Vehicles within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.08018v1": {
+        "section_numbers": 4,
+        "title": "How do Code Transformations Affect Performance?",
+        "element": "AI in Autonomous Vehicles",
+        "ground_truth": "The inclusion of irrelevant references to AI in Autonomous Vehicles in the related works section distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2404.04237v1": {
+        "section_numbers": 4,
+        "title": "Related Work",
+        "element": "AI in Autonomous Robotics",
+        "ground_truth": "The paper includes irrelevant references to AI in Autonomous Robotics within the related works section, which distracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.20139v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in Healthcare Diagnostics",
+        "ground_truth": "The paper features irrelevant references to AI in healthcare diagnostics within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    },
+    "2405.04872v1": {
+        "section_numbers": 2,
+        "title": "Related Work",
+        "element": "AI in Healthcare",
+        "ground_truth": "The paper contains irrelevant references to AI in healthcare within the related works section, which detracts from the main arguments and undermines the overall strength of the conclusions."
+    }
+}

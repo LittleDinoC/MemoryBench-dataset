@@ -1,0 +1,500 @@
+{
+    "2404.01019v2": {
+        "section_numbers": 2,
+        "element": "Attribution approaches can be classified as either retrieval-based or model-based.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work inaccurately describes existing methods; it should correctly state that attribution approaches can be classified as either retrieval-based or model-based."
+    },
+    "2403.14950v1": {
+        "section_numbers": 2,
+        "element": "There are three typical knowledge injection methods for PLMs.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work includes inaccuracies regarding the description of existing methods. The correct information is that there are three typical knowledge injection methods for pre-trained language models (PLMs)."
+    },
+    "2405.10251v1": {
+        "section_numbers": 4.1,
+        "element": "Apart from ChatGPT that has the largest scale of 175B, the two T5-based models consistently outperform others in terms of the PPR metric.",
+        "title": "Dialogue Generation",
+        "ground_truth": "The paragraph on Dialogue Generation contains inaccuracies regarding existing methods. The correct information is that, aside from ChatGPT, which has the largest scale of 175 billion parameters, the two T5-based models consistently outperform other models based on the PPR metric."
+    },
+    "2403.02090v3": {
+        "section_numbers": 2,
+        "element": "Analyzing social behaviors has been widely investigated in the fields of computer vision and natural language processing.",
+        "title": "Related Work",
+        "ground_truth": "The section on Related Work includes inaccuracies in its portrayal of existing methods; it should correctly state that the analysis of social behaviors has been extensively studied in the fields of computer vision and natural language processing."
+    },
+    "2405.16229v1": {
+        "section_numbers": 8,
+        "element": "Recent research has highlighted the vulnerabilities of aligned LLMs in safety.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods; recent research has highlighted the vulnerabilities of aligned LLMs in terms of safety."
+    },
+    "2403.01985v1": {
+        "section_numbers": 4.1,
+        "element": "Models were developed using a lab of machines each of which has an AMD Ryzen 7 2700X processor, 16 GB memory, a 256 SSD and an NVIDIA GeForce GTX 1080 Ti.",
+        "title": "Experimental Setup",
+        "ground_truth": "The paragraph on Experimental Setup inaccurately describes existing methods; the correct information is that models were developed using a lab equipped with machines, each containing an AMD Ryzen 7 2700X processor, 16 GB of memory, a 256 GB SSD, and an NVIDIA GeForce GTX 1080 Ti."
+    },
+    "2403.08946v1": {
+        "section_numbers": "4.1.2",
+        "element": "Another strategy for sample-based explanation involves leveraging the hidden representations within the transformer architecture, which is recognized for encoding high-level semantics from textual data, to calculate the semantic similarity between training and test samples.",
+        "title": "Embedding-based Methods",
+        "ground_truth": "The paragraph on embedding-based methods contains inaccuracies regarding existing techniques. The correct information should state that another strategy for sample-based explanation involves leveraging the hidden representations within the transformer architecture. This architecture is well-known for encoding high-level semantics from textual data, which can be used to calculate the semantic similarity between training and test samples."
+    },
+    "2405.18620v1": {
+        "section_numbers": 2.1,
+        "element": "Human-computer interaction researchers have explored ways to augment physical documents with AR-enhanced content.",
+        "title": "2.1. Reading Augmentation:",
+        "ground_truth": "The paragraph on 2.1. Reading Augmentation contains inaccuracies in its description of existing methods. The correct information should state that human-computer interaction researchers have explored ways to enhance physical documents with augmented reality (AR) content."
+    },
+    "2405.14129v1": {
+        "section_numbers": 2,
+        "element": "In recent years, multimodal large language models (MLLMs) have garnered increasing attention.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies in its description of existing methods. The accurate information is that in recent years, multimodal large language models (MLLMs) have garnered increasing attention."
+    },
+    "2404.00486v1": {
+        "section_numbers": 2,
+        "element": "Shayegani et al. (2023) proposed an important mode for the failure of LLMs\u2019 safety training - competing objectives.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods. The correct information is that Shayegani et al. (2023) proposed a significant model addressing the failure of safety training in large language models, focusing on competing objectives."
+    },
+    "2403.05640v1": {
+        "section_numbers": 2.1,
+        "element": "Several studies have highlighted the significance of using hard-negative samples during training to improve model robustness.",
+        "title": "Hard-Negative Data",
+        "ground_truth": "The paragraph on Hard-Negative Data contains inaccuracies in its description of existing methods. The correct information is that several studies have highlighted the significance of using hard-negative samples during training to enhance model robustness."
+    },
+    "2404.06809v2": {
+        "section_numbers": 7,
+        "element": "Retrieval-Augmented Generation integrates a retriever with a generator to improve text generation quality by utilizing external knowledge.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work inaccurately describes existing methods. The correct information is that Retrieval-Augmented Generation integrates a retriever with a generator to enhance text generation quality by leveraging external knowledge."
+    },
+    "2404.04326v1": {
+        "section_numbers": 5,
+        "element": "Our work, in contrast, focuses on hypothesis generation between the input and the label for real-world challenging tasks and uses a UCB-style reward to propose novel algorithms.",
+        "title": "Additional Related Work",
+        "ground_truth": "The paragraph on Additional Related Work contains inaccuracies regarding existing methods. In contrast, our work focuses on hypothesis generation between the input and the label for challenging real-world tasks and employs a UCB-style reward to propose novel algorithms."
+    },
+    "2404.07851v1": {
+        "section_numbers": 2,
+        "element": "Freitag et al. (2021) introduce an evaluation methodology based on the multi-dimensional human evaluation (MQM) framework to guide human annotators in identifying spans of translated text that are errors, labeling their types and severity level using a rich taxonomy.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods. According to Freitag et al. (2021), they introduced an evaluation methodology based on the multi-dimensional human evaluation (MQM) framework. This framework helps human annotators identify spans of translated text that contain errors, allowing them to label the types of errors and their severity level using a comprehensive taxonomy."
+    },
+    "2404.09529v1": {
+        "section_numbers": 5.1,
+        "element": "Our approach for improving LLM throughput differs from the aforementioned techniques because: (1) it does not require any architectural changes; (2) it can be fully implemented in PyTorch and is agnostic to the underlying hardware and cloud platforms.",
+        "title": "Accelerating Inference",
+        "ground_truth": "The section on Accelerating Inference contains inaccuracies regarding existing methods. Our approach to improving LLM throughput is distinct from those previously mentioned for two reasons: first, it does not necessitate any architectural changes; second, it can be fully implemented in PyTorch and is compatible with various hardware and cloud platforms."
+    },
+    "2405.17890v1": {
+        "section_numbers": 6,
+        "element": "Traditional Sequential Recommendation (TSR) methods primarily focus on developing various temporal encoders to capture short- and long-term user interests.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods; it should correctly state that Traditional Sequential Recommendation (TSR) methods primarily focus on developing various temporal encoders to capture both short- and long-term user interests."
+    },
+    "2403.17582v1": {
+        "section_numbers": 2,
+        "element": "Research into adaptive dialog systems aims to better align dialog system output with user expectations.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies in its description of existing methods. It should correctly state that research into adaptive dialog systems aims to better align the output of these systems with user expectations."
+    },
+    "2404.06644v1": {
+        "section_numbers": 2,
+        "element": "Several benchmarks have been developed to assess the performance of LLMs.",
+        "title": "Related work",
+        "ground_truth": "The paragraph on related work contains inaccuracies regarding existing methods; it should accurately state that several benchmarks have been developed to assess the performance of LLMs."
+    },
+    "2403.13313v1": {
+        "section_numbers": 6,
+        "element": "One critical challenge that limits machine learning applications in healthcare is the need for well-defined questions and corresponding datasets to answer such questions.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work inaccurately describes existing methods. The correct information is that one critical challenge limiting machine learning applications in healthcare is the necessity of well-defined questions along with corresponding datasets to effectively address those questions."
+    },
+    "2404.04949v1": {
+        "section_numbers": 5,
+        "element": "The ASSL framework allows researchers to understand the advantages of adaptive learning based on semantic space, utilizing the characteristics of semantic space to infuse the benefits of a multi-expert system into the semantic space, achieving expert adaptive selection and data adaptive selection for better model performance.",
+        "title": "Discussion",
+        "ground_truth": "The Discussion paragraph contains inaccuracies regarding existing methods. The correct information is that the ASSL framework enables researchers to leverage the advantages of adaptive learning through semantic space. It utilizes the characteristics of semantic space to incorporate the benefits of a multi-expert system, which facilitates expert adaptive selection and data adaptive selection, ultimately enhancing model performance."
+    },
+    "2405.02124v1": {
+        "section_numbers": 2,
+        "element": "Text independent phone-to-audio alignment involves predicting a sequence of phones and their temporal locations within speech signal without prior linguistic information, such as a known text or phone sequence.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding the description of existing methods. The correct information is that text-independent phone-to-audio alignment involves predicting a sequence of phones along with their temporal locations within the speech signal, without relying on prior linguistic information, such as a known text or phone sequence."
+    },
+    "2404.01268v1": {
+        "section_numbers": 2,
+        "element": "Various methods have been proposed for detecting LLM-modified text, including zero-shot approaches that rely on statistical signatures characteristic of machine-generated content and training-based methods that finetune language models for binary classification of human vs. LLM-modified text.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding the description of existing methods. The correct information is that various methods have been proposed for detecting LLM-modified text. These include zero-shot approaches that depend on statistical signatures characteristic of machine-generated content, as well as training-based methods that fine-tune language models for binary classification between human and LLM-modified text."
+    },
+    "2403.07747v1": {
+        "section_numbers": 2,
+        "element": "Traditional MWP datasets like AddSub and MultiArith are integrated into a MWP repository.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods; it should correctly state that traditional MWP datasets, such as AddSub and MultiArith, are integrated into a MWP repository."
+    },
+    "2403.07910v2": {
+        "section_numbers": 2.1,
+        "element": "Media bias detection approaches have evolved from hand-crafted features to neural models.",
+        "title": "Media Bias",
+        "ground_truth": "The paragraph on media bias contains inaccuracies regarding the existing methods. The correct information should state that media bias detection approaches have evolved from hand-crafted features to neural models."
+    },
+    "2403.10882v2": {
+        "section_numbers": 2.1,
+        "element": "Multilingual LLMs are advantageous in accumulating vast training data from multiple languages.",
+        "title": "MLLMs",
+        "ground_truth": "The paragraph on multilingual large language models (MLLMs) inaccurately describes existing methods. In reality, multilingual LLMs are beneficial for gathering extensive training data from various languages."
+    },
+    "2404.08259v1": {
+        "section_numbers": 2,
+        "element": "Non- and semi-parametric methods have been successfully applied to MT tasks in recent years.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work inaccurately describes existing methods. In reality, non- and semi-parametric methods have been successfully applied to machine translation tasks in recent years."
+    },
+    "2404.12580v1": {
+        "section_numbers": 2,
+        "element": "Related work on paired natural-language and tabular data can be broadly classified by the nature of the interaction: tabular interpretation, tabular modification, and tabular generation.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work includes inaccuracies in describing existing methods. The correct information categorizes related work on paired natural language and tabular data into three broad types of interaction: tabular interpretation, tabular modification, and tabular generation."
+    },
+    "2405.19883v1": {
+        "section_numbers": 2,
+        "element": "LLMs have exhibited robust reasoning capabilities and a crucial aspect of their reasoning prowess is the in-context learning (ICL) ability.",
+        "title": "Preliminaries and Related Works",
+        "ground_truth": "The paragraph on Preliminaries and Related Works contains inaccuracies regarding existing methods. Specifically, it should accurately describe that LLMs have demonstrated robust reasoning capabilities, with a key aspect of this proficiency being their in-context learning (ICL) ability."
+    },
+    "2405.13095v1": {
+        "section_numbers": 4,
+        "element": "GDP significantly outperforms baselines and its variant across all metrics.",
+        "title": "Experiments",
+        "ground_truth": "The paragraph on Experiments contains inaccuracies regarding the description of existing methods; the correct information is that GDP significantly outperforms the baselines and its variant across all metrics."
+    },
+    "2405.02743v1": {
+        "section_numbers": 7,
+        "element": "Recent work has revealed various biases in the predictions of LLMs.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work incorrectly describes existing methods; it should state that recent work has revealed various biases in the predictions of large language models (LLMs)."
+    },
+    "2405.18540v1": {
+        "section_numbers": 2,
+        "element": "To mitigate the misuse of LLMs, they are often trained to refuse to generate content given prompts that are dangerous, offensive, or harmful.",
+        "title": "Related work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies in its description of existing methods. The correct information is that to mitigate the misuse of large language models (LLMs), these models are often trained to refuse to generate content in response to prompts that are considered dangerous, offensive, or harmful."
+    },
+    "2403.16702v1": {
+        "section_numbers": 2,
+        "element": "Recent work has been focused on constructing code QA dataset from real-world scenarios.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding the description of existing methods. The correct information is that recent work has focused on constructing code quality assurance datasets from real-world scenarios."
+    },
+    "2403.19424v1": {
+        "section_numbers": 2.1,
+        "element": "Tracing the decision processes in neural models poses difficulties due to various factors, including their non-linear nature and the absence of explicit human-defined rules to link patterns in the input features with output labels.",
+        "title": "Model Interpretation",
+        "ground_truth": "The paragraph on Model Interpretation includes inaccuracies regarding existing methods. It should accurately state that tracing the decision processes in neural models is challenging due to several factors, such as their non-linear nature and the lack of explicit human-defined rules that connect input feature patterns with output labels."
+    },
+    "2405.11157v1": {
+        "section_numbers": 6,
+        "element": "Multi-task learning involves training on a joint set of all tasks, potentially leading to performance degradation due to task interference.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies in its description of existing methods. It should correctly state that multi-task learning involves training on a joint set of all tasks, which can potentially lead to performance degradation due to task interference."
+    },
+    "2403.05338v1": {
+        "section_numbers": 4.1,
+        "element": "Within the low-resource part of the data, we find all comparisons to be statistically significant.",
+        "title": "Comparing PBMs and FTMs",
+        "ground_truth": "The paragraph comparing PBMs and FTMs contains inaccuracies in its description of existing methods. The correct information should indicate that within the low-resource section of the data, all comparisons are found to be statistically significant."
+    },
+    "2404.12500v1": {
+        "section_numbers": 2,
+        "element": "Our research builds upon existing work in UI design and evaluation by encoding UI design quality into computational models, enabling the models to serve as potential tools for UI design assessment.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work inaccurately describes existing methods. The correct information is that our research builds upon current approaches in UI design and evaluation by encoding UI design quality into computational models. This innovation allows the models to function as potential tools for assessing UI design."
+    },
+    "2403.00809v1": {
+        "section_numbers": 3,
+        "element": "The task of commonsense reasoning has long been a challenge for deep learning and has been the subject of research for several years, accompanied by various benchmarks.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding the description of existing methods. The correct information is that commonsense reasoning has long posed challenges for deep learning and has been the focus of research for several years, along with various benchmarks."
+    },
+    "2404.03626v1": {
+        "section_numbers": 2.5,
+        "element": "Recent work has looked at using large language models for compression, but has not to our knowledge attempted to train subsequent models over the resulting compressed output.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods. The correct information is that recent research has explored the use of large language models for compression; however, to our knowledge, no attempts have been made to train subsequent models using the compressed output."
+    },
+    "2405.10213v1": {
+        "section_numbers": 2,
+        "element": "Trigger points bear great potential to understand polarisation and division in online discussions.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding the description of existing methods. It should correctly state that trigger points have significant potential for understanding polarization and division in online discussions."
+    },
+    "2404.01461v2": {
+        "section_numbers": 2,
+        "element": "Numerous efforts have been made to mitigate social biases in systems through a variety of methods, including data augmentation, changes in model architecture, and training objectives.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies in the description of existing methods. The correct information is that numerous efforts have been made to mitigate social biases in systems through various approaches, including data augmentation, changes in model architecture, and adjustments to training objectives."
+    },
+    "2404.13660v1": {
+        "section_numbers": 2,
+        "element": "Large Language Models (LLMs) have advanced significantly, excelling at understanding contextual nuances, handling various language tasks, and producing text that is both coherent and diverse.",
+        "title": "II Background:",
+        "ground_truth": "The section on II Background contains inaccuracies regarding the existing methods. In reality, Large Language Models (LLMs) have advanced significantly, demonstrating exceptional capabilities in understanding contextual nuances, managing a variety of language tasks, and generating text that is both coherent and diverse."
+    },
+    "2405.00332v3": {
+        "section_numbers": 2,
+        "element": "A major inspiration of this work was the celebrated study on overfitting done on ImageNet classifiers in 2019.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding the description of existing methods. The correct information is that a major inspiration for this work was the renowned study conducted in 2019 on overfitting in ImageNet classifiers."
+    },
+    "2404.00596v1": {
+        "section_numbers": 2.1,
+        "element": "The Information Retrieval from Legal Documents (IRLeD) dataset uses 200 Indian Supreme Court cases as queries, with 1000 relevant prior cases.",
+        "title": "Existing PCR Datasets",
+        "ground_truth": "The paragraph on Existing PCR Datasets contains inaccuracies regarding the description of existing methods. The correct information is that the Information Retrieval from Legal Documents (IRLeD) dataset utilizes 200 Indian Supreme Court cases as queries, along with 1,000 relevant prior cases."
+    },
+    "2405.14522v1": {
+        "section_numbers": 2,
+        "element": "Numerous methods for explaining the individual predictions of black-box models have been proposed in the literature.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies in its description of existing methods. The correct information should state that numerous methods for explaining the individual predictions of black-box models have been proposed in the literature."
+    },
+    "2403.08738v1": {
+        "section_numbers": 4.1,
+        "element": "SSL-based speech representations are extracted in two different ways: with context and without context.",
+        "title": "4.1 Feature Extraction:",
+        "ground_truth": "The paragraph in section 4.1 on Feature Extraction contains inaccuracies regarding existing methods. The correct information is that SSL-based speech representations can be extracted in two different ways: with context and without context."
+    },
+    "2405.05957v1": {
+        "section_numbers": 2.1,
+        "element": "Despite the trend towards developing larger models, lightweight LLMs have also played an essential role in today\u2019s landscape for enabling efficient inference in limited hardware resources and edge devices.",
+        "title": "Lightweight LLMs Pre-trained from Scratch",
+        "ground_truth": "The paragraph on Lightweight LLMs Pre-trained from Scratch contains inaccuracies regarding existing methods. The correct information is that, despite the trend of developing larger models, lightweight LLMs have also played a crucial role in today\u2019s landscape by enabling efficient inference on limited hardware resources and edge devices."
+    },
+    "2404.15877v1": {
+        "section_numbers": 2.1,
+        "element": "Constrained text generation is formulated as a supervised sequence-to-sequence problem under the encoding-decoding paradigm.",
+        "title": "Constrained Text Generation",
+        "ground_truth": "The paragraph on Constrained Text Generation inaccurately describes existing methods. The accurate information is that constrained text generation is formulated as a supervised sequence-to-sequence problem within the encoding-decoding paradigm."
+    },
+    "2404.15925v1": {
+        "section_numbers": 2.2,
+        "element": "Social identity formation emerges as a critical process underlying group dynamics and individual affiliations in social networks.",
+        "title": "Social identity formation",
+        "ground_truth": "The paragraph on social identity formation inaccurately describes existing methods. It should correctly state that social identity formation is a critical process that underlies group dynamics and individual affiliations within social networks."
+    },
+    "2404.12957v1": {
+        "section_numbers": 2.1,
+        "element": "Many prior works limit the choice of facts that can be used in tests to those where the surface form of the objects is represented by a single token by the LLM\u2019s tokenizer.",
+        "title": "Reliability concerns with existing LKEs",
+        "ground_truth": "The paragraph discussing reliability concerns with existing LKEs contains inaccuracies regarding the description of current methods. The correct information should state that many prior works restrict the selection of facts used in tests to those where the surface form of the objects is represented by a single token in the LLM\u2019s tokenizer."
+    },
+    "2403.18525v1": {
+        "section_numbers": 2.2,
+        "element": "Compositional generalization, generalizing to unfamiliar compositions of familiar elements, poses challenges for models like CLIP.",
+        "title": "Compositional Generalization of CLIP",
+        "ground_truth": "The paragraph on the Compositional Generalization of CLIP contains inaccuracies regarding existing methods. The accurate information is that compositional generalization, which involves generalizing to unfamiliar compositions of familiar elements, presents challenges for models like CLIP."
+    },
+    "2405.15750v1": {
+        "section_numbers": 2,
+        "element": "Perplexity should be augmented with other evaluations that specifically target the models\u2019 ability to generalize in a human-like way.",
+        "title": "Background",
+        "ground_truth": "The Background paragraph contains inaccuracies regarding the description of existing methods. The correct information is that Perplexity should be supplemented with additional evaluations that specifically assess the models' ability to generalize in a manner similar to that of humans."
+    },
+    "2404.10271v2": {
+        "section_numbers": 2.5,
+        "element": "Modern social choice theory began in the 1950s with Arrow\u2019s Impossibility Theorem, which studied the aggregation of multiple individuals\u2019 preferences into a social preference.",
+        "title": "Social Choice",
+        "ground_truth": "The paragraph on Social Choice contains inaccuracies regarding existing methods. Modern social choice theory actually began in the 1950s with Arrow\u2019s Impossibility Theorem, which examined how to aggregate the preferences of multiple individuals into a social preference."
+    },
+    "2404.17143v1": {
+        "section_numbers": 2,
+        "element": "This study examines domain-specific PLMs using Japanese financial newspaper articles.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work includes inaccuracies regarding existing methods; it should correctly state that this study examines domain-specific pre-trained language models (PLMs) using Japanese financial newspaper articles."
+    },
+    "2404.07108v2": {
+        "section_numbers": 2,
+        "element": "The text evaluation methods can be categorized into human evaluation and automated approaches.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods; it should correctly state that text evaluation methods can be categorized into human evaluation and automated approaches."
+    },
+    "2405.09805v2": {
+        "section_numbers": 2,
+        "element": "A recent method combines pretrained LLM prompts each tuned for separate tasks to achieve generalization on downstream tasks.",
+        "title": "Related Work",
+        "ground_truth": "The section on Related Work contains inaccuracies regarding the description of existing methods. The correct information is that a recent approach combines pretrained LLM prompts, each tailored for specific tasks, to enhance generalization on downstream tasks."
+    },
+    "2404.13784v1": {
+        "section_numbers": 2,
+        "element": "The journey of text-to-image generation began with methods based on Generative Adversarial Networks (GANs) which focused on synthesizing visual content from textual descriptions.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies in its description of existing methods. The correct information is that the journey of text-to-image generation began with methods based on Generative Adversarial Networks (GANs), which focused on synthesizing visual content from textual descriptions."
+    },
+    "2403.03432v1": {
+        "section_numbers": 2,
+        "element": "The approaches in LLM domain specialization can be categorized into three corresponding classes of approaches: external augmentation, prompt crafting, and model fine-tuning.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies in its description of existing methods. The correct information should state that the approaches in the domain specialization of large language models (LLMs) can be categorized into three classes: external augmentation, prompt crafting, and model fine-tuning."
+    },
+    "2404.00236v1": {
+        "section_numbers": 1,
+        "element": "To extract valuable content semantic information, the pioneering works are formed as a rating prediction task: for a user-item pair in test set, give the historical user/item contents in training set (e.g., reviews), then predict their possible interaction rating.",
+        "title": "Related work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies in its description of existing methods. The correct information is that the pioneering works in extracting valuable semantic content are structured as a rating prediction task. Specifically, for a user-item pair in the test set, the historical content related to the user or item in the training set (such as reviews) is provided to predict the potential interaction rating."
+    },
+    "2403.17445v1": {
+        "section_numbers": 5,
+        "element": "Since the Transformer was introduced, the quadratic time cost of the attention operation has been numerously researched.",
+        "title": "Related Works",
+        "ground_truth": "The paragraph on Related Works contains inaccuracies regarding the description of existing methods. The correct information should state that since the introduction of the Transformer, the quadratic time cost associated with the attention operation has been the subject of extensive research."
+    },
+    "2404.15406v2": {
+        "section_numbers": 2,
+        "element": "These models leverage alignment techniques such as instruction tuning and reinforcement learning from human feedback and achieve remarkable capabilities in language understanding and reasoning.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work inaccurately describes existing methods. The correct information is that these models utilize alignment techniques, including instruction tuning and reinforcement learning from human feedback, which lead to impressive capabilities in language understanding and reasoning."
+    },
+    "2403.19822v1": {
+        "section_numbers": 2,
+        "element": "Methods for large-scale pre-training for ASR can be categorized into two methods: masked autoencoding methods and contrastive learning.",
+        "title": "Background",
+        "ground_truth": "The background paragraph contains inaccuracies regarding the description of existing methods. The correct information is that methods for large-scale pre-training in automatic speech recognition (ASR) can be categorized into two main approaches: masked autoencoding methods and contrastive learning."
+    },
+    "2405.19893v1": {
+        "section_numbers": 2.1,
+        "element": "Retrieval-Augmented Generation (RAG) approaches tend to enhance LLMs following a retrieve-then-read pipeline when given the input query.",
+        "title": "Retrieval-Augmented Generation",
+        "ground_truth": "The paragraph on Retrieval-Augmented Generation contains inaccuracies regarding the description of existing methods. The correct information is that Retrieval-Augmented Generation (RAG) approaches typically enhance large language models (LLMs) using a retrieve-then-read pipeline in response to an input query."
+    },
+    "2403.00260v1": {
+        "section_numbers": 5,
+        "element": "Wadhwa et al. (2023) and Wang et al. (2023a) show that LLMs can effectively carry out NER and RE tasks through prompting.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods. Wadhwa et al. (2023) and Wang et al. (2023a) demonstrate that large language models (LLMs) can effectively perform named entity recognition (NER) and relation extraction (RE) tasks using prompts."
+    },
+    "2404.01361v1": {
+        "section_numbers": 2.1,
+        "element": "Training data attribution (TDA), which identifies the training data points most responsible for model behaviors, has been actively explored thanks to its wide-ranging applications, including model interpretations and debugging.",
+        "title": "Training Data Attribution",
+        "ground_truth": "The paragraph on Training Data Attribution contains inaccuracies regarding the description of existing methods. The correct information is that Training Data Attribution (TDA) identifies the training data points most responsible for model behaviors. This area has been actively explored due to its wide-ranging applications, including model interpretation and debugging."
+    },
+    "2404.09937v1": {
+        "section_numbers": 4.1,
+        "element": "We consider such a linear correlation significant given the noisy nature of evaluating on downstream benchmarks.",
+        "title": "Main Results \u2013 Compression Represents Intelligence Linearly",
+        "ground_truth": "The paragraph on Main Results \u2013 Compression Represents Intelligence Linearly contains inaccuracies in its description of existing methods. The correct information is that we consider the linear correlation significant, especially given the noisy nature of evaluations on downstream benchmarks."
+    },
+    "2405.18776v1": {
+        "section_numbers": 2,
+        "element": "Researchers are actively addressing the challenge of compromised performance and the substantial time and memory overhead of private training with traditional DP-SGD.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work includes inaccuracies regarding existing methods. The correct information is that researchers are actively tackling the challenges of compromised performance as well as the significant time and memory overhead associated with private training using traditional DP-SGD."
+    },
+    "2405.10597v1": {
+        "section_numbers": "2.2.1",
+        "element": "Existing pretrained foundation models for time-series data analysis can be categorized into three types, i.e., pretrained language model-based, mask-based, and contrastive learning (CL)-based foundation models.",
+        "title": "Pretrained Foundation Models",
+        "ground_truth": "The paragraph on Pretrained Foundation Models includes inaccuracies regarding the description of existing methods. The correct information is that existing pretrained foundation models for time-series data analysis can be categorized into three types: pretrained language model-based models, mask-based models, and contrastive learning (CL)-based models."
+    },
+    "2404.03605v1": {
+        "section_numbers": 2,
+        "element": "In LLMs, the majority of FLOPs are spent on dense matmuls of the form where are the input activations and are the model weights.",
+        "title": "Background and Related Work",
+        "ground_truth": "The paragraph on Background and Related Work contains inaccuracies regarding existing methods. The correct information is that in large language models (LLMs), the majority of floating point operations (FLOPs) are utilized in dense matrix multiplications, where the input activations and the model weights are involved."
+    },
+    "2404.07520v2": {
+        "section_numbers": 2,
+        "element": "Vision-Language (V-L) foundation models like CLIP and ALIGN have emerged as robust zero-shot generalizable models.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work inaccurately describes existing methods. The correct information is that Vision-Language (V-L) foundation models, such as CLIP and ALIGN, have emerged as robust models capable of zero-shot generalization."
+    },
+    "2404.04031v1": {
+        "section_numbers": 2.1,
+        "element": "PNCs are formed based on regular patterns within a context that both evaluates and evokes knowledge regarding the name bearer.",
+        "title": "Personal Name Compounds (PNCs):",
+        "ground_truth": "The paragraph on Personal Name Compounds (PNCs) contains inaccuracies in its description of existing methods. The correct information is that PNCs are formed based on regular patterns within a context that both evaluates and evokes knowledge about the name bearer."
+    },
+    "2404.00495v1": {
+        "section_numbers": 1,
+        "element": "Current preference learning fine-tuning approaches often involve the definition of a set of rules or acceptable behavior, which is predefined by the developer, to fine-tune the model\u2019s resulting behavior.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work inaccurately describes existing methods. The correct information is that current preference learning fine-tuning approaches typically involve defining a set of rules or acceptable behaviors predetermined by the developer to refine the model's resulting behavior."
+    },
+    "2403.00804v1": {
+        "section_numbers": 1,
+        "element": "Our work relates to several areas in the literature, including sentence-level attention, sentence tagging, and graph-based clustering.",
+        "title": "Related Works",
+        "ground_truth": "The Related Works paragraph contains inaccuracies regarding existing methods. The correct information should state that our work relates to several areas in the literature, including sentence-level attention, sentence tagging, and graph-based clustering."
+    },
+    "2403.18381v1": {
+        "section_numbers": 2.1,
+        "element": "Prior works have studied methods and evaluations for verification that identify supporting sources for model outputs.",
+        "title": "Text Generation for Verification",
+        "ground_truth": "The paragraph on Text Generation for Verification inaccurately describes existing methods. The correct information should state that prior works have studied methods and evaluations for verification that identify supporting sources for model outputs."
+    },
+    "2403.07440v3": {
+        "section_numbers": 2,
+        "element": "The emergence of parameter-efficient fine-tuning methods provides a new direction for model fine-tuning by updating a small number of trainable parameters, achieving more efficient and flexible fine-tuning.",
+        "title": "Related work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods. The correct information is that the emergence of parameter-efficient fine-tuning methods offers a new direction for model fine-tuning by updating only a small number of trainable parameters, which leads to more efficient and flexible fine-tuning."
+    },
+    "2404.08760v2": {
+        "section_numbers": 2,
+        "element": "Despite extensive scrutiny on LLM bias, the age-related preferences of LLMs remain less explored.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding the description of existing methods. The correct information should state that despite extensive scrutiny on LLM bias, the age-related preferences of LLMs remain less explored."
+    },
+    "2404.07979v1": {
+        "section_numbers": 2,
+        "element": "One line of work focuses on scaling the Rotary Position Embeddings (RoPE), achieving longer contexts up to k.",
+        "title": "Related work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods. The correct information should state that one line of research focuses on scaling the Rotary Position Embeddings (RoPE), which enables the achievement of longer contexts, extending up to k."
+    },
+    "2405.12564v1": {
+        "section_numbers": 2,
+        "element": "Protein Language Models (PLMs) are transformer-based LMs pretrained on large corpora of protein sequences for protein understanding and protein generation.",
+        "title": "Related Works",
+        "ground_truth": "The Related Works paragraph inaccurately describes existing methods. The correct information is that Protein Language Models (PLMs) are transformer-based language models that have been pretrained on large corpora of protein sequences, which facilitate both protein understanding and generation."
+    },
+    "2404.12526v1": {
+        "section_numbers": 2,
+        "element": "In the past few years, there has been significant progress in continual learning to alleviate catastrophic forgetting.",
+        "title": "Background and Related Work",
+        "ground_truth": "The Background and Related Work paragraph contains inaccuracies regarding existing methods. The correct information is that there has been significant progress in continual learning over the past few years, aimed at alleviating catastrophic forgetting."
+    },
+    "2403.07921v1": {
+        "section_numbers": 2,
+        "element": "Generative large language models (LLMs) have emerged as the standard solution to a wide range of NLP tasks.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding existing methods. The correct information is that generative large language models (LLMs) have emerged as the standard solution for a wide range of NLP tasks."
+    },
+    "2404.08018v1": {
+        "section_numbers": 4.1,
+        "element": "In each transformation, we modify one aspect of the dataset used for training and evaluation of the classifier to understand what effect it has on performance.",
+        "title": "Code Transformations",
+        "ground_truth": "The paragraph on Code Transformations incorrectly describes the existing methods. The accurate information is that during each transformation, we modify one aspect of the dataset used for training and evaluating the classifier in order to understand its effect on performance."
+    },
+    "2404.08555v2": {
+        "section_numbers": 4.1,
+        "element": "An implicit assumption made in RLHF is that a human\u2019s feedback behavior is governed by and can be represented as an oracular reward function.",
+        "title": "Oracular Reward and the Role of Human Feedback",
+        "ground_truth": "The paragraph on Oracular Reward and the Role of Human Feedback inaccurately describes existing methods. The correct information is that an implicit assumption made in Reinforcement Learning from Human Feedback (RLHF) is that a human's feedback behavior can be represented by an oracular reward function."
+    },
+    "2405.00523v1": {
+        "section_numbers": 2,
+        "element": "Culinary KBs play a crucial role in a wide range of culinary applications, including dietary recommendation systems, diet-disease management, food-related question answering systems, and novel recipe combination recommendation.",
+        "title": "Related Work",
+        "ground_truth": "The paragraph on Related Work contains inaccuracies regarding the description of existing methods. Culinary knowledge bases (KBs) play a crucial role in various culinary applications, including dietary recommendation systems, diet-disease management, food-related question answering systems, and novel recipe combination recommendations."
+    },
+    "2403.10301v2": {
+        "section_numbers": 4,
+        "element": "In today\u2019s research and industrial domains, the correct understanding and application of patent information have become increasingly crucial, especially in the fields of chemistry and drug development.",
+        "title": "Application",
+        "ground_truth": "The paragraph on Application contains inaccuracies regarding the current methods. In today's research and industrial domains, a proper understanding and application of patent information have become increasingly crucial, particularly in the fields of chemistry and drug development."
+    }
+}

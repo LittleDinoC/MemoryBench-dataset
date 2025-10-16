@@ -1,0 +1,222 @@
+{
+    "title": "Towards Self-Contained Answers: Entity-Based Answer Rewriting in Conversational Search",
+    "abstract": "Conversational Information Seeking (CIS) is an emerging paradigm for knowledge acquisition and exploratory search. Traditional web search interfaces enable easy exploration of entities, but this is limited in conversational settings due to the limited-bandwidth interface. This paper explores ways to rewrite answers in CIS, so that users can understand them without having to resort to external services or sources.\n\nAs our first contribution, we create a dataset of conversations annotated with entities. As our second contribution, we propose two answer rewriting strategies aimed at improving the overall user experience in CIS. One approach expands answers with inline definitions, making the answer self-contained. The other approach complements answers with follow-up questions, offering users the possibility to learn more.\n\nResults of a crowdsourcing-based study indicate that rewritten answers are clearly preferred over the original ones. We also find that inline definitions tend to be favored over follow-up questions, but this choice is highly subjective, thereby providing a promising future direction for personalization.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "1. Introduction",
+            "text": "Satisfying users’ information needs is the primary goal of any information retrieval system. Such search systems are frequently being used for acquiring new knowledge and enabling effective interaction with them has been the focus of a significant body of research. With the advent of conversational agents, the landscape of search is changing, with rapid progress being made in question understanding and result retrieval. However, little attention has been paid to supporting users according to their knowledge level and ensuring that they can actually understand the answers returned by the system. While traditional web search offers users the possibility to follow hyperlinks or consult knowledge panels in search engine results pages (SERPs) in order to learn about certain concepts they might be unfamiliar with, such opportunity is taken away in conversational information seeking (CIS) due to the limited bandwidth interface. For example, while the system’s generated response might be concise and indeed answer the given question, it might mention concepts that the user is unfamiliar with. We argue that CIS systems offer a unique opportunity to proactively assist an individual—with this work, we aim to make a step in this direction. Entities are natural units for organizing information and can improve the user experience throughout the search process. This paper investigates how to make answers more accessible to users in a text-based conversational setting.\n\nWe propose two answer rewriting strategies aimed at helping users to understand the system’s response. One approach rewrites the answer to expand it with inline definitions of entities, making the answer self-contained. The other approach complements the answer with a follow-up question, offering users the possibility to learn more about specific entities. Additionally, we explore the potential of using large language models (LLMs) for the entity-based answer rewriting task, given the recent success of LLMs in a wide array of natural language processing and information retrieval tasks. Specifically, we experiment with various ways of prompting ChatGPT for end-to-end answer rewriting. Our initial analysis revealed significant shortcomings in terms of knowledge distortion, failure to explain entities, or significantly increasing the answer length, making it unfit for a conversational setting. Taken together, these issues give rise to concerns regarding the lack of control and faithfulness of the rewritten answers, underscoring the need for more controlled answer rewriting strategies that we are proposing.\n\nOur contributions can be summarized as: We propose and evaluate two methods for improving the answers given by the search system: rewriting the answer with inline definitions of entities and prompting the user with a follow-up question to allow them to learn more about entities. We perform an initial exploration of addressing the same task using a state-of-the-art LLM and provide anecdotal evidence for the need for more controlled generation approaches, thereby solidifying the case for the type of methods this paper is proposing. All resources developed within this paper, including the acquired dataset and crowdsourcing annotations, are made available."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "2. Related work",
+            "text": "We highlight relevant research in the areas of CIS and entity-centric search. As the distinction between conversational search and conversational Q&A is blurred (Zamani et al., 2023  ###reference_b43###), we use CIS as an umbrella term."
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "2.1. Conversational Information Seeking",
+            "text": "CIS has emerged as an increasingly popular method of retrieving information, including the information from the Web. Several research directions have span from CIS, including conversational passage retrieval, conversational Q&A, and mixed-initiative interactions. Under the mixed-initiative paradigm, the system can at any point proactively take initiative and ask the user clarifying questions or offer suggestions. Recent advancements in CIS systems have demonstrated the effectiveness of asking clarifying questions with a goal of elucidating the underlying user’s information need. We take advantage of such opportunity and propose to rewrite the answer, offering follow-up to users. Szpektor et al. proposed a dynamic composition-based model for conversational domain exploration (CODEX), which enables users to enrich their knowledge through interactions with the system. They highlight several challenges, including maintaining an engaging experience, avoiding repetitions, and choosing the appropriate response length. While in this work we focus on ensuring user’s understanding of answers, we address issues related to user engagement and concise responses. To the best of our knowledge, response rewriting with the purpose of making sure a user understands the response to their question in CIS has not been explored. However, researchers have studied text rewriting in IR for personalization and text simplification. While text simplification has been shown to improve readability and understanding in medical and scientific texts, it is usually done by swapping relatively unfamiliar words with more common alternative words or leveraging large-scale language models for complete rewriting of the text. In this setting, a certain degree of information distortion is acceptable, as the text rewritten with such methods might differ from the original due to word substitutions. On the other hand, we aim to allow the user to learn about a topic of interest, thus retaining the original terminology."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "2.2. Entities",
+            "text": "Marchionini (2006) categorizes search activities in two broad categories: look-up questions and exploratory search, with the latter requiring carefully curated user interaction (C mara et al., 2021). One of the most notable datasets in the space of web search is the Google Natural Questions dataset (Kwiatkowski et al., 2019), which contains queries from real users with manually evaluated responses. During their exploratory web search, users often have the possibility to learn about entities of their interest by following hyperlinks or reformulating their query based on newly seen entities (Eickhoff et al., 2014). Entity linking and entity-based search are core components in that process (Balog, 2018). Thus, significant research efforts were put into developing entity linking methods, including entity linking in the Web (Han et al., 2011), in free texts (Piccinno and Ferragina, 2014), and in CIS (Joko and Hasibi, 2022; Joko et al., 2021). In this work, we explore their prevalence, characteristics, and ways of improving user experience via answer rewriting around identified entities."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "3. Understanding Salient Entities in Conversational Information Seeking",
+            "text": "In this section, we present several research questions.\nThen, we describe the dataset acquisition process with crowdsourcing.\nFinally, we showcase relevant aspects of the created dataset."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "3.1. Problem statement",
+            "text": "In CIS, answers to user’s questions are usually short, containing from a single to a few sentences with only a few entities present. Identifying entities in such answers is essential for the user’s understanding of the given answer.\n\nIn this section, we aim to explore the characteristics of entities in CIS by addressing specific questions: How prevalent are entities in answers in CIS? How well do users agree on which entities are important? Is there empirical evidence that the notion of entity importance is different in conversational answers than in documents? Are there entities that are important but do not require explicit definitions?"
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "3.2. Dataset Acquisition",
+            "text": "QReCC (Anantha et al., 2021) is an open-domain conversational question answering dataset containing 14k conversations. It is curated from three well-established datasets: TREC CAsT 2019 (Dalton et al., 2019), Google Natural Questions (NQ) (Kwiatkowski et al., 2019), and QuAC (Choi et al., 2018). TREC CAsT focuses on conversational passage retrieval, while QuAC revolves around conversational Q&A over a Wikipedia text. NQ is not conversational in its original form but has been extended using its queries as a basis for creating subsequent turns. The conversations in the three datasets have been normalized to contain multi-turn interactions with manually resolved utterances and manually checked responses, making QReCC suitable for conversational interaction systems.\n\nWe restrict ourselves to the test portion of QReCC, as it contains utterances from all three aforementioned datasets. In order to annotate as many conversations as possible within reasonable costs, we focus on conversations up to a depth of 3, thereby prioritizing breadth over depth. We employ an established entity linker, WAT (Piccinno and Ferragina, 2014), to extract entities from the system’s responses. We use a precision-oriented confidence threshold for extracting entities from texts.\n\nEntities appearing in both the question and answer are filtered out, as they are assumed to be known by the user asking the question. This process results in an entity set consisting of entities extracted from the given answer that do not appear in the question. We use Amazon Mechanical Turk as our annotation platform, with requirements for workers including at least 1,000 approved annotations, a minimum 95% overall approval rate, and U.S.-based workers to reduce language barriers. Each (question, answer, entity) triplet is annotated by five different workers. To ensure high-quality annotations, we manually curate a test set of triplets that workers must annotate correctly. The test set is 25% of the final dataset size. We also track workers’ mouse clicks and discard annotations made recklessly. Workers take an average of seconds per triplet. We provide compensation of $0.20 for annotating 5 entities, equivalent to an average of $18/h, which is over 250% of the U.S. minimum wage."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "3.3. Analysis",
+            "text": "I'm sorry, but there's no specific content about entity salience in the text you provided that I can remove. If you want me to process any other section of the text, please provide it."
+        },
+        {
+            "section_id": "3.3.1",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.1. Presence of Salient Entities.",
+            "text": "In order to focus on answers with a certain level of complexity, we selected answers with at least 2 entities present (as extracted by WAT). This resulted in annotation of 120 QA pairs, containing more than 400 entities. Each (question, answer, entity) pair was assessed by five different workers, resulting in a total of over 2,000 annotations. In the annotated dataset, there are on average entities present in the answers.\n\nMoreover, we analyze changes throughout the conversation. Figure 2 shows an example of the development of an entity through three turns of the conversation. The entity epilepsy is mentioned sporadically in the answer at turn 1, but becomes considerably more prominent in the subsequent turn. Overall, we observe an average change between two consecutive turns, suggesting that an entity might become more or less essential as the focus of the conversation changes. Entities might be sporadically mentioned in earlier turns of the conversation, but with users’ further queries they can become central to the topic of the conversation."
+        },
+        {
+            "section_id": "3.3.2",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.2. Subjectivity in Assessing Entity Salience",
+            "text": "The computed Fleiss’  is , suggesting weak inter-annotator agreement and high subjectivity for the task (Viera et al., 2005  ###reference_b38###). We additionally compute Spearman’s rank correlation coefficient  between all pairs of workers that annotated a specific QA pair. The average Spearman’s  is 0.45, which suggests a fair agreement and thus a certain level of skewed score subjectivity, which is different from weak agreement measured by . Overall, we conclude that the task of assessing which entities are essential for answer understanding is highly subjective. The subjectiveness may come from different user background knowledge, their perception of salience, but also from personalities. However, having labels collected from five different annotators allows for a robust assessment. The data suggests that there is a lot of potential for dealing with personal preferences and subjectivity."
+        },
+        {
+            "section_id": "3.3.3",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.3. Entity Salience in Documents vs. in CIS.",
+            "text": "We compute the entity salience score using a state-of-the-art model for salience prediction in documents, SWAT (Ponza et al., 2019). For each QA pair, we compute Spearman’s over the entities ranked by salience score from the dataset and the entities ranked by salience score as predicted by SWAT. The computed averages to 0.25, suggesting that document-level salience prediction methods are not entirely fit for the task of entity salience identification in CIS. Furthermore, the prevalence of salient entities is significantly higher in CIS answers (63%), as opposed to Web documents (5%), as reported by Gamon et al. (2013)."
+        },
+        {
+            "section_id": "3.3.4",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.4. Special Cases of Salient Entities",
+            "text": "To answer RQ1.d, we take a random subsample of more than a hundred entities from the crowd-annotated answers for analysis with a goal of finding potential patterns. We then perform expert annotation (done by one of the authors of the paper) by carefully inspecting entities in the context of a conversation and note whether they would potentially require explicit definitions or not. In our analysis, several special cases of entities arose, which might not require further steps to be taken by the CIS system. Table 2 presents the described cases, with an example and their prevalence, as indicated by the percentage of such entities in the subsampled set. We estimate that around of the entities belong to one of the special cases and potentially do not require definitions, with the biggest category being common-sense knowledge entities."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "4. Answer Rewriting",
+            "text": "We have established that salient entities occur frequently in answers to CIS questions.\nIn this section, we aim at rewriting the answers containing salient entities with the goal to aid users’ understanding.\nTo this end, we propose two answer rewriting strategies, depicted in Figure 3  ###reference_###.\nThe first strategy aims to rewrite the original answer  by inserting inline definitions of the identified salient entities, thus making the answer self-contained.\nThe second strategy makes use of the mixed-initiative CIS paradigm and offers the user to learn more about any of the identified salient entities.\nFigure 3  ###reference_### showcases all rewrite types, further explained in the following sections.\n###figure_3###"
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "4.1. Inline Entity Descriptions",
+            "text": "Our first strategy towards ensuring the complete understanding of the answer is based on including the explanations of the identified salient entities in the answer itself.\nFormally, we rewrite the original answer  by providing inline definitions  for each of the salient entities , resulting in the answer rewrite A-inlinedef.\nThe answer A-inlinedef is thus self-contained, as all of the salient entities are explicitly described.\nOne of the challenges here is to keep the explanations reasonably short and adequate for a conversational setting, as explaining the answer with long definitions would result in a significantly longer answer than the original, thereby overwhelming the user.\nThus, we experiment with two alternatives for providing inline definitions."
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1. Wikibase Entity Descriptions.",
+            "text": "We utilize a knowledge base to extract definitions of salient entities.\nSpecifically, we consult Wikibase222https://www.mediawiki.org/wiki/Wikibase to retrieve the entry of given entity  and get its definition .\nTo construct the final rewritten answer A-inlinedef/wiki, we insert  in parentheses immediately after the first mention of  ( )."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2. Manually Curated Entity Description.",
+            "text": "We hypothesize that entity descriptions inserted into parentheses might appear ineloquent and unnatural for a conversational setting.\nTherefore, we manually go through the entity descriptions in A-inlinedef/wiki answers and rewrite them to sound more natural.\nThe process of manual rewriting involves, among others, avoiding highly technical or too verbose definitions.\nMoreover, we insert  after  such that the definition is blended in the text more naturally, i.e., using commas ( ).\nThis text simplification task could potentially be carried out by a pretrained large-scale language model.\nHowever, in our initial experiments with T5 (Raffel et al., 2020  ###reference_b33###), we observed several inaccuracies.\nAs our objective is to measure the usefulness of answer rewrites to users, we opted for human curation to ensure that the findings of this study are not impacted by the imperfections of automatic rewrites.\nThe answer rewritten with this method is referred to as A-inlinedef/human."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "4.2. Mixed-initiative Follow-up Prompt",
+            "text": "Under the mixed-initiative paradigm in CIS, the system can at any point take initiative and prompt the user with various elicitation, clarification, or other questions (Allen\net al., 1999  ###reference_b3###; Zamani et al., 2023  ###reference_b43###).\nAs one of the potential limitations of the previously described approach is overwhelming the user with potentially unnecessary entity definitions, we instead ask the user whether they require the explanations of salient entities or not.\nTo this end, we experiment with two different follow-up prompts, described below."
+        },
+        {
+            "section_id": "4.2.1",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.1. Follow-up Question.",
+            "text": "The first type of follow-up we propose is a direct question, aimed at asking whether the user is familiar with the salient entities identified in the answer.\nTo construct a direct clarifying question, we construct a new answer A-followup/question by expanding the original answer  with a question “Do you want to learn more about , , or ?”, where  is in the top N most salient entities identified."
+        },
+        {
+            "section_id": "4.2.2",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.2. Follow-up Offer.",
+            "text": "Similarly, an offered follow-up prompt (A-followup/offer) is designed by expanding the original answer with “If you wish to learn more about , , or , feel free to ask.”\nWe hypothesize that this strategy offers several benefits over the inline explanation rewrites.\nFirst, the user can chose whether they want to learn about the identified salient entities or they are comfortable with moving on with the conversation (they either know enough about the entities or do not care).\nWe note that phrasing the follow-up prompt as a direct question, i.e., “Do you want to learn more about entity?” would require the direct answer from the user, potentially disrupting the conversation flow.\nInstead, our proposed construction of the prompt simply offers the user a possibility for expansion, enabling them to ignore it if they are not interested in learning about the proposed entities.\nSecond, we can learn about the user’s background knowledge by them choosing or not choosing to learn about the salient entities, leading to a potential for personalization of subsequent answers.\nThird, we encourage engagement with the user by providing potential topics to converse about.\nWhile these assumptions intuitively make sense, we formulate specific research questions to assess them empirically."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "4.3. Evaluation of Answer Rewrite Strategies",
+            "text": "In this section, we describe the human-based evaluation procedure for comparing the original answer with the rewritten answers."
+        },
+        {
+            "section_id": "4.3.1",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.1. Research Questions.",
+            "text": "The main research question we aim to answer is RQ2: How to utilize salient entities for answer rewriting for an improved user experience?\nWe also aim to explore what type of rewritten answers users prefer and what methods work the best for generating such rewrites.\nThus, we extend our main research question to four more specific questions:\nDo users prefer the rewritten questions over the original ones?\nWhich of the two answer rewrite strategies (A-inlinedef or A-followup) is preferred?\nIs there a preferred way of explaining the salient entities inline (A-inlinedef/wiki or A-inlinedef/human)?\nIs there a preferred way of offering follow up to the user (A-followup/question or A-followup/offer)?\nHow does the number of salient entities considered in the rewrite (top 1, 2, or 3) affect user preferences?"
+        },
+        {
+            "section_id": "4.3.2",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.2. Experiment Design.",
+            "text": "We design the evaluation study as a multiple choice inquiry and ask crowd workers to provide their assessments.\nGiven an initial question, the workers need to assume the role of a user and select the answer that they would prefer in an interaction with a conversational assistant.\nThe given options are threefold: an original answer, a rewritten answer with inline explanations, and a rewritten answer with a follow-up prompt in the end.\nFurthermore, to answer research questions RQ2.c and RQ2.d, we vary the methods for inline explanations, as well as the types of questions for the prompt-based rewrite.\nNote that crowd workers are not aware of those changes and they always have the three mentioned options, without knowing how the rewrites are generated.\nTo ensure consistency, we generate rewrites on the same pool of QA pairs, thus controlling the potential impact of different topics on the rewrite preference.\nEach question and three answer options, corresponding to original answer, an answer with inline definitions, and an answer with follow-up, is annotated by three different crowd workers.\nWe ensure the quality and consistency of the annotations by selecting high-quality workers, as described in Section 3.2  ###reference_###.\nMoreover, we randomize the order of A-original, A-inlinedef, and A-followup to reduce any potential position bias.\nIn order to gain further insights into the underlying rationales, we ask annotators to provide a brief explanation of on why they chose the answer they did.\nWe analyze the provided reasons in depth in the next section.\nTo additionally ensure high quality annotations, we manually inspect all of them, rejecting crowd workers who carelessly provided nonsensical reasons (e.g., “first one,” “best text,” or simply copy-pasted parts of the answers), and blocking them from further participation in the study.\nIn total, we acquire more than 600 assessments on rewrite type preference with justifications for the choice."
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "4.4. Results",
+            "text": "In this section, we present the results of the crowdsourcing study on answer rewrite type preference and analyze them in the light of the aforementioned research questions."
+        },
+        {
+            "section_id": "4.4.1",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.1. Original or Rewritten Answer Preference",
+            "text": "Table 3  ###reference_### presents the results of the different combinations of answer rewrites, as explained in Section 4.3  ###reference_###.\nTo assess whether differences in answer preference are statistically significant, we perform a  test under the null hypothesis of data being drawn from a uniform probability distribution across the three rewrites (i.e., each row of the table).\nIn response to RQ2.a, we observe a preference for one of the answer rewrites, over the original answer (222 for original vs 399 for rewrites, p-value ).\nThese results suggest that there is a large potential for improving the user experience through answer rewriting.\nMoreover, the findings suggest a promising direction for further research on answer rewriting in CIS systems, both by providing further inline explanations of certain entities and by offering follow-up clarifications."
+        },
+        {
+            "section_id": "4.4.2",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.2. Rewrite Type Preference",
+            "text": "Regarding RQ2.b, we observe a preference for answers with inline explanations (A-inlinedef) over the answers with a follow up (A-followup).\nMoreover, as indicated in Table 3  ###reference_###, this preference is prevalent across all combinations of rewrite subtypes.\nAlthough not all combinations in Table 3  ###reference_### yield statistically significant differences, the overall trend is prevalent across all of the experiments.\nThis suggests that making the answer self-contained by providing inline entity explanations is more desirable than offering the user to clarify these entities.\nContrary to our hypothesis, longer answers obtained by inserting entity descriptions do not seem to overwhelm the majority of the users.\nHowever, subjectivity is still important in this scenario, as some users indeed find A-inlinedef to be too cluttered, as discussed in the next section."
+        },
+        {
+            "section_id": "4.4.3",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.3. Rewrite Subtype Preference",
+            "text": "To address research questions RQ2.c and RQ2.d, we aggregate the results of different subtypes of answer rewriting.\nExperiments indicate humanly-curated answer to be slightly more preferred over the Wikbase definitions in parentheses (131 vs. 119), suggesting that more natural rewrites could better help the user understand the answers.\nThis finding is a motivation for the development of answer rewriting methods aimed at defining entities in a more natural manner, compared to entity definitions being inserted into parentheses.\nSimilarly, A-followup/offer is slightly more preferred than A-followup/question (81 vs. 68).\nWe hypothesize that a prompt that could be ignored, as opposed to a direct question, would benefit the overall user experience.\nWhile both strategies are equally effective in providing the user with desired information, A-followup/offer might not impair the flow of the conversation, as it can be ignored if the user does not desire to learn more about proposed entities."
+        },
+        {
+            "section_id": "4.4.4",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.4. Result Preference by Top N Entities",
+            "text": "Regarding RQ2.e, we report the results on answer preference across top  most salient entities rewritten in Table 4  ###reference_###.\nSpecifically, we construct the experiment such that the same original answer is rewritten three times, each time with  salient entities taken into account, with .\nResults suggest that the higher the , i.e., the more entities are defined in the answer, the stronger the user’s preference for A-inlinedef.\nWe hypothesize that such answers provide a more complete response to the given question, thus not requiring further explorations of the topic through clarifying prompts."
+        },
+        {
+            "section_id": "4.5",
+            "parent_section_id": "4",
+            "section_name": "4.5. Analysis",
+            "text": "In order to gain further insight into answer rewrite preferences, we manually analyze responses from crowd workers.\nRecall that workers were asked to justify why they would prefer the answer rewrite they have chosen. We perform a qualitative analysis of the provided reasons by identifying re-occurring reasons for workers’ choices.\nWe find five distinct patterns of the provided reasons, presented in Table 5  ###reference_###.\nTo estimate the prevalence of each of these, we randomly select 100 responses from the crowd workers and label them using these pattern.\nIn our analysis, we allow for multiple patterns to be associated with a single reason of choice, as for example worker can pick an answer because it is both concise and natural.\nThe patterns and their frequency in the analyzed set are shown in Table 5  ###reference_###.\nOverall, we find that:\nUsers prefer the original answer  mostly because it is short, concise, and does not introduce unnecessary clutter.\nUsers prefer the answer with inline explanations A-inlinedef when they appreciate additional information and think it provides a well-defined answer.\nUsers prefer the answer with a follow-up prompt A-followup when they think it is the most welcoming of the different answer alternatives, inviting for further conversation, but is not unnecessarily overwhelming with long explanations of entities they perhaps do not require explanation of.\nAlthough all of the workers provided reasonable justifications for their selection, the inter-annotator agreement, as measured by Fleiss’ , is , indicating high subjectivity.\nFrom the conducted experiments and observed patters in user’s preferences, we find solid evidence that entity-based answer rewriting can lead to an improved conversational user experience. At the same time, we also find that the choice of preferred answer format is highly subjective, which calls for further research on the personalization of such approaches."
+        },
+        {
+            "section_id": "4.6",
+            "parent_section_id": "4",
+            "section_name": "4.6. LLM-based Answer Rewriting",
+            "text": "While entity definitions are currently either taken from a knowledge base or curated by human intervention, the question naturally arises: Could this task not be tackled in an end-to-end manner by a large language model (LLM)?\nGiven promising advancements in text simplification, e.g., with T5 (Sheang and\nSaggion, 2021  ###reference_b35###), and the broad variety of knowledge and language capabilities demonstrated by ChatGPT, there are reasons to believe that the answer rewriting task could be performed by simply engineering the “right” prompt. Below, we present some anecdotal evidence to the contrary, by presenting results obtained with a state-of-the-art LLM, gpt-3.5-turbo (Brown\net al., 2020  ###reference_b7###).\nSpecifically, we consider two types of prompts: (1) instructing the LLM to rewrite the answer for easier understandability and (2) additionally, including the specific entities that need to be explained. For both settings, we experimented with both zero- and few-shot prompts. Due to space constraints, we only include a few examples in Table 6  ###reference_### to illustrative the main limitations we identified:\nFailure to identify salient entities: When entities that require explanations aren’t explicitly stated, the LLM can simply reword the answer, without providing any additional information.\nKnowledge distortion: Certain salient entities are removed from the original answer, causing the loss of information by oversimplifying the text.\nAnswer length: when explicitly stated which entities require inline explanations, the LLM tends to significantly lengthen the original answer (from 1-2 to 5-6 sentences).\nInconsistency: Although hallucination is a known issue in LLMs (Ji et al., 2023  ###reference_b21###), we also observe inconsistency, i.e., a high degree of variation in answer quality, when generating answers to the same prompt multiple times (controllable with parameters to some degree) and across different examples (not controllable).\nThat said, LLMs can also generate appropriate rewrites, as illustrated by the last example in Table 6  ###reference_###, which is both concise and natural, while still covering all of the salient entities.\nHowever, it is evident that the salient entities had to be explicitly stated and that prompts need to be carefully engineered for the desired outcome.\nThe main take home message of our study is that entity-based answer rewriting can improve the user experience, but to unlock its full potential, the identification of salient entities as well as the preferred form of answer rewrite need to be addressed in a personalized manner. These parts require future research. When it comes to the actual generation of the rewritten answer, there is a large potential for utilizing LLMs, provided that they are prompted with the specific entities and the desired format of rewrite."
+        },
+        {
+            "section_id": "4.7",
+            "parent_section_id": "4",
+            "section_name": "4.7. Discussion",
+            "text": "Ours is a novel task in a conversational setting, which makes evaluation inherently challenging.\nIn this section, we reflect on some of the design decisions, acknowledge limitations, and highlight possible future research directions, including potentially revisiting some of the design choices."
+        },
+        {
+            "section_id": "4.7.x",
+            "parent_section_id": "4.7",
+            "section_name": "Impact of Rewriting on Answer Length",
+            "text": "Rewriting answers in CIS by inserting inline definitions of salient entities lengthens the original answer.\nAs observed in our experiments, up to three entity definitions do not seem to hurt the answer rewrite, as such rewrite was often chosen by the crowd workers.\nHowever, in case the answer becomes too long due to a large number of salient entities, the amount of them we provide definitions for can be reduced by taking only the top N entities, as ordered by the salience scores."
+        },
+        {
+            "section_id": "4.7.x",
+            "parent_section_id": "4.7",
+            "section_name": "Text- vs. Voice-based CIS",
+            "text": "We hypothesize that results on answer rewrite preference might differ in a voice-only setting, as the user is not able to skim through potentially unnecessary parts of the answer.\nAs such, preference for inline definitions might not be so prevalent, as users could not simply skim through the text and would in fact need to listen to the extended answers.\nWe aim to explore the aforementioned questions in further research."
+        },
+        {
+            "section_id": "4.7.x",
+            "parent_section_id": "4.7",
+            "section_name": "More Realistic Conversational Setting",
+            "text": "Design-wise, we compare answer rewrites turn by turn, rather than evaluating the whole conversations.\nThis is often the case in crowdsourcing-based studies due to the limited availability of users, although recent research points out the benefits of multi-turn dialogue evaluation (Li\net al., 2019  ###reference_b26###).\nAt the same time, utterances in our study are self-contained and do not necessarily require full conversation history for correct assessments.\nAlso, we provide an analysis of the salient entity evolution throughout the conversation.\nNevertheless, as part of our future work, we aim to build multiple CIS systems based on answer rewrite type (e.g., a system that generates answers with inline explanations of salient entities and a system that offers follow-up prompts) and perform a thorough user study to validate the findings of this work."
+        },
+        {
+            "section_id": "4.7.x",
+            "parent_section_id": "4.7",
+            "section_name": "Salient Entity Annotation",
+            "text": "While other automated options for extracting salient entities exist, we opted for annotating salience through crowdsourcing with a goal of acquiring high-quality data. Nevertheless, despite having multiple controls in place for ensuring quality (from the selection of crowd workers to using test questions), the inter-annotator agreement turned out to be relatively low.\nWe attribute this to the high subjectivity of the task, as workers’ perception of what is “essential to understand” might differ, in relation to their personal knowledge and their understanding of what “essential” means. We acknowledge the possibility of the annotation task being set up this way to be too open for interpretations, or simply too hard, thus leading to low inter-annotator agreement. In the future we plan to repeat the annotation process as part of a dedicated study, aiming to untangle what role prerequisite knowledge and subjectivity might play here. Nonetheless, we believe the findings of this study on question rewrite strategies and preferences to be sound and useful for the research community."
+        },
+        {
+            "section_id": "4.7.x",
+            "parent_section_id": "4.7",
+            "section_name": "Role of Background Knowledge",
+            "text": "High subjectivity of rewrite preferences potentially comes from different backgrounds and personal preferences of different users.\nThus, having information about the background of the user would help the system tailor the rewrite to a specific user, both by selecting only entities which the user needs explanation for and by adjusting the style of the rewrite.\nFuture work therefore includes personalized answer rewrites."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "5. Conclusions",
+            "text": "We analyzed conversational information seeking interactions and proposed two strategies for answer rewriting to ensure user understanding. The first strategy involves providing inline definitions, while the second offers the user an option to learn more. Our methods were evaluated through human-based assessment, showing a user preference for answers with inline definitions. We hope these findings encourage further research on answer rewriting strategies."
+        }
+    ]
+}

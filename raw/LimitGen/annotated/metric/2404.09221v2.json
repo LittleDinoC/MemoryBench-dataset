@@ -1,0 +1,120 @@
+{
+    "title": "\\scalerel* Exploring and Improving Drafts in Blockwise Parallel Decoding",
+    "abstract": "Despite the remarkable strides made by autoregressive language models, their potential is often hampered by the slow inference speeds inherent in sequential token generation.\n\nThis paper contributes to the understanding and improvement of block drafts in two ways. First, we analyze the token distributions produced by multiple prediction heads. Secondly, we leverage this analysis to develop algorithms to improve BPD inference speed by refining the block drafts using n-gram and neural language models.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "The landscape of natural language processing has been profoundly reshaped by recent advances in autoregressive language models. These models have shown remarkable proficiency across a range of text generation tasks, including applications like question answering and summarization. However, a significant obstacle to their wider application is high inference latency, particularly for extremely deep models with hundreds of billions of parameters. This latency, intrinsic to decoding with autoregressive language models (LMs), imposes considerable computational burdens and limits real-time deployment.\n\nIn response to these latency challenges, the field has seen a shift towards decoding methods aimed at reducing the inference latency in large language models (LLM). One promising development is decoding strategies that accelerate text generation while ensuring that the output remains fluent and natural."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Our contributions",
+            "text": "In this paper, we first investigate properties made by the prediction heads of blockwise parallel LMs across several tasks; given these observations, we propose rescoring algorithms to produce higher quality drafts."
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "Observations on block drafts",
+            "text": "Consecutive repetitions  All heads within a block make predictions independently in a blockwise parallel LM. Unsurprisingly, we observe that this leads to block drafts with significant token repetition across heads. Consecutive repetition is pervasive across tasks, ranging from 20% to 75% of all neighboring draft tokens, depending on the task (subsection 6.1  ###reference_###).\n\nConfidence of different heads  We analyze the distribution of probabilities within each softmax head. Our empirical analysis reveals a key property of BPD: the block drafter tends to be more confident with initial tokens, and becomes progressively less confident for subsequent tokens. We find that the confidence of block heads correlates strongly with the quality of the block drafter (subsection 6.2  ###reference_###)."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "New algorithms",
+            "text": "Based on these observations, we propose two algorithms to leverage the top- predictions at each head and improve BPD latency. Neither of these algorithms require changes to the underlying blockwise parallel LMs.\n\nLocal rescoring via neural LMs  Given the top- predictions at each head, we refine the block draft by using a small neural, autoregressive LM to greedily rescore these local predictions. While the block prediction scores are produced independent of each other, neural rescoring should favor sequences that are fluent, encouraging coherence between the predictions at each head.\n\nGlobal rescoring via n-gram LMs with multi-drafts  If the blockwise parallel LM has heads and we consider the top- tokens from each head, then there are candidate drafts of length that can be formed. We propose to use an n-gram model to efficiently rescore all paths, via dynamic programming, and generate the most probable rescored paths as a batch of draft candidates. These drafts can then be verified in parallel by the blockwise parallel LM.\n\nThere are two critical distinctions between the proposed algorithms: the amount of context/expressive power available to each class of rescoring model, and fundamental limitations of decoding with each class. While neural rescoring models are potentially more expressive and can leverage unbounded context, n-gram LMs can be used to efficiently find the globally most likely rescored drafts from the exponentially-sized set of possible draft candidates."
+        },
+        {
+            "section_id": "2.3",
+            "parent_section_id": "2",
+            "section_name": "Organization",
+            "text": "The remainder of this paper organized as follows. In section 3 ###reference_###, we discuss previous literature in reducing LLM latency. In section 4 ###reference_###, we define foundational concepts and terminology. section 5 ###reference_### describes our experimental setup, datasets, on methods. subsection 7.1 ###reference_### presents the proposed BPD rescoring algorithms and empirical results, followed by a final discussion in section 8 ###reference_###."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Related Work",
+            "text": ""
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Efficient transformer inference",
+            "text": "Works on improving transformer efficiency encompass both optimization of an existing set of model weights, or a fundamental change to the model architecture. Examples of the former include techniques such as quantization [44, 45, 9] and model pruning [40, 26]. In parallel, neural architecture search has played a crucial role in identifying network structures that balance performance with efficiency [22, 46]. Relatedly, Elbayad et al. propose early-exiting at intermediate layers for faster inference, while Schuster et al. explore confidence thresholding for balancing speed and accuracy. These methods offer insights into optimizing decoding under resource constraints.\n\nOne important line of work has focused on modifying the decoding method in LMs. The adoption of non-autoregressive (parallel) decoding strategies [38, 14] marks a pivotal shift in this domain, addressing inference latency by simultaneously generating multiple tokens. Subsequent innovations have sought to refine this approach by incorporating additional context [6], iterative refinement [20], and tree-based attention mechanism [4]. However, these refinements often require complex training or additional inference data."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Efficient and effective decoding",
+            "text": "There are several recent works that improve the speed of LLM decoding, including pioneering works like BPD and speculative decoding. Speculative decoding leverages a smaller ‘draft’ model to anticipate the outputs of a larger target model, improving average decode latency without loss in generation quality [24, 5, 20]. The draft model is typically trained on the same corpus as the LLM, thus autoregressively generates similar drafts as the target model with reduced latency. Speculative decoding is most successful when a long sequence of speculated tokens are accepted by the target LM during verification, avoiding multiple serial calls to the target LM to generate the same sequence.\n\nOn the surface, contrastive decoding algorithms share some similarities with our proposed draft rescoring approach, insofar as a weaker model is used to modify the predictions of the target LM [25, 21]. Like speculative decoding, our proposals have no effect on the quality of the target LM’s generated text."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Preliminaries",
+            "text": "This section introduces notation and concepts, including algorithms for standard autoregressive decoding and BPD.\nAutoregressive decoding  Let  be an autoregressive LM parameterized by . The objective is to generate an output sequence  conditioned on an input sequence .\n is a vector of logits, , where  is the vocabulary over tokens. These logits define a conditional probability distribution at each time step , which by the chain rule yields .\nSequences are generated autoregressively, either through ancestral sampling from some form of the conditional next token distribution [17  ###reference_b17###], or by a beam search through the space of possible sequences to return a probable sequence. Greedy decoding, a special case of beam search, generates each token as . In this work, we consider greedy decoding exclusively, as this is the setting that Stern et al. [38  ###reference_b38###] was designed to accelerate.\nBlockwise parallel decoding  Let  be a blockwise parallel LM with block size . This model employs  distinct feedforward neural (FFN) layer with a single hidden layer, atop the target LM’s final hidden layer. The output of each FFN is followed by a softmax layer over the vocabulary to predict each of the  subsequent tokens in the block. In our experiments, the parameters of the FFNs are learned jointly with the base LM during training, and the weights of all softmax layers are tied to the input embedding table. Algorithm 1  ###reference_### describes the BPD greedy decoding procedure:\nPredict:  is used to generate a draft of  token predictions , conditioned on the prompt, , and existing generated text, .  is identical to the target LM greedy decode.\nVerify: At this stage, the target LM greedily generates next-token logits  conditioned on the existing prefix and block draft . Verification amounts to checking which block draft tokens match the autoregressive greedy decode from the target LM: (. Verification of all positions can be performed in parallel under the assumption that the target LM is a decoder-only transformer.\nAccept: Finally, the length of the longest contiguous prefix of draft tokens that match the target LM greedy decode is identified: . The decoded sequence is extended by  tokens and we iterate.111The decoded sequence is extended by  tokens since during verification we generate the token from the target LM, , at the first position where the draft differs from the target LM greedy decode. Note that in general, not all  tokens are accepted, and many of the draft tokens in each block are discarded. Since the additional time required to generate a block of tokens is fast relative to the time it takes for the forward pass of the target LM, a modest gain in accepted prefix length justifies the cost of draft generation."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Experimental setup",
+            "text": "In this paper, we use billion (B) parameter decoder-only transformer LMs with up to 9 blockwise heads. This study is based on the original BPD framework, with a modification: we use decoder-only models instead of the T5 encoder-decoder architecture. Other setups are consistent with the approach in Stern et al.\n\nThe 1.5B model and all other LMs were pretrained on (English) C4 with the causal next token prediction objective tokenized with the GPT3 subword vocabulary. For the 1.5B blockwise parallel LMs, all heads were trained jointly to predict the following tokens at each iteration. During pretraining, we use batches of 2048 subword sequences, each 512 tokens in length, amounting to B input tokens in total on TPUv3/TPUv4 with Jax.\n\nIn addition to a standard language modeling dataset, LAMBADA, we conduct experiments across several classes of downstream tasks. In the realm of text summarization, we evaluate models on the XSUM, MultiNews, SAMSum, NewsRoom, and CNN/DailyMail datasets. Each of these datasets is characterized by distinct summary lengths and styles. For extractive QA, the SQuAD V1 dataset serves as our testbed. For each task aside from language modeling, we finetune the blockwise parallel LM for that task. Details are given in Appendix C. \n\nTable 2 sketches how BPD acts on three examples from each class of tasks. LM: BPD excels at generating common multi-word expressions in a single step. For example, (no) ‘thing more than’, and (take) ‘his word for the’ are each drafted and accepted in a single step. QA: In SQuAD V1, it accurately completes the answer ‘Grumman’ from ‘Gru’ by adding ‘mman’, highlighting its ability to process multiple tokens at once and quickly extend answers. SUM: BPD’s effectiveness in SUM tasks varies by dataset. For formulaic summaries like CNN/DailyMail, it performs well, reflecting its alignment with LM and QA tasks. However, in narrative-driven datasets like SAMSum and XSUM, where concise summaries are required, the performance of BPD is similar to standard decoding."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "Exploration of predictive dynamics in BPD",
+            "text": ""
+        },
+        {
+            "section_id": "6.1",
+            "parent_section_id": "6",
+            "section_name": "Consecutive repetition",
+            "text": "We observe that vanilla block drafts are prone to significant token repetition. This is due to the fact that each head’s prediction is independent of the others, and is a limitation shared with non-autoregressive generation in general [14]. Strings of repeated tokens are unnatural, and unlikely to be generated by a strong base language model. Rescoring the top-lattice with even a simple language model eliminates a significant amount of repetition, reducing the percentage of consecutive repeated tokens from between 9.9% to 24.5%, depending on the task."
+        },
+        {
+            "section_id": "6.2",
+            "parent_section_id": "6",
+            "section_name": "Confidence across multiple heads",
+            "text": "Intuitively, predicting the identity of the future token becomes harder as increases. To better understand this phenomenon, we measure the confidence of the predictions by the entropy of the probability distribution. In 3(a), we plot the normalized histogram of entropy of each head on the LAMBADA task. From the normalized histogram, it is clear that the entropy increases as we move from the first head to the last head, which agrees with our intuition that hardness of predictions increases as increases.\n\nHowever, we observed that the entropy of heads does not increase monotonically for all tasks. Let be the average entropy of head on a particular corpus, and let , be the index of the largest head such that the average entropy of each head increases monotonically to that point. Heads with lower entropy (indicating more confident predictions) intuitively contribute more. Nonetheless, simply maximizing the number of low-entropy heads is not optimal, but rather incorporating progressively higher entropy heads, up to a certain point, can benefit decoding. A linear regression confirms this with an R-value of . This analysis suggests that BPD head entropy could be used as a proxy for inference latency."
+        },
+        {
+            "section_id": "6.3",
+            "parent_section_id": "6",
+            "section_name": "Oracle top-k block efficiency",
+            "text": "###figure_8### ###figure_9### ###figure_10### ###figure_11### ###figure_12### ###figure_13###"
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "Lattice rescoring for improved block efficiency",
+            "text": "Having explored BPD’s prediction dynamics, we propose two drafting algorithms for rescoring the top- lattice. This section presents techniques for rescoring the top- lattice along with empirical results.\n\nEach of these algorithms is a modification of the block drafted in Stage 1 in Algorithm 1. Instead of using the most likely token at each head as the prediction, we construct the top- sausage lattice of likely drafts from each head, where the set of top- tokens is denoted as  for head . This approach allows any token within  to be chosen for position , yielding a total possible combinations of:\n\nIn this lattice, any path from the start to final state represents a viable draft. Two algorithms are proposed to select a small number of -length drafts from this lattice, which are then passed to the verification step. The first algorithm employs neural autoregressive transformers (subsection 7.1), while the second utilizes n-gram language models (subsection 7.2)."
+        },
+        {
+            "section_id": "7.1",
+            "parent_section_id": "7",
+            "section_name": "Local rescoring via neural models",
+            "text": "A simple approach uses a small neural rescorer, interpolating between the logits of the rescorer LM and vanilla block draft logits with an interpolation weight. The rescored prediction is given by:\nwhere  represents the logit of the block draft at head , and  is the corresponding logit predicted by the small neural rescoring model, which is conditioned on the sequence . The parameter  is the weight placed on the rescorer’s prediction. We experiment with decoder-only transformers having 32, 61, and 94 million (M) weight parameters. We use greedy rescoring when generating the neural draft."
+        },
+        {
+            "section_id": "7.2",
+            "parent_section_id": "7",
+            "section_name": "Global n-gram rescoring",
+            "text": "We evaluate the quality of drafts generated by rescoring with an n-gram LM. Blockwise parallel LMs can be used to compute a lattice representing possible sequences. We rescore all of these sequences with an n-gram model, select the top sequences and pass them to the verification stage. When , we refer to this as n-gram rescoring and when , we refer to this as -best n-gram BPD.\n\nWhile global rescoring typically yields better results compared to local rescoring, rescoring sequences with a neural LM and selecting the most likely sequence would take time , which is computationally prohibitive in most cases. Hence, we take advantage of n-gram models, which are unique in that we can select the most likely sequence in time  using dynamic programming.\n\nWe use the OpenFST library to represent each n-gram model as a weighted finite state automaton and apply finite state composition with the top- lattice followed by extraction of the most likely draft sequences. Training details for the n-gram models are given in Appendix C.3."
+        },
+        {
+            "section_id": "7.3",
+            "parent_section_id": "7",
+            "section_name": "Empirical evaluation",
+            "text": "Repairing repetitions  In subsection 6.1, we note that vanilla block drafts are prone to token-level repetition and that rescoring with a simple language model reduces the incidence of this. To answer this, we compared the drafts generated by greedy rescoring with the 61M parameter neural rescorer against vanilla drafts. Time step instances were considered wins/ties/losses based on the accepted prefix length of the rescored draft vs. vanilla draft. Table 5 displays the win frequency across tasks along with the percentage of wins/losses attributed to introducing/eliminating repetition.\n\nNote that in the tasks where rescoring improves the most, a high percentage of those repaired instances are driven by fixing erroneously repeated tokens. In fact, for MultiNews, 66.23% of block drafts are improved through repetition repair. We also evaluated the performance of rescoring with in-domain trained rescoring LMs, but found that they tended to perform no better than C4-trained LMs (Appendix D)."
+        },
+        {
+            "section_id": "8",
+            "parent_section_id": null,
+            "section_name": "Conclusion",
+            "text": "This paper presents a comprehensive analysis of BPD, highlighting its predictive dynamics and proposing methods to refine the generation of block drafts. Our study offers insights into BPD’s behavior, particularly the tendency for drafts to contain consecutive repetitions and its heads to exhibit varying confidence levels in predictions. Two algorithms are proposed for generating higher quality drafts: one for local rescoring with small neural models (i.e., neural BPD) and another for global rescoring with an n-gram LM and generating multiple drafts (i.e. -best n-gram BPD). These algorithms leverage the strengths of both blockwise parallel LMs and small rescoring models to reduce average decoding latency, pushing the boundaries of efficient text generation with BPD. We believe that this paper lays the groundwork for future exploration in optimizing LM decoding speed."
+        }
+    ]
+}

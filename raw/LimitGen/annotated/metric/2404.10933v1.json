@@ -1,0 +1,114 @@
+{
+    "title": "LLMem: Estimating GPU Memory Usage for Fine-Tuning Pre-Trained LLMs",
+    "abstract": "Fine-tuning pre-trained large language models (LLMs) with limited hardware presents challenges. Various distributed fine-tuning methods have been proposed to alleviate these constraints. However, determining the most effective method for achieving rapid fine-tuning in a given environment remains unclear. To address this challenge, we introduce LLMem, a solution that identifies the optimal fine-tuning method across multiple GPUs. Experimental results demonstrate LLMem's ability to effectively select distributed fine-tuning methods for LLMs with more than a billion parameters.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "Since the introduction of the Transformer model by Vaswani et al. (2017), researchers have proposed numerous language models based on it. As the model's performance has improved, its size has grown exponentially, necessitating a substantial dataset for training. However, training emerging large language models (LLMs) is infeasible without a dedicated infrastructure with high-performance hardware due to memory constraints. Instead, it is preferred to utilize a small dataset to fine-tune a pre-trained model for a specific application.\n\nTo efficiently handle small datasets and reduce training time, the conventional method of data parallelism places the entire model on each GPU, splits the dataset, and trains simultaneously. \n\nTensor parallelism divides each parameter tensor in the model into rows or columns and distributes them to each GPU, using only partitioned parameters on each GPU during computation. For example, Megatron-LM Shoeybi et al. (2019), a representative tensor parallelism method, splits a tensor along its rows or columns considering the position and connection of operators. \n\nAs we described above, various distributed fine-tuning methods have been proposed, and the fine-tuning time required for each is different. For instance, conventional data parallelism provides the shortest fine-tuning time. On the other hand, tensor parallelism has no benefit in saving fine-tuning time. Users may want to select an appropriate method that has a short fine-tuning time. \n\nDNNMem Gao et al. (2020) is the most recent work providing key equations for model training by analyzing the connections between operators and live tensors in the forward and backward passes. However, it has limitations for fine-tuning LLMs. \n\nTo address these challenges, we propose LLMem, a method to estimate the peak memory consumption when applying distributed fine-tuning methods. \n\nLLMem considers several factors for each method, including recombining parameters prior to computation when applying advanced data parallelism and the output driven by all-gather in the backward pass when using tensor parallelism. Additionally, LLMem analyzes the difference in allocation method between the transformer and the lm_head part and reflects it in the estimation.\n\nTo the best of our knowledge, this is the first work to estimate the peak memory consumption for LLM fine-tuning.\n\nIn summary, our contributions are:\n\nWe provide an algorithm to determine the most efficient distributed fine-tuning method. \n\nOur source code repository can be found at https://github.com/taehokim20/LLMem."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Related Works",
+            "text": ""
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "GPU Memory Estimation",
+            "text": "There have been several attempts to enhance performance and efficiency in training deep learning models. DNNMem Gao et al. (2020) sequentially traverses the computation graph of a DL model, focusing on efficient management and reuse of computation resources. Our LLMem is inspired by DNNMem, whose mechanism is described in more detail in Section 3. TSplit Nie et al. (2022) also looks at optimizing the workflow by calculating the operational needs for the visiting operator. However, TSplit lacks an explanation of the detailed estimation process and its accuracy. SchedTune Albahar et al. (2022) optimizes resources by considering DL model characteristics as well as different hardware types running the job."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Distributed Fine-Tuning with GPUs",
+            "text": "Data parallelism can enhance fine-tuning speed in proportion to the number of GPUs. The ZeRO optimizer Rajbhandari et al. (2020), described in Section 1, is widely used as an alternative.\n\nThe ZeRO optimizer selectively gathers only the model parameters or gradients required during the computation process and utilizes reduce-scatter after the computation to maintain their partitioning on each GPU.\n\nAnother method, tensor parallelism, results in each GPU producing only partial results, necessitating that all GPUs receive the same input data. The widely adopted tensor parallelism method, Megatron-LM Shoeybi et al. (2019), splits each model parameter tensor by row or column. Other proposed methods Xu et al. (2021) Wang et al. (2021) Bian et al. (2021) achieve additional savings by sharding both input and model parameters.\n\nIf constraints cannot be met with any distributed fine-tuning method on GPUs alone, we can use heterogeneous fine-tuning utilizing CPU memory. ZeRO-offload Ren et al. (2021) manages gradients, optimizer states, and optimizer computation on the CPU while retaining parameters and forward and backward computation on the GPU."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Motivation",
+            "text": "To select distributed fine-tuning methods, it is crucial to understand the impact of advanced data parallelism mechanisms. Existing approaches often overlook scenarios where techniques like ZeRO Stage 3 optimizer or tensor parallelism are applied across multiple GPUs. This oversight can result in significant estimation errors. \n\nIn this section, we implement the existing DNNMem Gao et al. (2020), validate the implementation results, and discuss factors affecting the accuracy of these methods during the fine-tuning of pre-trained transformer-based language models."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "DNNMem Implementation",
+            "text": "DNNMem source codes are not publicly available and are mainly based on TensorFlow, so we implement DNNMem based on the description in the paper Gao et al. (2020). First, we extract the corresponding computation graph from a given pre-trained DL model to identify the output size in each operator based on parameters, batch size (), and sequence length (). The next step is to compute peak GPU memory usage at each operator while traversing the graph. Additionally, we reflect that PyTorch aligns with multiples of 512 bytes for internal tensor fragmentation."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Limitations of DNNMem for LLM Fine-Tuning Memory Estimation",
+            "text": "DNNMem Gao et al. (2020  ###reference_b8###) does not handle mixed precision, which is commonly used in fine-tuning pre-trained language models. In addition, it does not consider how memory chunks are managed to ensure that forward pass parameters and backward pass gradients share the same space Fang et al. (2022  ###reference_b7###). Furthermore, DNNMem overlooks extra usage during the initial fine-tuning iteration due to optimizer states."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Single-GPU Memory Usage Estimation",
+            "text": "This section outlines considerations for estimating computational performance of transformer-based language models on a single GPU. The symbols used in the explanation are organized in Table 1."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Workflow for Fine-Tuning Pre-Trained Models",
+            "text": "Initialization phase. The initialization phase preceding fine-tuning involves allocating memory for the CUDA context, responsible for managing information to control GPU devices, and memory for applying chunk-based memory management Fang et al. (2022  ###reference_b7###). \n\nFine-tuning phase. During the fine-tuning phase, param fp16 goes through forward and backward passes, and param fp16 is converted to gradient fp16, as illustrated in Figure 2  ###reference_###. After the backward pass, the ADAM optimizer updates parameters using optimizer states, including param fp32, momentum fp32, and variance fp32 tensors. Momentum fp32 and variance fp32 tensors consume memory based on the actual tensor size. Subsequently, memory is retained until the fine-tuning process is complete."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Memory Consumption with Structure of Transformer-based Decoder Model",
+            "text": "First, the Transformer-based decoder models Vaswani et al. (2017) are largely divided into a transformer model for fine-tuning and lm_head for output, as shown in Figure 3. The part that uses the chunk memory is the transformer model in which the parameters are updated because the input embedding has a large dictionary. Therefore, it is managed separately.\n\nThe system allocates GPU memory based on the actual size of each momentum fp32 and variance fp32, so GPU memory must be calculated for each tensor of each operator. Since the amount of GPU memory consumed by Bias or LayerNorm is very small, they can use space with other memory fragmentation. Therefore, we only calculate the GPU memory usage due to Embedding or Linear operator parameters.\n\nPyTorch provides gradient checkpointing as an option to save memory during fine-tuning. Therefore, we support estimating GPU memory usage due to each operator’s input/output tensors considering gradient checkpointing. Since the output tensors of the current operator are the input tensors of the next operator, we focus on the output. It is challenging to accurately predict GPU memory consumption due to the outputs of operators within a model. We observed that the layer and embedding outputs of the transformer model are kept in GPU memory for efficient gradient checkpointing, which minimizes the increase in fine-tuning time. The estimation error rate is reduced using the equation, which accounts for our observation.\n\nLastly, the lm_head part, including the loss calculation part, converts the transformer outputs into logits. Then, the value obtained by shifting the sequence length of the logits by one space is stored in a separate temporary variable and used for the loss calculation."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Multi-GPU Memory Usage Estimation",
+            "text": "Tensor parallelism divides the parameter values of each operator by  and does not combine them again, as shown in Figure 5(b). It splits each model parameter tensor by row or column to apply tensor parallelism to multiple pre-trained language models. We call this one-dimension tensor parallelism (1D TP). Let us assume that we apply 1D TP to a linear operation on four GPUs. The linear operator’s equation is , where  is output,  is input,  is params/gradients, and  is bias. The linear matrix multiplication process when each parameter tensor is split into columns is shown in Figure 6. We shard parameters by column because the output size after multiplication is the same as the size of the bias without sharding, so it is not affected by the use of bias. In the backward pass, the fine-tuning goes through an all-gather process.  is the total temporary buffer size for tensors imported from the other GPUs, calculated by multiplying the output size of each layer by the number of layers.\n\nIt is possible to achieve hybrid parallelism by fine-tuning through a combination of data and tensor parallelism."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "Distributed Fine-Tuning Method Decision",
+            "text": "Algorithm 1 describes the process for selecting the optimal method to fine-tune a pre-trained model based on the estimation results. Here, CDP represents one method, and the remaining estimations are connected to ADP, TP, and DP+TP, respectively. Of these methods, the optimal one is the method that requires the shortest time for fine-tuning.\n\nLLMem takes a pre-trained model , the total number of GPUs to fine-tune, and the maximum sequence length .  is a list that stores the performance evaluation score of each method. , , , and  correspond to CDP, ADP, TP, and DP+TP, respectively. LLMem increments the batch size  for each method to get the performance score. CDP uses a certain amount of data for fine-tuning in one iteration. In addition, since the ZeRO-3 optimizer increases the total communication volume of a baseline DP, the performance score of CDP is considered accordingly. In one iteration, ADP uses a specific volume, TP uses another, and DP+TP uses a different volume of data for fine-tuning.  is the number of GPUs used for DP. These values become the performance scores of each method. Finally, LLMem selects the method with the highest performance score (if the scores are tied, select CDP, ADP, TP, and DP+TP in that order). If the performance scores of all methods are zero, heterogeneous training using CPU memory is selected as an alternative. \n\nInput: Pre-trained model , , and \nOutput: Selected fine-tuning method and the optimal configuration."
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "Experiments",
+            "text": "In this section, we compare the performance of LLMem when applying various distributed fine-tuning methods. In addition, our DNNMem implementation is included in the evaluation."
+        },
+        {
+            "section_id": "7.1",
+            "parent_section_id": "7",
+            "section_name": "Experimental Setup",
+            "text": "In a multi-GPU environment, we employ a Tesla V100 with 4 GPUs in CloudLab CloudLab (2023  ###reference_b5###). We utilize the Colossal-AI framework Li et al. (2023  ###reference_b9###), which is popular for distributed fine-tuning, along with PyTorch 2.0.1 with CUDA 11.7. The models used in the experiment include OPT Zhang et al. (2022  ###reference_b23###), BLOOM Workshop et al. (2022  ###reference_b21###), CodeGen Nijkamp et al. (2022  ###reference_b12###), BioGPT Luo et al. (2022  ###reference_b10###), GPTBigCode Allal et al. (2023  ###reference_b2###), GPT Neo Black et al. (2021  ###reference_b4###), and LLaMA Touvron et al. (2023  ###reference_b17###). The dataset applied is alpaca data Taori et al. (2023  ###reference_b16###), which consists of 52K instruction-following entries."
+        },
+        {
+            "section_id": "7.2",
+            "parent_section_id": "7",
+            "section_name": "Estimation of Single-GPU Memory Usage",
+            "text": "###figure_9###"
+        },
+        {
+            "section_id": "7.3",
+            "parent_section_id": "7",
+            "section_name": "Estimation of Multi-GPU Memory Usage",
+            "text": "CDP. The experimental results are consistent as mentioned in Section 7.2.\n\nADP. We examined the behavior of ADP on multiple GPUs. The error rate in multi-GPU setups can be attributed to differences in execution across GPUs and the structure of larger models, which increase the complexity of allocations.\n\nTP and DP+TP. Our study showed how the 4TP and 2DP+2TP setups influence fine-tuning on four GPUs. In TP, temporary buffers are effectively used during operations, mitigating excess resource demands. Despite larger models and batch sizes, errors remained manageable. In combined DP and TP scenarios, allocations can vary more widely, impacting prediction accuracy."
+        },
+        {
+            "section_id": "7.4",
+            "parent_section_id": "7",
+            "section_name": "Fine-Tuning Method Selection with LLMem",
+            "text": "Table 3 assesses whether LLMem finds the optimal fine-tuning method to achieve the fastest fine-tuning for various models. When measuring the time taken for each method, we applied the maximum batch size. LLMem typically selects TP when DP causes issues. It is challenging for LLMem to choose DP+TP because only 4 GPUs were used in the experiment. DP+TP allows for more diverse combinations depending on the number of GPUs used and is more likely to be selected. LLMem also suggests CPU offloading when needed."
+        },
+        {
+            "section_id": "8",
+            "parent_section_id": null,
+            "section_name": "Conclusion",
+            "text": "This paper introduces LLMem, a method for estimating resource consumption during fine-tuning of large language models (LLMs) on multi-GPU setups. We analyze factors affecting performance, considering different allocation methods for the transformer and output sections. Experimental results demonstrate that LLMem achieves accurate estimations with minimal error rates."
+        }
+    ]
+}

@@ -1,0 +1,348 @@
+{
+    "title": "RealitySummary: On-Demand Mixed Reality Document Enhancement using Large Language Models",
+    "abstract": "We introduce RealitySummary, a mixed reality reading assistant that can enhance any printed or digital document using on-demand text extraction, summarization, and augmentation. While augmented reading tools promise to enhance physical reading experiences with overlaid digital content, prior systems have typically required pre-processed documents, which limits their generalizability and real-world use cases. In this paper, we explore on-demand document augmentation by leveraging large language models. To understand generalizable techniques for diverse documents, we first conducted an exploratory design study which identified five categories of document enhancements (summarization, augmentation, navigation, comparison, and extraction). Based on this, we developed a proof-of-concept system that can automatically extract and summarize text using Google Cloud OCR and GPT-4, then embed information around documents using a Microsoft Hololens 2 and Apple Vision Pro. We demonstrate real-time examples of six specific document augmentations: 1) summaries, 2) comparison tables, 3) timelines, 4) keyword lists, 5) summary highlighting, and 6) information cards. Results from a usability study (N=12) and in-the-wild study (N=11) highlight the potential benefits of on-demand MR document enhancement and opportunities for future research.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "1. Introduction",
+            "text": "“We live in a complex world, filled with myriad objects, tools, toys, and people. [..] Yet, for the most part, our computing takes place sitting in front of, and staring at, a single glowing screen. […] How can we escape from the computer screen and bring these two worlds together?” — Pierre Wellner (Wellner, 1991  ###reference_b67###)\nIn his pioneering work (Wellner, 1991  ###reference_b67###), Pierre Wellner presented the first demonstration of AR-enhanced documents, arguing that the future of computer interfaces should augment our physical environment, rather than confining us to a flat rectangle screen. This fusion harnessed the dynamic capabilities of digital content while retaining the tangible benefits of physical documents. With recent advances in mixed reality technologies like the Microsoft Hololens and Apple Vision Pro, we are getting closer to realizing his vision where we can naturally augment surrounding paper, books, and documents, as well as content on screens, to enhance our reading and learning experiences (Li\net al., 2019  ###reference_b34###; Rajaram and\nNebeling, 2022  ###reference_b53###; Chen\net al., 2020  ###reference_b12###).\nHowever, most prior systems (Billinghurst\net al., 2001  ###reference_b7###; Zhao\net al., 2014  ###reference_b72###; Li\net al., 2019  ###reference_b34###) have typically required documents to be pre-processed with pre-generated content. The lack of on-demand and real-time content generation for non-prepared documents hinders their generalizability and practicality in real-world applications beyond research labs.\nThis paper introduces RealitySummary, a mixed reality reading assistant that enhances any printed or digital document using on-demand text extraction, summarization, and augmentation. Our on-demand document augmentation leverages optical character recognition (OCR) and a large language model (LLM) to enhance any given document without prior preparation. To design our system, we first conducted a formative design workshop with six participants to identify common document enhancement techniques across diverse document types. We identified 20 unique techniques across five categories of document enhancement: summarization, augmentation, navigation, comparison, and extraction. Insights from the study led us to incorporate the top six techniques into our system: 1) summaries, 2) comparison tables, 3) timelines, 4) keyword lists, 5) summary highlighting, and 6) information cards.\nBased on this insight, we developed our system for the Microsoft Hololens 2 and Apple Vision Pro. The system first captures the document, and then extracts text and the document image using Google’s Cloud OCR API and OpenCV. Given this extracted text, the system generates different augmented content and extracts related images through GPT-4 and Google Image Search. The system also tracks the document based on the extracted document image, rendering the generated content around the document as a spatial 2D canvas. Furthermore, we integrated a speech input using Google’s speech-to-text API, enabling users to activate different summarization features or ask questions related to the current content through voice commands.\nTo evaluate our system, we conducted two user studies: 1) a usability study with twelve participants, and 2) an in-the-wild study with eleven participants. Both studies highlighted the unique benefits of contextual assistant for diverse set of reading materials without prior preparation. Participants valued the always-on feature for enabling implicit interactions and appreciated the mixed reality interface for facilitating spatial and tangible exploration, significantly enhancing user engagement and the applicability of AI-generated content across various scenarios. Based on the study insights, we also discuss potential risks and future research opportunities of AI-powered mixed reality reading assistants.\nFinally, our paper contributes:\nRealitySummary, a mixed reality reading assistant that uses a large language model to provide on-demand content summarization and augmentation.\nA set of design features and summarization techniques for mixed reality document enhancement derived from a formative design workshop (N=6).\nInsights and findings from our usability study (N=12) and in-the-wild study (N=11) that highlight the potential benefits of on-demand mixed reality document enhancements."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "2. Related Work",
+            "text": ""
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "2.1. Reading Augmentation",
+            "text": ""
+        },
+        {
+            "section_id": "2.1.1",
+            "parent_section_id": "2.1",
+            "section_name": "2.1.1. Document Enhancement",
+            "text": "Human-computer interaction researchers have developed ways to augment physical documents with AI-enhanced content. Examples include HoloDoc (Li  \net al., 2019  ###reference_b34###), Replicate and Resuse (Gupta  \net al., 2020  ###reference_b25###), and PaperTrail (Rajaram and  \nNebeling, 2022  ###reference_b53###), all of which laid the groundwork for augmenting physical paper by superimposing dynamic virtual content onto printed documents. Prior works have demonstrated these concepts on different platforms. For example, Pacer (Liao  \net al., 2010  ###reference_b35###), MagPad (Xu  \net al., 2015  ###reference_b69###), Tecahable Reality (Monteiro et al., 2023  ###reference_b45###), and Dually Noted (Qian et al., 2022  ###reference_b52###) use mobile AR for text augmentation, whereas Replicate and Resuse (Gupta  \net al., 2020  ###reference_b25###) and Wiki-TUI (Wu  \net al., 2007  ###reference_b68###) leverage head-mounted displays to overlay information. Other examples such as DigitalDesk (Wellner, 1991  ###reference_b67###), DocuDesk (Everitt  \net al., 2008  ###reference_b20###), Affinity Lens (Subramonyam  \net al., 2019  ###reference_b60###), Matulic et al. (Matulic and  \nNorrie, 2013  ###reference_b42###; Matulic et al., 2013  ###reference_b43###), and QOOK (Zhao  \net al., 2014  ###reference_b72###) use projection mapping for document augmentation.  \nAt their core, such augmented reading research (Kirner  \net al., 2012  ###reference_b32###; Billinghurst  \net al., 2001  ###reference_b7###; Hidayat et al., 2020  ###reference_b27###; Grasset  \net al., 2008  ###reference_b24###) aims to improve cognitive load (Cheng, 2017  ###reference_b13###), knowledge accumulation (Dünser et al., 2012  ###reference_b18###; Zhang  \net al., 2019  ###reference_b71###), and spatial visualization (Shelton and  \nHedley, 2004  ###reference_b58###), given a long-standing consensus that readers prefer physical paper over screen-based reading  (Tashman and  \nEdwards, 2011a  ###reference_b62###; Sellen and Harper, 2002  ###reference_b57###).  \nHowever, none of the existing systems have achieved an on-demand document enhancement. Instead, documents required pre-processing with content manually prepared before being embedded in AR. For example, HoloDoc (Li  \net al., 2019  ###reference_b34###), PaperTrail (Rajaram and  \nNebeling, 2022  ###reference_b53###), and Affinity Lens (Subramonyam  \net al., 2019  ###reference_b60###) did not extract text directly from the given document; instead, content was prepared in advance and loaded based on attached fiducial markers. As a result, these systems are not fully adaptable and deployable to real-world scenarios. Some preliminary works have explored on-demand text analysis using machine learning, such as Dually Noted (Qian et al., 2022  ###reference_b52###) analyzing document structure in real-time, Augmented Math (Chulpongsatorn et al., 2023  ###reference_b15###) extracting graphs and math equations, and SOCRAR (Strecker et al., 2022  ###reference_b59###) using OCR to extract key information. However, none have yet achieved comprehensive and general-purpose document enhancement. In this paper, we contribute to the first demonstration of on-demand document enhancement by leveraging large language models. The goal of this paper is not only to demonstrate its potential but also to uncover its limitations and challenges from a user experience perspective through user evaluations."
+        },
+        {
+            "section_id": "2.1.2",
+            "parent_section_id": "2.1",
+            "section_name": "2.1.2. Screen-Based Reading Support Tools",
+            "text": "Human-computer interaction researchers have explored ways to augment digital images with AR-enhanced content."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "2.2. Content Summarization",
+            "text": ""
+        },
+        {
+            "section_id": "2.2.1",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.1. Automatic Summarization",
+            "text": "In the field of natural language processing, several works have employed automatic summarization to support readers (El-Kassas et al., 2021  ###reference_b19###; Zhang\net al., 2023  ###reference_b70###). These approaches provide various summarization methods, including abstractive and extractive summaries generated from document photos (Benharrak et al., 2022  ###reference_b5###), real-time summarization of user writing for quick text iterations (Dang\net al., 2022  ###reference_b16###), enhancing reading comprehension through automatic summarization (Chen\net al., 2022  ###reference_b11###), and responsive text summarization for adapting document summaries to screen sizes ranging from large displays to small watch faces (Leiva, 2018  ###reference_b33###).\nWith the recent advances in large language models like GPT-4, such automatic summarization tasks have become more accurate, robust, and accessible. For example, Goyal et al. (Goyal\net al., 2022  ###reference_b23###) showed that GPT-3 summaries were preferred by humans over those generated by fine-tuned models. Various types of summarization have been explored using GPT-3, such as opinion summarization (Bhaskar\net al., 2022  ###reference_b6###), news summarization (Goyal\net al., 2022  ###reference_b23###), and medical dialogue summarization (Chintagunta et al., 2021  ###reference_b14###) while others have built custom frameworks for feeding long texts into GPT-3 to elicit more finely-controlled summarizations (Payne, 2022  ###reference_b49###)."
+        },
+        {
+            "section_id": "2.2.2",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.2. Interactive Summarization.",
+            "text": "Instead of automatically summarizing the content, the researchers have also explored interactive summarization based on the context and user’s needs.\nFor example, Hoeve et al. (ter Hoeve et al., 2020  ###reference_b64###) studied Q&A interactions to assist users with a document-centric question-answering paradigm, finding that information-seeking was a common query. Semantic Reactor (Google, [n.d.]  ###reference_b22###), developed by Google, enables users to ask questions about documents in natural language by fine-tuning BERT (Devlin\net al., 2019  ###reference_b17###) using the SQuAD dataset (Rajpurkar\net al., 2018  ###reference_b54###). VERSE (Vtyurina et al., 2019  ###reference_b66###) is another Q&A system that allows users to ask specific types of questions about a document but is limited by its inability to summarize. Hoeve et al. (ter Hoeve et al., 2020  ###reference_b64###) identified various question types asked by participants regarding documents, with factual/summarization questions being the most frequent. Some question types include document-related, factoid, mechanical (answerable by rule-based methods), factual, yes/no, navigational, and summary questions. Voice assistants like Cortana, Alexa, Siri, VERSE (Vtyurina et al., 2019  ###reference_b66###), Firefox Voice (Cambre et al., 2021  ###reference_b9###), and Pushpak (Holani\net al., 2019  ###reference_b29###) offer efficient query modalities, as speech input has been found to be significantly faster than manual input, especially for mixed reality devices (Ruan\net al., 2016  ###reference_b56###; Adhikary and\nVertanen, 2021  ###reference_b4###).\nOur goal is to build on top of this prior work, developing and exploring automatic and interactive summarization techniques for on-demand and real-time summaries embedded in documents."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "3. Exploring Document Enhancement Techniques for Augmented Reading",
+            "text": "To explore the possible design of an AI-assisted augmented reading, we conducted formative design workshops with six participants (4 males, 2 females), who had various design backgrounds as undergraduate and graduate HCI researchers."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "3.1. Method",
+            "text": "We asked participants to complete a four-part design task where they read and graphically annotated both their own document (Table 1  ###reference_###) and a Wikipedia article111Source: https://en.wikipedia.org/wiki/Russian_invasion_of_Ukraine  ###reference_sion_of_Ukraine###. After reading the documents, participants brainstormed possible ideas for AI-powered augmentations to enhance their readability.\nIn the first design task, participants annotated a physical printout of their own article, sketching ideas for possible enhancements, and then did the same with a printed copy of the Wikipedia article.\nIn the second design task, we gave participants digital copies of the two documents on a virtual whiteboard (Miro) and asked them to design a second set of document enhancements with the assistance of ChatGPT. Each task took approximately 15 minutes, and each session of the entire study took approximately 60 minutes.\nBefore commencing the study, we gave participants a verbal walk-through of the study’s purpose and provided a one-page reference containing sample visualizations. We also provided a set of sample prompts for ChatGPT to demonstrate the AI’s summarization and enhancement capabilities. The study followed a talk-aloud protocol and the authors took detailed notes of responses and observations. At the study’s conclusion, the authors collected all sketches authored by the participants.\nUpon study completion, all designs elicited from the participants were collated in a single Miro board. Four authors independently categorized and coded those results to identify common themes. We identified twenty distinct types of document enhancements, each with its specific usage, purpose, popularity, and the context in which it was used. Next, all authors discussed the initial design dimensions to refine the consistency and comprehensiveness of the categorization. Finally, four authors collaboratively re-coded the examples to produce a final set of design dimensions.\n###figure_1### ###figure_2###"
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "3.2. Elicited Designs and Findings",
+            "text": "We identified twenty unique classes of document enhancements, with each participant generating designs from on average three classes (SD = 1.41). We then identify five high-level categories, which include summarize, compare, augment, extract, and navigate. Figure 2  ###reference_### illustrates the summary of our study results. In this section, we describe each category in more detail."
+        },
+        {
+            "section_id": "3.2.x",
+            "parent_section_id": "3.2",
+            "section_name": "Category 1. Summarize",
+            "text": "One of the most common themes was to expedite the reading process by condensing lengthy text. All participants suggested text-based summaries with different scopes (document-level, page-level, or paragraph-level). Some participants also explored personalized summaries, such as “summarize this for a 5-year-old”, which help understand unfamiliar concepts and fit the unique comprehension levels and interests. Furthermore, many participants recommended the use of text summaries as a reference tool, enabling them to quickly review content from different parts of the document without losing focus on the current page."
+        },
+        {
+            "section_id": "3.2.x",
+            "parent_section_id": "3.2",
+            "section_name": "Category 2: Compare",
+            "text": "The most unique approach was the idea to dynamically change content representation by leveraging AI. For instance, participants envisioned transforming text and numerical data into more visual and spatial formats, such as tables, mind maps, or graphs. These alternative representations enable users to visually compare and analyze elements that would be less apparent in text. Moreover, these representations could be designed to be fluid and adaptive; for instance, tables or graphs could dynamically update, filter, or highlight based on user queries. Another idea was summarizing all of the chronological information into timelines. Such timelines could also automatically update by adding new content as the user reads through the document. This approach represents a unique design for AI-enabled augmentation, which emphasizes reshaping existing content into more comprehensible and comparable formats, offering an alternative method for active reading."
+        },
+        {
+            "section_id": "3.2.x",
+            "parent_section_id": "3.2",
+            "section_name": "Category 3. Augment",
+            "text": "All participants showed interest in enhancing their content with external data, such as maps and images. For instance, one participant envisioned a feature similar to Apple’s keyword lookup for quick reference to unfamiliar words. Such augmented content could come either from external sources (like images and maps), user-generated content (labels and sticky notes), or AI-generated content (converting 2D figures into 3D models). While such ideas have been explored in prior works (Li\net al., 2019  ###reference_b34###; Qian et al., 2022  ###reference_b52###), participants also came up with unique AI-driven enhancements beyond simple augmentation. For instance, participants envisioned that by visualizing the importance, relevance, or number of citations for each reference in academic papers, they could quickly determine which paper to read next. Another unique concept involved synthesizing external information with the comparison feature. For example, when looking up the president of Ukraine, participants suggested not just showing a biography image and profile but also visualizing the organizational relationships through a network diagram with other individuals on a page by combining both external information and content on the page."
+        },
+        {
+            "section_id": "3.2.x",
+            "parent_section_id": "3.2",
+            "section_name": "Category 4. Extract",
+            "text": "Participants envisioned interacting with reading materials by extracting elements for persistent references, such as creating keyword lists or extracting figures like scrapbooks. They also considered the possibility of extracting citations from academic articles’ bibliographies or footnotes. For example, one participant envisioned a feature where inline citations could be expanded on paper documents. Furthermore, there was interest in pulling out significant quotes from books over the years, enabling them to accumulate and store these quotes for future use."
+        },
+        {
+            "section_id": "3.2.x",
+            "parent_section_id": "3.2",
+            "section_name": "Category 5. Navigate",
+            "text": "Participants proposed various methods to enhance navigation through dense documents. They suggested the creation of document reading progress indicators to clarify their location within a text. Additionally, there was interest in making a table of contents readily accessible to better comprehend the document’s structure. Another idea involved implementing collapsible headings, allowing users to hide sections they find irrelevant in extensive documents, thereby facilitating a more focused reading experience. One participant suggested making the document searchable in AR. By integrating extraction features, they imagined users verbally dictating a search term and subsequently viewing a list of pages along with a concise summary of that term within the document."
+        },
+        {
+            "section_id": "3.2.x",
+            "parent_section_id": "3.2",
+            "section_name": "Other Findings Related AI-Driven Augmented Reading",
+            "text": "Additional findings include the potential benefits of AI to support idea generation and critical thinking. For example, participants believed that AI-assisted enhancements could deepen understanding by presenting multiple perspectives or providing new insights to enhance critical thinking. On the other hand, participants also identified several possible challenges associated with AI-generated content, including the risk of inaccurate information, instability of output quality, overly lengthy responses, and the possibility of information overload leading to distraction. In summary, while some of the proposed features are beyond the scope of our implementation, these design ideas, along with insights, have informed the development of our system, which we describe next."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "4. System and Implementation",
+            "text": "Building on insights from our formative study, we developed RealitySummary, a mixed reality reading assistant that utilizes real-time OCR and a large language model."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "4.1. System Design",
+            "text": "Figure 3  ###reference_### summarizes the overview of our system design. The system first detects and captures the document with the headset’s camera and proceeds to extract text from printed or digital documents using optical character recognition (Google Cloud OCR). Given the extracted text, our system employs the GPT-4 large language model through OpenAI’s API for analyzing and extracting important information from the document. Additionally, we have a middle layer on the server that parses the text using spaCy’s named entity recognition module to extract a list of persons, locations, organizations, and keywords that are used for the web search via Google search API. The processed information is transformed into either a text summary or visual aid with a prepared design template, which we built based on our formative study (Figure 4  ###reference_###).\n###figure_3###"
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1. Mixed Reality Headsets and Image Capture",
+            "text": "The system then embeds the text and visual output via the mixed reality headset. Since our pipeline is hardware independent, we deployed our system to Microsoft Hololens 2 and Apple Vision Pro. For HoloLens 2, we use an internal camera for image capture, Vuforia for image tracking, and handle content rendering with MRTK3 (Mixed Reality Toolkit 3) SDK222Source:https://github.com/MicrosoftDocs/mixed-reality/blob/docs/mrtk-unity/mrtk3-overview/index.md  ###reference_lity/blob/docs/mrtk-unity/mrtk3-overview/index.md###. For Apple Vision Pro, we implement the same rendering and image tracking features using the RealityKit framework and Swift. Since the Vision Pro does not allow raw camera access, our prototype feeds the camera scene to a MacBook Air via AirPlay, then extracts images via screen capture. Additionally, we offer voice interaction support to modify or create these summary visualizations using Google’s speech-to-text API and a semantic similarity check between the transcript and feature descriptions to detect which feature the user intends to choose."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2. Text Extraction",
+            "text": "We extract text content from physical or digital documents using OCR. We decided to use Google OCR in Google Cloud Vision API for accurate text extraction. OCR output also includes the position of each word, sentence, and paragraph, which helps embed the content for on-document augmentation. However, the OCR processing time is not fast enough for continuous capturing, we only first take a screenshot of the page every 5 seconds, hence, the system only needs to perform OCR once, as long as the page content does not change. We detect whether the user still reads the same page by comparing the new OCR results from the previous one. On top of the repeated capturing, the user can also manually activate the OCR with a voice command."
+        },
+        {
+            "section_id": "4.1.3",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.3. Document Tracking",
+            "text": "We use Vuforia’s markerless image tracking or Vision Pro’s built-in image tracking features to track the document. The captured image is used for both OCR and document image segmentation, which runs in parallel. When the image is captured through the above step, we segment the document boundary with OpenCV rectangle detection. The system then uses the segmented image to generate a dynamic image target in Vuforia and Vision Pro.\nThis allows RealitySummary to track essentially any document with sufficiently distinct visual features without attaching markers in advance. However, the accuracy of the system depends on various factors, such as lighting and tracked image pattern, the user can also manually place and move the content with hands.\nRecognizing the challenges of image tracking in diverse settings, our Vision Pro implementation also allows viewers to manually anchor content panels to the environment rather than the document. By taking advantage of the platform’s extremely robust spatial tracking, these environmentally-anchored panels (combined with its much higher-resolution displays) dramatically improve the readability of augmented content while reducing instability and jitter caused by moving image targets."
+        },
+        {
+            "section_id": "4.1.4",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.4. Text Summarization",
+            "text": "After text extraction and document localization, the system extracts important information using NLP. We utilize spaCy and the GPT-4 large language model in the server. We use render AR content as a series of 2D canvases. We employ WebSockets communicate between mixed reality headset and the server with JSON format. We also store the OCR results, captured images, and GPT response history in Firebase database. We query multiple prompts to multiple GPT-4 API simultaneously to reduce the generation time. The specific implementation choices for each type of document enhancement are described in the next section."
+        },
+        {
+            "section_id": "4.1.5",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.5. Speech Input Interaction",
+            "text": "The user can enable or disable different summarization panels simply by saying a trigger word like “show me the summary of this page” and “show me the table-of-contents”. Our system leverages Google’s speech-to-text API to convert spoken sentences into text. We leverage spaCy to measure the semantic similarity between the user’s spoken sentence and our predefined list of action descriptions. Beyond a simple summary activation, the user can also ask free-form, open-ended questions about the reading content by simply saying a question, which is directly sent to GPT-4 API along with the OCR results."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "4.2. Document Enhancements",
+            "text": "In this section, we describe our supported document enhancements.\nOn top of the elicited designs that we derive from our formative study, our design is also inspired by the prior MR- and non-MR-based reading assistant, such as HoloDoc (Li\net al., 2019  ###reference_b34###), DuallyNoted (Qian et al., 2022  ###reference_b52###), Marvista (Chen\net al., 2022  ###reference_b11###), and SummaryLens (Benharrak et al., 2022  ###reference_b5###).\nWhile we acknowledge that individual design elements may not be significantly novel, we believe that our system contributes to the following two aspects: 1) our holistic framework and its evaluation provide a better understanding of document augmentation design space, 2) automated and real-time approach to creating on-demand content opens up a new potential of mixed reality assistant tools.\nEach of our document enhancement techniques relies on specific language model queries (more commonly known as prompts, which are documented in our supplemental material), often in combination with additional web services like image search for images and people bio information cards, and mapbox for generating maps. Figure LABEL:fig:documents_user_study shows various reading materials augmented with a variety of information through our system.\n###figure_4###"
+        },
+        {
+            "section_id": "4.2.x",
+            "parent_section_id": "4.2",
+            "section_name": "Summary",
+            "text": "The text summary is extracted directly by using a GPT-4 API call from the Node.js server. We send the entire text of the current page to GPT-4 and get a summary in return, which is then sent to be rendered on HoloLens. We simply prompt GPT-4 asking it to summarize the current text data extracted from the page. This technique is often used in prior summary-based reading assistants like Marvista (Chen\net al., 2022  ###reference_b11###). We limit the maximum word length of the summary to less than 150 words, as we learned the user struggles to digest lengthy text through the formative study."
+        },
+        {
+            "section_id": "4.2.x",
+            "parent_section_id": "4.2",
+            "section_name": "Comparison Table",
+            "text": "RealitySummary generates comparison tables based on the user’s prompt. We use GPT-4 to generate a comparison table between the two items along with contextual text from the document similar to generating text (see supplementary material for the prompt). Alternatively, while parsing the document, we prompt GPT-4 beforehand to generate possible comparison tables and store them locally through the session (and query directly from it when comparison action is detected)."
+        },
+        {
+            "section_id": "4.2.x",
+            "parent_section_id": "4.2",
+            "section_name": "Timeline",
+            "text": "A timeline is a series of summarised events in a given text. When a user requests a timeline, we prompt GPT-4 to generate a series of events in the form of a timeline based on the user’s query and get a JSON with the relevant data. We then render this using Unity Canvas (Hololens) or HTML Canvas (Vision Pro) in a custom format to make it easy for the user to skim through."
+        },
+        {
+            "section_id": "4.2.x",
+            "parent_section_id": "4.2",
+            "section_name": "Keyword List",
+            "text": "The keyword list is generated using both GPT-4 and spaCy. SpaCy is used for keyword and phrase extraction, which also provides named entity such as date, location, and persons, which will be used for web search. We simply process the text by calling spaCy’s python wrapper using python-shell from our Node.js server and send the result back to the headset for rendering a list of keywords or highlighting them using word/phrase location, similar to keyword-based skimming techniques like ConceptEVA (Zhang\net al., 2023  ###reference_b70###)."
+        },
+        {
+            "section_id": "4.2.x",
+            "parent_section_id": "4.2",
+            "section_name": "Summary Highlighting",
+            "text": "Summary Highlighting works very similarly to summaries, in that, the user asks to summarize or find more information about a specific phrase, sentence, or paragraph. Once the user wants information about content inside a document, we prompt GPT-4 for a brief summary and use word/phrase, sentence, or paragraph matching to find the location of the content in the document. We then highlight, draw arrows, or annotate based on OCR’s word bounding box results. Other features also leverage word and phrase highlighting to connect relevant information directly to the text in the document."
+        },
+        {
+            "section_id": "4.2.x",
+            "parent_section_id": "4.2",
+            "section_name": "Information Cards",
+            "text": "Inspired by AR-based annotations demonstrated in DigitalDesk (Wellner, 1991  ###reference_b67###) and DuallyNoted (Qian et al., 2022  ###reference_b52###), information cards, as the name suggests, contain information about keywords and people (image with a description), places (a map), and images about common keywords. To reduce the number of requests made to the LLM, we use Google Search API to extract information related to key terms, places, or people. We also use Google Image Search API to source pictures related to terms or phrases on demand. Moreover, we use mapbox API to generate maps.\nIn the rare case that the API fails to provide a response, we query GPT-4 for more information."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "4.3. Technical Evaluation",
+            "text": "To characterize the technical performance of our prototype, we assessed the reliability of document tracking and overall system latency, as well as the tool’s ability to recognize documents of a variety of different types.\nTo measure the system performances, we also systematically tested RealitySummary with (1) AR tracking, (2) OCR, and (3) summarization relevance/correctness using 20 additional documents (10 physical and 10 on-screen) with greater visual and technical diversity, including posters, newspapers, online articles, patents, magazines, thesis, books, blog posts, etc."
+        },
+        {
+            "section_id": "4.3.1",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.1. Document Tracking",
+            "text": "The AR tracking analysis measured the system’s document tracking reliability with Microsoft Hololens 2 over 60 seconds each. We saw reliable tracking for 14 documents that included graphics (M=92%, SD=5.4% up-time). However, the 6 documents that included only text showed worse performance (M=64%, SD=3.7% up-time) due to their lack of distinct trackable features.\nAR tracking is not always very reliable, especially with text documents because they have fewer feature points to track. We used system logs to automatically analyze document tracking accuracy throughout the user study. We measured tracking loss whenever the system lost AR rendering or image tracking.\nWe found our system’s tracking to be 72% accurate while tracking documents with only black-and-white text and 92% accurate with tracking documents with some colors and visuals (images, diagrams, charts, etc.). We also found substantial changes in tracking with different lighting conditions (better tracking with better lighting), document image tracking size (large image targets performed much better than smaller documents), and motion (sudden headset movements resulted in temporary tracking loss or flickering)."
+        },
+        {
+            "section_id": "4.3.2",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.2. Applicability of Physical or Digital Content",
+            "text": "OCR analysis examined the fraction of words correctly extracted from the documents. Across the 20 documents, we saw extremely high OCR accuracy (M= 97.9%, SD=5.0%).\nWe tested our system’s generalizability and applicability with 20 different document types—newspapers, magazines, academic papers, books, legal documents, and technical documents.\nTwo authors checked each summarization feature on all 20 documents manually to evaluate the applicability and accuracy of the content generated by the large language model. We found our system to be 94% accurate when generalized to other documents in providing correct information based on the context of the document. Summarization analysis verified the relevance and factual correctness of the initial 120 (20  6) summary cards generated by RealitySummary across these 20 documents. Two authors manually examined and verified all documents and cards, and found that 96.77% were both factually correct and relevant."
+        },
+        {
+            "section_id": "4.3.3",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.3. Latency",
+            "text": "In our technical evaluation of latency, we measured the average latency of three different components: AR rendering, network communication, and API responses. Network communication represented our socket.io connection between the Node.js server and the headset client. The system recorded an average latency of 100 ms for rendering AR content in HoloLens and Vision Pro and an average latency of 40 ms for socket.io network connection, which is relatively low and suggests that the rendering and network process is responsive and efficient. On the other hand, API callbacks included two main components, namely external request to the GPT-4 model and pyShell request to our own NLP processing unit built with spaCy. Latency analysis included their API callbacks and wait-time. The average latency for GPT-4 was 2.4 s and NLP Module was 670 ms."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "5. Usability Study",
+            "text": "We evaluated our system with 12 participants via a think-aloud usability study. Our goal was to qualitatively assess our system’s usability, examine participants’ reactions to our document enhancements, and elicit new opportunities for MR reading assistants."
+        },
+        {
+            "section_id": "5.1",
+            "parent_section_id": "5",
+            "section_name": "5.1. Method",
+            "text": "We recruited participants (P1-P12, 6 male, 6 female; Ages = 19-35 years) through word-of-mouth and they were compensated with $15 for their one-hour participation in the study. The study was conducted with Microsoft Hololens 2 in a lab environment. All the participants had verbal and written fluency in English.\nBefore starting the study, the authors familiarized participants with AR and the Hololens 2, then introduced RealitySummary and each of the document enhancements described in the previous section. After this introduction, we provided three reading tasks using: 1) an A4 size magazine in physical format, 2) a digital document of the participant’s choice, and 3) an A3 size book. Participants’ digital documents included 3 books, 2 blog posts, 2-course assignment PDFs, 2 Wikipedia articles, 2 magazine articles, and 1 news article which they viewed on either a PC (4/12), tablet (5/12), or laptop (3/12). We asked participants to use RealitySummaryto aid with their reading, using whatever combination of enhancements best suited the current document. Throughout this 30-minute period, we encouraged participants to think aloud, documenting their experiences with the system. After the tasks, we conducted semi-structured interviews and asked them to complete a Likert scale questionnaire, including a System Usability Scale (SUS) protocol (Brooke, 1995  ###reference_b8###). Together, the questionnaire and interview took roughly 20 minutes.\nAfterward, we conducted a thematic analysis by first transcribing the think-aloud sessions and interviews, then individually familiarizing ourselves with the content and organizing data into rough categories. Two authors then individually searched for broader groups and patterns and clustered these into themes. The writing team then iterated to further refine the identified themes."
+        },
+        {
+            "section_id": "5.2",
+            "parent_section_id": "5",
+            "section_name": "5.2. Results",
+            "text": "Participants responded positively to RealitySummary (Figure 5  ###reference_###), with most participants either agreeing or strongly agreeing that the the prototype was easy to use (10/12), easy to understand (11/12),\nand well-integrated with the task (10/12).\nSimilarly, nearly all participants reported that the summary approaches provided by RealitySummary helped with comprehension (12/12),\nwere relevant to the document content (11/12),\nimproved comprehension speed (10/12),\nand augmented their reading experience (10/12).\nFinally, the System Usability Scale (SUS) returned an overall composite score of 71, suggesting a reasonable level of usability for an early-stage prototype.\n###figure_5###"
+        },
+        {
+            "section_id": "5.3",
+            "parent_section_id": "5",
+            "section_name": "5.3. Findings",
+            "text": "Our analysis identified five themes related to participants’ experience comprehending and navigating documents, as well as their sense of focus and control. We also discuss our participants’ comparisons of the visual and text-based summarization techniques and layouts implemented in RealitySummary."
+        },
+        {
+            "section_id": "5.3.x",
+            "parent_section_id": "5.3",
+            "section_name": "Comprehension",
+            "text": "Document enhancements can improve readers’ sense of comprehension, and readers value the ability to see multiple types of enhancements simultaneously.\nAll the users in the study felt that the system improved their reading comprehension. Out of the 12 participants surveyed, 11 reported that they were able to understand the document without actually reading it, solely by relying on the contextual information provided by RealitySummary. P9 even stated, “I didn’t even read the document but I understand what it is about.”\nFurthermore, multiple participants (P7, P8, P11, P12) argued that the combination of multiple features like summaries, timelines, keywords, images, and people cards provided them with a more comprehensive understanding of the document, allowing them to engage with it from different angles. This allowed them to gain multiple perspectives on the same topic, leading to a deeper comprehension of the material.\nAll participants mentioned that RealitySummary helped them comprehend documents more quickly than their typical approaches (like visually scanning a physical book and manually searching for a related summary or timeline on a phone/PC). For example, after perusing the first magazine, P12 noted that “I’ve not read this magazine thoroughly but, it seems that these features can significantly help me understand what this document is about in less amount of time.”."
+        },
+        {
+            "section_id": "5.3.x",
+            "parent_section_id": "5.3",
+            "section_name": "Navigation",
+            "text": "Both structured overviews and in-context highlights provide useful entry points that can make it easier to navigate documents in a top-down fashion, even within individual pages.\nBroadly, participants spoke positively about how RealitySummary helped them navigate documents.\nFour participants (P3, P4, P6, P8) specifically reported using structured navigation elements like timelines to get a better understanding and structural flow of the whole text, with P4 noting that “the timeline helped me organize and navigate my thoughts very quickly while reading the text” (P4).\nMeanwhile, at least a third of participants (P5, P6, P9, P10) also mentioned using lower-level augmentations to help navigate the document— highlighting how the proximity of annotations and content allowed them to use keyword highlights and information cards as visual anchors. Additionally, several participants found the connection lines between highlighted words and their corresponding features to be a valuable tool for navigating the document—with P8 stating, “the words in the documents are highlighted […] and connected with all the features […] it is very helpful. It is also pretty helpful that I can see the word ‘Yosemite’ and where it is on the map around the text!”.\nIn fact, ten different participants reported that the system allowed them to focus their reading by taking a “top-down” approach—first examining high-level ideas and terms surfaced by RealitySummary, then gradually transitioning into reading lower-level content where necessary. P8 highlighted that “[the enhancements] give you a foundation before you actually jump inside [the document]”. This allowed participants more leeway to prioritize their reading to “focus on things that you’re more unsure about rather than just kind of trying to find external information” (P1).\nInterestingly, several participants also reflected positively on the fact that summaries and keywords surfaced in our prototype were drawn only from the currently visible page, rather than the document as a whole. P5 reported that, “I like page by page summary—having a summary for each page does help make it feel less dense compared to a summary of the whole document”. Similarly P6 stressed that, “I like that it (system) gives you keywords for each page and not as a whole.”"
+        },
+        {
+            "section_id": "5.3.x",
+            "parent_section_id": "5.3",
+            "section_name": "Visual vs. Text Enhancements",
+            "text": "Both visual and text-based enhancements can benefit readers, with visuals providing supporting high-level overviews and providing context, and text summaries capturing more complex concepts.\nWhile our participants responded positively to all of the document enhancements in the prototype, they reported that they preferred text features when trying to gain a deeper understanding of a particular topic or content within the document. Conversely, participants generally felt that visual features improved their comprehension speed, increased engagement, and improved memorability.\nAll 12 participants ranked the visual summarization techniques—including image cards, people bios, and maps—as helpful, with eight participants specifically highlighting the value of images and bio cards.\nMany participants (P1, P4, P6, P7, P9, P10, and P11) agreed that the visual augmentations helped them understand the document faster compared to just reading the text, noting that, “seeing the visuals helped me grasp what’s happening in the document right away” (P11).\nSeveral participants (P7, P8) also stressed the potential for visuals to increase their engagement with the text, with P7 stating, “I’m not a big fan of reading so having visuals are helping me assist in reading this”. These participants also highlighted the potential for visuals to increase memorability with P8 noting that for historical documents the people cards could “help them put a face to a name”. Similarly, P7 noted that while text-based summaries might contribute to greater understanding, “graphical stuff makes me remember it for a longer time”."
+        },
+        {
+            "section_id": "5.3.x",
+            "parent_section_id": "5.3",
+            "section_name": "Layouts and Visual Clutter",
+            "text": "Placing enhancements in the space around the document using mixed reality can successfully reduce the potential for visual clutter and distraction.\nBecause they can sit alongside and even on top of document content, summaries, information cards, and other document enhancement have the potential to occlude or distract attention from the document. However, reducing the number of enhancements or moving them further from the text may limit their utility.\nIn our case, several participants (P7, P10, P11) specifically highlighted how our around-document placement of the layouts integrated nicely with the documents themselves—calling them natural and intuitive to use. P10 reported that “[the system] is like a natural extension of the book. It is very easy to follow through.”. Similarly, four participants (P1, P2, P5, P11) praised the fact that the augmentations did not disrupt their visual focus on the document, with P5 noting that “it is not cutting into your field of view and it’s not invasive at all”.\nMoreover, 10 participants also remarked positively on the connecting lines linking document text to cards around around the document—indicating that they were easy to follow but did not impede readability."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "6. In-the-Wild User Study",
+            "text": "To explore additional real-world use cases, we also conducted an in-the-wild study with eleven participants. In contrast to the previous usability study, which focuses on standardized reading tasks in a lab setting, this study instead focused on examining the versatility and applicability of our system across uncontrolled environments and diverse reading materials. Our goal was to uncover unique advantages and potential use cases of employing mixed reality and AI-generated assistants in everyday settings. For this study, the system was deployed on an Apple Vision Pro, which provides considerably higher rendering quality than the Hololens 2. To accommodate diverse applications and reduce the obtrusiveness of additional content in everyday scenarios, the user interface was refined, limiting augmented content to a text box and an image slot.\n###figure_6### ###figure_7### ###figure_8### ###figure_9### ###figure_10### ###figure_11### ###figure_12### ###figure_13###"
+        },
+        {
+            "section_id": "6.1",
+            "parent_section_id": "6",
+            "section_name": "6.1. Method",
+            "text": "We recruited 11 participants (W1-W11, 7 male and 4 female; Ages 19-32 years) from the local community. They were compensated with $25 for their participation in a 1.5-hour study, which consisted of a one-hour experiment and a half-an-hour interview. The study was conducted in various locations at a local university, including a library, cafeteria, store, hallway, classroom, and multiple lab settings.\nBefore the experiments, we collected participants’ demographics and their reading habits, which were input into the system as the prior knowledge of ChatGPT. Participants familiarized themselves with Apple Vision Pro by doing the eye tracking calibration setup. Unlike structured tasks or prepared reading materials, participants were encouraged to utilize our system with any text content they encountered during the experiments, including documents, books, papers, posters, online news on mobile devices, and other materials in their environment. Throughout this one-hour experiment, we also encouraged participants to think aloud about their experiences. After the experiment session, we conducted semi-structured interviews, followed by a Likert scale questionnaire similar to the usability study. Both the interview and questionnaire took approximately 30 minutes.\nAs in the earlier usability study, we then analyzed participants’ questionnaire responses and reflections to identify high-level trends and opportunities for augmented reading tools."
+        },
+        {
+            "section_id": "6.2",
+            "parent_section_id": "6",
+            "section_name": "6.2. Results",
+            "text": "We gathered feedback from participants on various aspects including the reading experience (immersiveness, understanding, distraction), perceptions of the system (content and query comprehension, trustworthiness, and privacy concerns), and overall usability (content placement and comfort using the MR headset). In general, most participant either agree or strongly agree that RealitySummary deepened their understanding of the reading content (7/11), RealitySummary demonstrated a deep understanding of the content they were reading (7/11). Participants reported feeling more immersed and interested while reading, with an average rating of 3.45 (SD = 1.04), and they perceived the system as effectively interpreting their queries (M = 3.27, SD = 1). Besides, their responses on the content placement within the system were also overall positive (M = 3.36, SD = 1.29).\nParticipants had varied opinions on whether the system became distracting throughout the reading process (M = 2.55, SD = 1.37), and whether they tended to trust the accuracy and reliability of contents provided by the system (M = 2.82, SD = 1.25). Privacy concerns were also noted by the majority (6/11), and discomfort using the headset was prevalent among the respondents (8/11). These findings are detailed in Figure 7  ###reference_###.\n###figure_14###"
+        },
+        {
+            "section_id": "6.3",
+            "parent_section_id": "6",
+            "section_name": "6.3. Findings",
+            "text": "Observations from the in-the-wild deployment highlighted a wider range of use cases for augmented reading as well as some of the practical trade-offs associated with real-world use."
+        },
+        {
+            "section_id": "6.3.x",
+            "parent_section_id": "6.3",
+            "section_name": "Types of Reading Content",
+            "text": "The in-the-wild study demonstrated our system’s broad utility, revealing diverse exploratory use cases across various reading materials. Participants engaged with a variety of books, spanning textbooks, encyclopedias, fiction, and non-fiction. The system was also employed for different types of documents, including academic papers, handouts, and class assignments, as well as digital content accessed through smartphones and laptops, like social media posts, online news articles, and e-commerce websites. Beyond conventional reading materials, participants also used our system with everyday objects and texts in the environment, such as restaurant menus, printer instructions, product nutrition labels, furniture assembly guides, posters, and signage on trash bins and advertisements. Notably, some participants even applied our system to their handwritten notes from lectures."
+        },
+        {
+            "section_id": "6.3.x",
+            "parent_section_id": "6.3",
+            "section_name": "Benefits of Always-On Assistant",
+            "text": "The exploration of such diverse reading materials can be attributed to the always-on capability of the mixed reality reading assistant. A key advantage of this always-on feature is its support for implicit interactions, offering a distinct user experience compared to ChatGPT on smartphones or laptops, which require explicit effort to engage. This implicit and automatic content capture greatly expands the range of applications, beyond what participants initially considered possible. The always-on capturing feature eliminated the need for manually supplying context, saving considerable time. For example, W9 experienced a smoother workflow when working on her business course project with RealitySummary compared to conventional screen-based methods. She was able to concentrate on her project, without having to switch between smartphones or laptops to familiarize ChatGPT with the context."
+        },
+        {
+            "section_id": "6.3.x",
+            "parent_section_id": "6.3",
+            "section_name": "Unique Affordances of Spatial and Tangible Interactions",
+            "text": "Beyond the always-on implicit assistance, participants appreciated the unique affordances offered by mixed reality interfaces, such as the opportunities for spatial and tangible exploration. In a library setting, for example, participants could naturally navigate through bookshelves (spatial exploration), physically pick up a book (tangible interaction), and browse through its pages to automatically receive summaries (always-on assistance). W5 and W10 even leveraged our system to provide summaries or recommendations for entire collections of books on a bookshelf, not just content from a single page. Furthermore, W1 demonstrated the capability to synthesize information across multiple books on a table, requesting summaries or connections between various books and pages. Such observations highlight how mixed reality interfaces enable spatial and tangible interactions that go beyond the limitations of traditional screen-based interfaces, which can only capture and summarize visible content."
+        },
+        {
+            "section_id": "6.3.x",
+            "parent_section_id": "6.3",
+            "section_name": "Unique Ways of Using AI-Generated Content",
+            "text": "We observed several unique and unexpected use cases that took advantage of the LLM’s capacity for free-form questioning and answering. For instance, when reading a physics textbook, W8 asked the system to generate ten quizzes to help him understand quantum mechanics, transforming the textbook into a more active and personalized learning tool. Other common usages included translations (W4, W5, W6), learning aids (W4, W8), and personalized content recommendations (W5, W10). For example, applied the system to his handwritten calculus notes to find answers to particular questions. Beyond traditional reading applications, the AI’s capabilities supported practical decision-making; W4 compared nutritional information of products on store shelves and menu items to determine healthier options, while W5 used it for guidance on waste disposal and printer operations. The LLM’s ability to process a broad spectrum of inquiries significantly expanded the system’s applicability and utility."
+        },
+        {
+            "section_id": "6.3.x",
+            "parent_section_id": "6.3",
+            "section_name": "Proactive Summaries vs On-Demand Question Answering",
+            "text": "Our system offers both 1) proactive assistance through automatic summary generation and 2) on-demand assistance where users manually ask questions. Participants shared their insights on these two functionalities by comparing the benefits and limitations. Proactive summaries were appreciated for providing a useful initial overview of unfamiliar topics. Preferences for proactive summaries varied with reading habits. For example, infrequent readers like W6 and W10 found these proactive summaries helpful in deciding whether to read the content or understand it without reading the full text. On the other hand, W10, who is a more frequent reader, found the constant summary updates unnecessary. In contrast, on-demand question answering allowed for a more focused engagement on specific topics. For instance, W1 enjoyed the ”rapid-fire” questioning with a physics textbook, asking more questions than with traditional ChatGPT saying ”You have to describe it properly you have to specifically say what you’re asking about what you’re reading, so that kind of all of this abstracted in this system is like frees up your mind to just focus on the curiosity part Like rapid-fire questions and get rapid-fire answers”. W2 valued how questioning was woven into reading, preserving thought flow without the disruption of toggling between reading and ChatGPT interfaces. Overall, participants favored the on-demand feature due to its applicability to diverse situations, yet many appreciated having both options for different purposes: proactive features for implicit skimming and on-demand for addressing more specific questions."
+        },
+        {
+            "section_id": "6.3.x",
+            "parent_section_id": "6.3",
+            "section_name": "Trust of AI-Generated Content",
+            "text": "Many participants approached the system’s responses with caution, often verifying the answers with the reading material. They highlighted the necessity of consulting additional sources for in-depth or technical readings when depending on the system. There was a general agreement among participants about their reluctance to fully trust an always-on reading assistant in their daily activities. Conversely, we noted some intriguing discussions regarding how participants perceive our system, either as a mere tool or more like a personal companion. While most participants engaged with the system as a conventional chatbot, some regarded it more as a personal companion than a mere tool. Notably, W3 and W5 described the system as a friend for discussing and inquiring about their readings. The system’s ability to provide always-on immediate responses facilitates this personification."
+        },
+        {
+            "section_id": "6.3.x",
+            "parent_section_id": "6.3",
+            "section_name": "Potential Risks of AI-Driven Augmented Reading",
+            "text": "Participants also expressed several concerns about potential risks, notably privacy issues due to the possibility of constant surveillance. Despite this concern, most participants were willing to continue using the system, if they could control when it was active. For example, W1 expressed the desire to capture all text throughout her entire life, allowing for an extensive searchable archive of everything she has encountered. Additionally, participants also mentioned the risk of decreased motivation and skill development. For example, W6 mentioned that relying too heavily on the system for translations could reduce the motivation to learn new languages. Similarly, W11 worried that immediate access to answers for every question might contribute to a broader intellectual complacency. Overall, participants wanted the flexibility to choose when and how the system would be used to mitigate these risks."
+        },
+        {
+            "section_id": "6.3.x",
+            "parent_section_id": "6.3",
+            "section_name": "Possible Future Improvements",
+            "text": "A desired feature among participants was the system’s ability to recognize not only text but also images. For instance, W1 faced limitations when attempting to inquire about a diagram on a page, which the system could not recognize. Similarly, they anticipated broader usage scenarios beyond text recognition, such as generating cooking recipes from fridge ingredients or providing information on real-world objects. We anticipate that enhancing the system with multi-modal LLM capabilities could address such needs. Additionally, there was interest in a “chat history” feature to recall previous interactions with the system, highlighting a need for temporal relevance in user-system interactions. Finally, participants suggested they would be more inclined to use such a system long-term if hardware constraints were overcome."
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "7. Limitations and Future Work",
+            "text": "Our experiences building RealitySummary and the insights from both our formative workshop and study highlight a range of promising research directions for MR document enhancement."
+        },
+        {
+            "section_id": "8",
+            "parent_section_id": null,
+            "section_name": "8. Conclusion",
+            "text": "RealitySummary is the first example of an on-demand MR reading assistant that uses OCR and an LLM to generate reading aids for any physical or digital document. We hope our study opens up new opportunities for on-demand and natural language-powered reading assistance and inspires the HCI community to continue exploring such systems to realize the full potential of intelligent reading tools."
+        }
+    ]
+}

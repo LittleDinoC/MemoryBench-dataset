@@ -1,0 +1,138 @@
+{
+    "title": "Transformers for Low-Resource Languages: Is Féidir Linn!",
+    "abstract": "The Transformer model is the state-of-the-art in Machine Translation. However, in general, neural translation models often under perform on language pairs with insufficient training data. As a consequence, relatively few experiments have been carried out using this architecture on low-resource language pairs. In this study, hyperparameter optimization of Transformer models in translating the low-resource English-Irish language pair is evaluated. We demonstrate that choosing appropriate parameters leads to considerable performance improvements. Most importantly, the correct choice of subword model is shown to be the biggest driver of translation performance. SentencePiece models using both unigram and BPE approaches were appraised. Variations on model architectures included modifying the number of layers, testing various regularisation techniques and evaluating the optimal number of heads for attention. A generic 55k DGT corpus and an in-domain 88k public admin corpus were used for evaluation. A Transformer optimized model demonstrated a BLEU score improvement of 7.8 points when compared with a baseline RNN model. Improvements were observed across a range of metrics, including TER, indicating a substantially reduced post editing effort for Transformer optimized models with 16k BPE subword models. Bench-marked against Google Translate, our translation engines demonstrated significant improvements. The question of whether or not Transformers can be used effectively in a low-resource setting of English-Irish translation has been addressed. Is féidir linn - yes we can.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "The advent of Neural Machine Translation (NMT) has heralded an era of high-quality translations. However, these improvements have not been manifested in the translation of all languages. Large datasets are a prerequisite for high quality NMT. This works well in the context of well-resourced languages where there is an abundance of data. In the context of low-resource languages which suffer from a sparsity of data, alternative approaches must be adopted.\nAn important part of this research involves developing applications and models to address the challenges of low-resource language technology. Such technology incorporates methods to address the data scarcity affecting deep learning for digital engagement of low-resource languages.\nIt has been shown that an out-of-the-box NMT system, trained on English-Irish data, achieves a lower translation quality compared with using a tailored SMT system (Dowling et al, 2018). It is in this context that further research is required in the development of NMT for low-resource languages and the Irish language in particular.\nMost research on choosing subword models has focused on high resource languages (Ding et al.,, 2019  ###reference_b10###; Gowda and May,, 2020  ###reference_b14###). In the context of developing models for English to Irish translation, there are no clear recommendations on the choice of subword model types. One of the objectives in this study is to identify which type of subword model performs best in this low resource scenario."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Background",
+            "text": "Native speakers of low-resource languages are often excluded from useful content since, more often than not, online content is not available to them in their language of choice. Such a digital divide and the resulting social exclusion experienced by second language speakers, such as refugees living in developed countries, has been well documented in the research literature  (MacFarlane et al.,, 2008  ###reference_b20###; Alam and Imran,, 2015  ###reference_b1###).\nResearch on Machine Translation (MT) in low-resource scenarios directly addresses this challenge of exclusion via pivot languages  (Liu et al.,, 2018  ###reference_b19###), and indirectly, via domain adaptation of models  (Ghifary et al.,, 2016  ###reference_b13###). Breakthrough performance improvements in the area of MT have been achieved through research efforts focusing on NMT (Bahdanau et al.,, 2014  ###reference_b3###; Cho et al.,, 2014  ###reference_b9###). Consequently, state-of-the-art (SOA) performance has been attained on multiple language pairs (Bojar et al.,, 2017  ###reference_b7###, 2018  ###reference_b8###)."
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "Irish Language",
+            "text": "The Irish language is a primary example of such a low-resource language that will benefit from this research. NMT involving Transformer model development will improve the performance in specific domains of low-resource languages. Such research will address the end of the Irish language derogation in the European Commission in 2021 111amtaweb.org/wp-content/uploads/2020/11/MT-in-EU-Overview-with-Voiceover-Andy-Way-KEYNOTE-K1.pdf (Way,, 2020  ###reference_b32###) helping to deliver parity in support for Irish in online digital engagement."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Hyperparameter Optimization",
+            "text": "Hyperparameters are employed in order to customize machine learning models such as translation models. It has been shown that machine learning performance may be improved through hyperparameter optimization (HPO) rather than just using default settings (Sanders and Giraud-Carrier,, 2017  ###reference_b24###).\nThe principle methods of HPO are Grid Search (Montgomery,, 2017  ###reference_b21###) and Random Search (Bergstra and Bengio,, 2012  ###reference_b5###)]. Grid search is an exhaustive technique which evaluates all parameter permutations. However, as the number of features grows, the amount of data permutations grows exponentially making optimization expensive in the context of developing long running translation models.\nAn effective, and less computationally intensive, alternative is to use random search which samples random configurations."
+        },
+        {
+            "section_id": "2.2.1",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.1 Recurrent Neural Networks",
+            "text": "Recurrent neural networks are often used for the tasks of natural language processing, speech recognition and MT. RNN models enable previous outputs to be used as inputs while having hidden states. In the context of MT, such neural networks were ideal due to their ability to process inputs of any length. Furthermore, the model sizes do not necessarily increase with the size of its input. Commonly used variants of RNN include Bidirectional (BRNN) and Deep (DRNN) architectures. However, the problem of vanishing gradients coupled with the development of attention-based algorithms often leads to Transformer models performing better than RNNs."
+        },
+        {
+            "section_id": "2.2.2",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.2 Transformer",
+            "text": "The greatest improvements have been demonstrated when either the RNN or the CNN architecture is abandoned completely and replaced with an attention mechanism creating a much simpler and faster architecture known as Transformer  (Vaswani et al.,, 2017  ###reference_b31###).\nTransformer models use attention to focus on previously generated tokens. The approach allows models to develop a long memory which is particularly useful in the domain of language translation. Performance improvements to both RNN and CNN approaches may be achieved through the introduction of such attention layers in the translation architecture.\nExperiments in MT tasks show such models are better in quality due to greater parallelization while requiring significantly less time to train."
+        },
+        {
+            "section_id": "2.3",
+            "parent_section_id": "2",
+            "section_name": "Subword Models",
+            "text": "Translation, by its nature, requires an open vocabulary and the use of subword models aims to address the fixed vocabulary problem associated with NMT. Rare and unknown words are encoded as sequences of subword units. By adapting the original Byte Pair Encoding (BPE) algorithm (Gage,, 1994  ###reference_b12###), the use of BPE submodels can improve translation performance (Sennrich et al.,, 2015  ###reference_b26###; Kudo,, 2018  ###reference_b16###).\nDesigned for NMT, SentencePiece, is a language-independent subword tokenizer that provides an open-source C++ and a Python implementation for subword units. An attractive feature of the tokenizer is that SentencePiece trains subword models directly from raw sentences (Kudo and Richardson,, 2018  ###reference_b17###)."
+        },
+        {
+            "section_id": "2.3.1",
+            "parent_section_id": "2.3",
+            "section_name": "2.3.1 Byte Pair Encoding compared with Unigram",
+            "text": "BPE and unigram language models are similar in that both encode text using fewer bits but each uses a different data compression principle (dictionary vs. entropy). In principle, we would expect the same benefits with the unigram language model as with BPE. However, unigram models are often more flexible since they are probabilistic models that output multiple segmentations with their probabilities.\n###figure_1###"
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Proposed Approach",
+            "text": "HPO of RNN models in low-resource settings has previously demonstrated considerable performance improvements. The extent to which such optimization techniques may be applied to Transformer models in similar low-resource scenarios is evaluated as part of this study. Evaluations included modifying the number of attention heads, the number of layers and experimenting with regularization techniques such as dropout and label smoothing. Most importantly, the choice of subword model type and the vocabulary size are evaluated.\nIn order to test the effectiveness of our approaches, optimization was carried out on two English-Irish parallel datasets: a general corpus of 52k lines from the Directorate General for Translation (DGT) and an in-domain corpus of 88k lines of Public Administration (PA) data. With DGT, the test set used 1.3k lines and the development set comprised of 2.6k lines. In the case of the PA dataset, there were 1.5k lines of test data and 3k lines of validation. All experiments involved concatenating source and target corpora to create a shared vocabulary and a shared SentencePiece subword model. The impact of using separate source and target subword models was not explored.\nThe approach adopted is illustrated in Figure 1  ###reference_###. Two baseline architectures, RNN and Transformer, are evaluated. On evaluating the hyperparameter choices for Transformer models, the values outlined in Table 1 were tested using a random search approach. A range of values for each parameter was tested using short cycles of 5k training steps. Once an optimal value, within the sampled range was identified, it was locked in for tests on subsequent parameters."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Architecture Tuning",
+            "text": "Given the long training times associated with NMT, it is difficult and costly to tune systems using a conventional Grid Search approach. Therefore a Random Search approach was adopted in the HPO of our transformer models.\nWith low-resource datasets, the use of smaller and fewer layers has previously been shown to improve performance  (Araabi and Monz,, 2020  ###reference_b2###). Performance of low-resource NMT has also been demonstrated to improve in cases where shallow Transformer models are adopted  (Van Biljon et al.,, 2020  ###reference_b30###). Guided by these findings, configurations were tested which varied the number of neurons in each layer and modified the number of layers used in the Transformer architecture.\nThe impact of regularization, by applying varying degrees of dropout to Transformer models, was evaluated. Configurations using smaller (0.1) and larger values (0.3) were applied to the output of each feed forward layer."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Subword Models",
+            "text": "It has become standard practise to incorporate word segmentation approaches, such as Byte-Pair-Encoding (BPE), when developing NMT models. Previous work shows that subword models may be particularly beneficial for low-resource languages since rare words are often a problem. Reducing the number of BPE merge operations resulted in substantial improvements of 5 BLEU points (Sennrich and Zhang 2019) when tested on RNN models.\nIn the context of English to Irish translation, there is no clear agreement as to what constituted the best approach. Consequently, as part of this study, subword regularization techniques, involving BPE and unigram models were evaluated to determining the optimal parameters for maximising translation performance. BPE models with varying vocabulary sizes of 4k, 8k, 16k and 32k were tested."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Empirical Evaluation",
+            "text": ""
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Experimental Setup",
+            "text": ""
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1 Datasets",
+            "text": "Models were developed using a lab of machines each of which has an AMD Ryzen 7 2700X processor, 8 GB memory, a 256 SSD and an NVIDIA GeForce GTX 1080 Ti."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2 Infrastructure",
+            "text": "Models were developed using a lab of machines each of which has an AMD Ryzen 5 2700X processor, 16 GB memory, a 256 SSD and an NVIDIA GeForce GTX 1080 Ti. Rapid prototype development was enabled through a Google Colab Pro subscription using NVIDIA Tesla P100 PCIe 16 GB graphic cards and up to 27GB of memory when available (Bisong,, 2019  ###reference_b6###).\nOur MT models were trained using the Pytorch implementation of OpenNMT 2.0, an open-source toolkit for NMT (Klein et al.,, 2017  ###reference_b15###)."
+        },
+        {
+            "section_id": "4.1.3",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.3 Metrics",
+            "text": "Models were developed using a lab of machines each of which has an Intel Core i7 processor, 16 GB memory, a 256 SSD and an NVIDIA GeForce GTX 1080 Ti."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Results",
+            "text": ""
+        },
+        {
+            "section_id": "4.2.1",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.1 Performance of subword models",
+            "text": "The impact on translation accuracy when choosing a subword model is highlighted in Tables 2  ###reference_### - 5  ###reference_###. In training both RNN and Transformer architectures, incorporating any submodel type led to improvements in model accuracy. This finding is evident when training either the smaller generic DGT dataset or the larger in-domain PA dataset.\nUsing an RNN architecture on DGT, as illustrated in Table 2  ###reference_###, the best performing model with a 32k unigram submodel, achieved a BLEU score 7.4% higher than the baseline. With the PA dataset using an RNN, as shown in Table 3, the model with the best BLEU, TER and ChrF3 scores again used a unigram submodel.\nThere are small improvements in BLEU scores when the RNN baseline is compared with models using a BPE submodel of either 8k, 16k or 32k words, as illustrated in Tables 2  ###reference_### and 3  ###reference_###. The maximum BLEU score improvement of 1.5 points (2.5%) is quite modest in the case of the public admin corpus. However, there are larger gains with the DGT corpus. A baseline RNN model, trained on DGT, achieved a BLEU score of 52.7 whereas the highest-performing BPE variant, using a 16k vocab, recorded an improvement of nearly 3 points with a score of 55.6.\nIn the context of Transformer architectures, highlighted in Table 4  ###reference_### and Table 5  ###reference_###, the use of subword models delivers significant performance improvements for both the DGT and public admin corpora. The performance gains for Transformer models are far greater than RNN models. Baseline DGT Transformer models achieve a BLEU score of 53.4 while a Transformer model, with a 16k BPE submodel, has a score of 60.5 representing a BLEU score improvement of 13% at 7.1 BLEU points.\nFor translating into a morphologically rich language, such as Irish, the ChrF metric has proven successful in showing strong correlation with human translation (Stanojević et al.,, 2015  ###reference_b28###). In the context of our experiments, it worked well in highlighting the performance differences between RNN and Transformer architectures.\n###figure_2###"
+        },
+        {
+            "section_id": "4.2.2",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.2 Transformer performance compared with RNN",
+            "text": "The performance of RNN models is contrasted with the Transformer approach in Figure 2  ###reference_### and Figure 3  ###reference_###. Transformer models, as anticipated, outperform all their RNN counterparts. It is interesting to note the impact of choosing the optimal vocabulary size for BPE submodels. Both datasets demonstrate that choosing a BPE vocabulary of 16k words yields the highest performance.\nFurthermore, the TER scores highlighted in Figure 3  ###reference_### reinforce the findings that using 16k BPE submodels on Transformer architectures leads to better translation performance. The TER score for the DGT Transformer 16k BPE model is significantly better (0.33) when compared with the baseline performance (0.41).\n###figure_3### ###figure_4### ###figure_5###"
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Environmental Impact",
+            "text": "Motivated by the findings of Stochastic Parrots (Bender et al.,, 2021  ###reference_b4###), energy consumption during model development was tracked. Prototype model development used Colab Pro, which as part of Google Cloud is carbon neutral (Lacoste et al.,, 2019  ###reference_b18###). However, longer running Transformer experiments were conducted on local servers using 324 gCO2 per kWh 222https://www.seai.ie/publications/Energy-in-Ireland-2020.pdf(SEAI,, 2020  ###reference_b25###). The net result was just under 10 kgCO2 created for a full run of model development. Models developed during this study, will be reused for ensemble experiments in future work."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "Discussion",
+            "text": "Validation accuracy, and model perplexity, in developing the baseline and optimal models for the DGT corpus are illustrated in Figure 4  ###reference_### and Figure 5  ###reference_###. Rapid convergence was observed while training the baseline model such that little accuracy improvement occurs after 20k steps. Including a subword model led to much slower convergence and there were only marginal gains after 60k steps. Furthermore, it is observed that training the DGT model, with a 16k BPE submodel, boosted validation accuracy by over 8% compared with its baseline.\nWith regard to the key metric of perplexity, it is shown to rise after training for 15k steps in the baseline models. PPL was observed to rise at later stages, typically after 40k steps in models developed using subword models. Perplexity (PPL), shows how many different, equally probable words can be produced during translation. As a metric for translation performance, it is important to keep low scores so the number of alternative translations is reduced. Therefore, for future model development it may be worthwhile to set PPL as an early stopping parameter.\nOn examining the PPL graphs of Figure 4  ###reference_### and Figure 5  ###reference_###, it is clear that a lower global minimum is achieved when the Transformer approach is used with a 16k BPE submodel. The PPL global minimum (2.7) is over 50% lower than the corresponding PPL for the Transformer base model (5.5). Such a finding illustrates that choosing an optimal submodel delivers significant performance gains.\nTranslation engine performance was bench-marked against Google Translate’s 333https://translate.google.com/ English to Irish translation service which is freely available on the internet. Four random samples were selected from the English source test file and are presented in Table 6  ###reference_###. Translation of these samples was carried out on the optimal DGT Transformer model and using Google Translate. Case insensitive, sentence level BLEU scores were recorded and are presented in Table 7  ###reference_###. The results are encouraging and indicate well-performing translation models on the DGT dataset.\nThe optimal parameters selected in this discovery process are identified in bold in Table 2. A higher initial learning rate of 2 coupled with an average decay of 0.0001 led to longer training times but more accurate models. Despite setting an early stopping parameter, many of the Transformer builds continued for the full cycle of 200k steps over periods of 20+ hours.\nTraining transformer models with a reduced number of attention heads led to a marginal improvement in translation accuracy with a smaller corpus. Our best performing model on a 55k DGT corpus, with 2 heads and a 16k BPE submodel, achieved a BLEU score of 60.5 and a TER score of 0.33. By comparison, using 8 heads with the same architecture and dataset yielded 60.3 for the BLEU and 0.34 for the TER. In the case of a larger 88k PA corpus, all transformer models using 8 heads performed better than equivalent models using just 2 heads.\nStandard Transformer parameters for batch size (2048) and the number of encoder / decoder layers (6) were all observed to perform well on the DGT and PA corpora. Reducing hidden neurons to 256 and increasing regularization dropout to 0.3 improved translation performance and were chosen when building all Transformer models."
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "Conclusion",
+            "text": "In our paper, we demonstrated that a random search approach to hyperparameter optimization leads to the development of high-performing translation models.\nWe have shown that choosing subword models, in our low-resource scenarios, is an important driver for the performance of MT engines. Moreover, the choice of vocabulary size leads to varying degrees of performance. Within the context of low-resource English to Irish translation, we achieved optimal performance, on a 55k generic corpus and an 88k in-domain corpus, when a Transformer architecture with a 16k BPE submodel was used.\nThe importance of selecting hyperparameters in training low-resource Transformer models was also demonstrated. By reducing the number of hidden layer neurons and increasing dropout, our models performed significantly better than baseline models and Google Translate.\nPerformance improvement of our optimized Transformer models, with subword segmentation, was observed across all key indicators namely a higher validation accuracy, a PPL achieved at a lower global minimum, a lower post editing effort and a higher translation accuracy."
+        }
+    ]
+}

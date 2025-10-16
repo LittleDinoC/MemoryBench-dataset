@@ -1,0 +1,78 @@
+{
+    "title": "What Makes Math Word Problems Challenging for LLMs?",
+    "abstract": "This paper investigates the question of what makes math word problems (MWPs) in English challenging for large language models (LLMs). We conduct an in-depth analysis of the key linguistic and mathematical characteristics of MWPs. In addition, we train feature-based classifiers to better understand the impact of each feature on the overall difficulty of MWPs for prominent LLMs and investigate whether this helps predict how well LLMs fare against specific categories of MWPs. Our code, data, and analysis are publicly available at github.com/kvadityasrivatsa/analyzing-llms-for-mwps",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "In recent years, large language models (LLMs) have demonstrated significant potential across a range of core NLP tasks (Zhao et al., 2023; Brown et al., 2020; Radford et al., 2019, inter alia), and also exhibited a number of emergent abilities, such as solving mathematical puzzles (Wei et al., 2022). Math word problems (MWPs) serve as a challenging testbed for LLMs, as they assess not only the models' abilities to handle purely mathematical expressions but also their reasoning and natural language understanding capabilities (Wang and Lu, 2023; Cobbe et al., 2021; Patel et al., 2021; Miao et al., 2020, inter alia). Experiments indicate that even powerful LLMs are still challenged by MWPs (Cobbe et al., 2021). Most previous work has focused on evaluating LLMs’ performance on MWPs or on changes in their behavior due to progressive-hint prompting, prompt paraphrasing, or similar approaches (Norberg et al., 2023; Raiyan et al., 2023; Zheng et al., 2023; Zhu et al., 2023), while a detailed analysis of what exactly makes math problems challenging for LLMs is lacking. We aim to address this knowledge gap.\n\nA recent study by Almoubayyed et al. (2023) highlights a strong connection between reading skills and math outcomes in students. We hypothesize that LLMs’ capability to solve MWPs correctly may similarly rely on: (1) the linguistic complexity of the questions; (2) the conceptual complexity of the tasks (e.g., the number of steps and types of math operations involved); and (3) the amount of real-world knowledge required to solve the tasks. Supporting this intuition, our preliminary analysis of the GSM8K dataset (Cobbe et al., 2021) suggests that relatively short questions with a small number of described entities, few calculation steps, and a limited range of operators involved in the solution (e.g., Mark is 7 years older than Amy, who is 15. How old will Mark be in 5 years?) are typically answered correctly by a range of LLMs. Conversely, long questions requiring real-world knowledge (e.g., how many cents there are in a dollar) and extended natural language understanding (NLU) (e.g., interpretation of a lower price) pose challenges for LLMs.\n\nIn this paper, we formulate and investigate two research questions: (1) Which characteristics of the input math word questions contribute to their complexity for an LLM? and (2) Based on these characteristics, can we predict whether a particular LLM will be able to solve specific input MWPs correctly?"
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Methodology",
+            "text": "We use the GSM8K dataset Cobbe et al. (2021), divided into training and test instances, because of the high quality of human-generated MWPs. This dataset contains a diverse set of problems in English with minimal amount of recurring templates. Furthermore, the difficulty level of the problems is tailored for LLMs, allowing for a wide variation in correctness across models and question types, which is ideal for our feature-based analysis.\n\nWe collect solution attempts from several LLMs to the questions from the GSM8K training and test sets. Next, we train statistical classifiers on a filtered subset of questions to predict if they are consistently solved correctly or incorrectly across multiple runs of the models. Our approach is relatively simple but it allows us to investigate which of the features are most indicative of the challenges LLMs face in solving math problems.\n\nWe analyze and experiment with the features extracted from MWP questions and their respective expected solutions. This way, the features remain grounded in the dataset, allowing our approach to be applied to any LLM. The features are broadly grouped into the following categories:\n\nLinguistic features focus on the phrasing of the question. These include the length of the question, sophistication of the vocabulary, syntactic complexity, instances of coreference, and overall readability. Note that the linguistic features are only extracted from the question body as the phrasing of the gold solution has no impact on the expected answer.\n\nMathematical features cover the math arguments, operations, and reasoning steps required to solve the questions. These include the number and diversity of the math operations in the solution body. Arguments provided in the question but not utilized in the solution also require mathematical reasoning for them to be disregarded as noise. Note that while a question can be phrased in many ways (affecting its linguistic features), the underlying math operations and reasoning steps (thus, the mathematical features) remain unchanged.\n\nReal-world knowledge & NLU based features indicate the amount of extraneous information needed to solve the task that is not provided explicitly in the question. This may include how many days there are in a month or the interpretation of “half” as such."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Experiments",
+            "text": "We use Logistic Regression, Decision Tree, and Random Forest classifiers, which allow us to extract relative feature importance with ease. For high confidence samples, we use the training and test subset from GSM8K where the sampled success rate is either (always correct) or (never correct). We employ several preprocessing steps including dropping highly correlated features, class-balancing, and feature scaling. We also perform a hyperparameter search for each model to maximize performance on unseen data. See Appendix C for more details."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Solution Generation",
+            "text": "To collect solution attempts from the LLMs, we use a simple task-specific prompt to minimize any bias imposed on the model generation. We query each LLM multiple times on each question with varying generation seeds and a set temperature. A soft-matching strategy is then used to extract the final answer from the solutions. Using each LLM’s attempted solutions, every question is assigned a mean success rate calculated as the number of correct answers divided by the number of solution attempts."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Success Rate Prediction",
+            "text": "We train and evaluate classifiers on their ability to predict for input test questions whether they will be answered correctly or incorrectly by a specific LLM. We use Logistic Regression, Decision Tree, and Random Forest classifiers, which allow us to extract relative feature importance with ease. For high confidence samples, we use the training and test subset from GSM8K where the sampled success rate is either (always correct) or (never correct). We employ several preprocessing steps including dropping highly correlated features, class-balancing, and feature scaling. We also perform a hyperparameter search for each model to maximize performance on unseen data. See Appendix C for more details."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Results",
+            "text": ""
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Success Rate Distribution",
+            "text": "We report the mean success rates for each LLM on GSM8K’s test set in Table 1. Our results generally align with those reported previously for these models. Figures 2(a) and 2(b) respectively capture the number of questions always and never answered correctly by each LLM. "
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Classification Results",
+            "text": "To compare classifiers’ performance, we report the accuracy and macro-F1 scores for each classifier-specific test data split (see Table 2). We observe that Random Forest outperforms other classifiers across most solution sets. At the same time, we also note that, due to significant class imbalance, this task is not easy for the classifiers, with the best accuracy scores across splits being in the range of . The small number of questions always or never solved correctly by any LLM speaks to the models’ varying capabilities (and potential points of brittleness). We include additional analysis of the results in Appendix D.\n\nFor comparison, we also report the classification results for a fine-tuned RoBERTa-base model Liu et al. (2019) for the same training and evaluation sets (tuned on the question and gold solution as input text; see Appendix C for more details) in Table 2. We note that the Transformer base classifier scores on a par or a few points above the best statistical classifier, i.e., Random Forest, suggesting that the proposed feature-based classifiers are not far behind token-level contextual models for this task."
+        },
+        {
+            "section_id": "4.2.1",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.1 Feature Importance",
+            "text": "The statistical classifiers used in our experiments allow us to estimate the importance of each feature and its contribution to the classification performance. We report the top features with the highest aggregate ranks across LLM data splits and classifiers in Table 3. We use mean rank here as a proxy for relative importance across features, and the respective standard deviations indicate how spread out this importance is across classifiers and queried LLMs. We observe that a greater number (Gx_op_unique_count) and diversity (Gx_op_diversity) in math operations, and the use of infrequent numerical tokens in the question and solution body (Qx_ & Gx_mean_numerical_word_rank) impact the success rate. The list also contains linguistic features based on the phrasing of the questions: longer questions with a high number of noun phrases (Qx_np_count), mean syntactic depth (Qx_constituency_tree_depth), and readability grade (Qx_flesch_kinkaid_grade) are also difficult for LLMs to solve. Additionally, the need for extraneous information (Gx_world_knowledge), such as conversion units for time, distance, or weight, can make a question challenging. We also report value thresholds at which each feature affects the success rate significantly: see the results of the Student’s t-test and p-values in Table 7 in Appendix D."
+        },
+        {
+            "section_id": "4.2.2",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.2 Ablation Studies",
+            "text": "To further measure the impact of each feature type, we report classification scores along different feature-type subsets in Figure 3. We note that the feature set with all types (L+M+W) is not optimal for classification. "
+        },
+        {
+            "section_id": "4.2.3",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.3 Impact of Linguistic Features",
+            "text": "In order to better gauge the impact of linguistic features on the success rate, we cluster questions by mathematical features. We fit a KMeans clustering model on all math features for each question in the GSM8K training set with a target cluster count. This helps group together questions from the data, wherein the math features hardly vary within each question subset (or cluster). Thus, variations in success rate across the questions within a cluster can be more clearly attributed to other, i.e., linguistic types of features. We report some notable Spearman correlation values between the linguistic feature values within a cluster and the corresponding success rates in Table 4. The strong and significant feature-wise negative correlations suggest that for a relatively fixed set of math features, questions with greater length, nesting, lexical rank, and reading grade become more challenging for LLMs to solve. Note that this form of analysis on feature-based minimal pairs is extractive in nature and may, to a certain extent, be restricted to the question types in the GSM8K dataset. For a more exhaustive analysis for each feature, generative approaches to furnish question paraphrases with the desired set of linguistic features need to be employed."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Conclusions",
+            "text": "This work aims to identify what aspects of MWPs make them difficult for LLMs to solve. To this end, we extract key features (spanning linguistic, mathematical, and real-world knowledge & NLU-based aspects) to predict whether several LLMs can reliably solve MWPs from GSM8K. We find that questions with a high number and diversity of math operations using infrequent numerical tokens are particularly challenging to solve. In addition, we show that lengthy questions with low readability scores and those requiring real-world knowledge are also seldom solved correctly. Our future work will rely on these findings to make informed modifications to questions in order to study the impact on LLMs’ reasoning and MWP-solving abilities. Figure 4 provides an example of an informed modification, which leads to improved LLM performance."
+        }
+    ]
+}

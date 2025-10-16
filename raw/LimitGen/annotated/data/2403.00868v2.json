@@ -1,0 +1,252 @@
+{
+    "title": "SoftTiger: A Clinical Foundation Model for Healthcare Workflows",
+    "abstract": "We introduce SoftTiger, a clinical large language model (CLaM) designed as a foundation model for healthcare workflows. The narrative and unstructured nature of clinical notes is a major obstacle for healthcare intelligentization. We address a critical problem of structuring clinical notes into clinical data, according to international interoperability standards. We collect and annotate data for three subtasks, namely, international patient summary, clinical impression and medical encounter. We then supervised fine-tuned a state-of-the-art LLM using public and credentialed clinical data. The training is orchestrated in a way that the target model can first support basic clinical tasks such as abbreviation expansion and temporal information extraction, and then learn to perform more complex downstream clinical tasks. Moreover, we address several modeling challenges in the healthcare context, e.g., extra long context window. Our blind pairwise evaluation shows that SoftTiger outperforms other popular open-source models and GPT-3.5, comparable to Gemini-pro, with a mild gap from GPT-4. We believe that LLMs may become a step-stone towards healthcare digitalization and democratization. Therefore, we publicly release SoftTiger models at scales of 13 billion and 70 billion parameters 111models: https://huggingface.co/TigerResearch; data and code: https://physionet.org/projects/bWnuYbH3hewAnOONalfV, as well as datasets and code for our innovative scalable evaluation, hopefully, making a significant contribution to the healthcare industry.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "The healthcare sector is currently grappling with an unprecedented level of demand and critical challenges. In an ideal setting, physicians would require an unfeasible 26 hours per day to adhere to all care protocols, underscoring their extreme work pressure (Porter et al. 2022  ###reference_b14###). This scenario is compounded by the fact of nearly half of physician’s time is devoted to digital paperwork, rather than direct patient care (Sinsky et al. 2016  ###reference_b15###). The intensive workload led to a disturbing increasing trend: 50.4% of physicians reported burnout, in a large cohort and longitudinal study (Ortega et al. 2023  ###reference_b12###) with many specialities. Moreover, this overburden of healthcare professionals has dire consequences for patient safety. Nearly 800,000 patients annually in the United States (US) are harmed by diagnostic errors. Most of them were associated with cognitive mistakes, according to a recent study of John Hopkins (Newman-Toker et al. 2024  ###reference_b11###), escalating medical errors as the third leading cause of death in the US (Makary and Daniel 2016  ###reference_b8###). This scenario is already dramatic by itself, but it would even be worsened by the predicted shortfall of health workforce (HWF) of 18 million health workers by 2030 (Boniol et al. 2022  ###reference_b2###), making a critical need for systemic changes in healthcare industry.\nRecent advancements in large language models (LLMs), both proprietary models, e.g. GPT (Brown et al. 2020  ###reference_b3###) and Gemini (Pichai 2023  ###reference_b13###), and open-source models, e.g. Llama-2 (Touvron et al. 2023  ###reference_b17###) and TigerBot (Chen et al. 2023a  ###reference_b4###), have shown significant potential in processing and analyzing clinical notes (Kweon et al. 2023  ###reference_b7###; Chen et al. 2023b  ###reference_b5###). However, integrating them into clinical practice poses two primary challenges. The first pertains to the helpfulness of the AI powered clinical tasks, such as clinical note question answering (Kweon et al. 2023  ###reference_b7###). These tasks, while functionally important, must also be designed and implemented seamlessly with both electronic health records (EHRs) and the clinical steps of the patient care to avoid workflow fragmentation (Moy et al. 2023  ###reference_b10###). To understand the potential for enhancing the workflows, we conducted a survey of various clinical downstream tasks, from associated research papers from arXiv and AI models in Hugging Face, including clinical language models (CLaMs) and foundation models for electronic medical records (FEMRs) (Wornow et al. 2023  ###reference_b18###). We asked domain experts to provide rate for a Fibonnaci-scale on the complexity and helpfulness of reported tasks, with results as shown in the Figure 1  ###reference_###.\n###figure_1### The second challenge is associated with the input length constraints of LLMs. Most popular LLMs were trained using 4k-token context window, e.g., Llama-2, which is sufficient for most general-purpose tasks. An annotated sample of 620 clinical notes drawn from MIMIC IV (Johnson et al. 2023  ###reference_b6###) shows that 75% exceeds 2k and 38% is above 4k tokens, a Gaussian-like distribution very different from other daily tasks (usually follows a power law). Therefore, it is imperative for clinical LLMs to be able to efficiently trained on a context window up to 8k tokens or more, instead of length extrapolation during inference, which we found in our experiments would lose resolution drastically.\nIn this work, we strategically focused on the tasks of patient clinical data structuring, a crucial yet intricate component of clinical workflows. A large published review shows that almost 80% of medical data is unstructured (A.Maria Nancy 2020  ###reference_b1###), hampering efficient development of more intelligent models. We choose these tasks, both moderately complex and highly valuable in our comprehensive analysis of the clinical domain, not only due to its practical significance, but also considering the status quo of LLMs, particularly their superb capabilities exhibited in structural extraction and natural language instruction following. We present SoftTiger, a clinical LLM suitable for both basic tasks such as named entity recognition, summarization and question answering, but also for more complex and foundational workflows tasks of clinical data structuring.\nOur approach is seamless and lightweight embarking from a state-of-the-art (SOTA) general-purpose LLM, taking about 20 thousand dollars of GPU hours and a week to develop. The compute economics we deem is critical for rapid experimentation and adoption in the healthcare domain. Overall, we have made the following contributions:\nWe publicly release a family of clinical LLMs, SoftTiger, at scales of 13 billion and 70 billion parameters, achieving SOTA performance in clinical note processing compared with other popular open and closed-source LLMs.\nWe develop a stack of algorithmic and infrastructural implementations, not only fast adapting LLMs to the clinical domain, but also addressing challenges specific to the domain, including training long context and medical jargon understanding and abbreviation expansion.\nWe also open-source release our first training data for the enablement of clinical workflow tasks, in a subset of 100 clinical notes sourced from MIMIC-IV free text notes dataset (Johnson et al. 2023  ###reference_b6###), structured by Azure OpenAI GPT-4 and further curated and corrected by a team of experienced physician annotators.\nFurthermore, to validate the efficacy of SoftTiger in the light of fast experimentation and adoption, we implemented and also open-source a comprehensive LLM-as-a-Judge (Zheng et al. 2023  ###reference_b19###) evaluation test of helpfulness and harmfulness of clinical data structuring."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Problem Formulation",
+            "text": "In order to build a clinical foundational model, our approach was not only focused into building the LLM capacities, but also the enablement of global digital health standards like the International Patient Summary (IPS) and HL7 Fast Healthcare Interoperability Resources (FHIR), to ensure robust and universally applicable solutions. In this first release, we aligned and optimized the model for three distinct subtasks, each focusing on a different aspect of patient information and interaction with the healthcare system. The aim is to facilitate better healthcare planning and efficient patient care through comprehensive and organized clinical documentation. The three subtasks are as follows:\nPatient Clinical Summary (FHIR IPS) 222Web: https://build.fhir.org/ig/HL7/fhir-ips: This subtask involves creating a comprehensive summary of the patient’s social and clinical history. It includes detailing the patient’s background, lifestyle choices, past illnesses, and family medical history. The objective is to provide a complete overview of the patient’s medical and personal background, which is crucial for informed healthcare planning and decision-making.\nClinical Impression (FHIR Clinical Impression) 333Web: https://build.fhir.org/clinicalimpression.html: The focus of this subtask is to summarize objective information gathered from various patient examinations. This includes documenting findings from imaging studies, laboratory test results, and other diagnostic procedures. The goal is to efficiently compile and review the patient’s diagnostic data, aiding in the formulation of accurate clinical impressions and treatment plans.\nMedical Encounter (FHIR Encounter) 444Web: https://build.fhir.org/encounter.html: This subtask aims to systematically document the key elements of each patient-physician interaction. Essential details such as the location of the encounter, participants involved, and the reasons for the encounter are to be recorded. The purpose is to streamline the clinical documentation process, ensuring a clear and concise record of patient visits and the medical team’s involvement.\nBy completing these subtasks, healthcare professionals can ensure thorough and efficient clinical documentation for every step, which is essential for quality patient care and effective healthcare management."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "SoftTiger Models",
+            "text": "We are open-source releasing the SoftTiger family of clinical LLMs for free research and experimentation use, as summarized in Table 1  ###reference_###. Figure 2  ###reference_### shows the training and validation loss for fine-tuning.\n###table_1### ###figure_2### ###figure_3###"
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Training Methods",
+            "text": "SoftTiger models are supervised fine-tuned (SFT) on general-purpose open-source foundation LLMs, e.g., Llama-2 and TigerBot. Our choice of the foundation model is based upon several design considerations. First, the model has a good representativeness of biomedical vocabulary. Llama-2 has a vocabulary size of 30k, while TigerBot has 65k vocabulary. TigerBot is more transparent in open-source its training data (Chen et al. 2023a  ###reference_b4###), which particularly includes the whole corpora of arXiv papers, besides academic books and Wikipedia. The arXiv dataset has 1.2% biomedical related subjects, which we deem lays us a good foundation knowledge for healthcare domain. Second, the foundation model should have grasped general-purpose tasks such as summarization, extraction, and question answering, with good instruction-following capabilities. For this, we choose chat models instead of pre-trained ones. Building a clinical LLM is essentially a domain adaptation process, which should be lightweight. Also, the clinical domain data is mostly one order of magnitude smaller than general fine-tuning data. Third, it is beneficial for world-wide adoption to build multilingual models with a range of parameter sizes. Llama-2 is known mainly for English, while TigerBot is a multilingual foundation model. Both model families have sizes from 7B, 13B, to 70B, while TigerBot further supports 180B.\nWe embark on TigerBot models 555web: https://www.tigerbot.com/chat; github: https://github.com/TigerResearch/TigerBot for our clinical LLM exploration. To empirically validate our choice, we collected a sample of 100 curated clinical notes from MIMIC IV, and then used Azure OpenAI GPT-4 to simulate three subtasks of patient clinical data structuring, to form a validation dataset of 300 examples. We then evaluate TigerBot and Llama-2 chat models using next-token prediction. The results support our choice of TigerBot, as shown in Table 2  ###reference_###.\n###table_2### Both foundation models were trained on 4k context length, without domain data fine-tuning. For both 4k and 8k evaluation context windows, TigerBot outperforms Llama-2. One thing noteworthy, when evaluated using 8k context length, Llama-2 performs catastrophically worse. We conjecture that this is due to under representativeness of clinical vocabulary which leads to worsened hallucination."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Training Data",
+            "text": "Our training data consists of 134 million tokens, or 313k instruction completion examples and 489M plaintext data in the JSON format: {\"instruction\":..., \"output\":...}. For the clinical domain data, the “instruction” prompt is composed of input clinical note concatenated with task instruction, while the “output” is structural extraction. Input clinical notes were drawn from MIMIC IV dataset. The three output task extractions were first synthesized from Azure OpenAI GPT-4, and then corrected for quality and safety by a group of 5 physicians during one week. They received an annotation manual and two hour remote training in the task domain. Also, they followed an annotation workflow of to balance workload.\n\nThe histogram of data lengths in tokens is shown in Figure 3  ###reference_###. Other than output length, both input and total length of examples follow a Gaussian-like distribution, with a major chunk beyond 2k. ###figure_4### Since we formulate the clinical LLM building as a domain specialization problem, we mix in two layers of data other than the domain data for the task of patient summarization. First, a new sample of general-purpose SFT data was drawn from previously unseen corpus. This layer is for experience replay (Sun et al. 2020  ###reference_b16###) for general tasks such as generation, summarization, question answering, and so forth. Second, we add the Asclepius dataset (Kweon et al. 2023  ###reference_b7###) for basic functional tasks in the clinical domain, such as named entity recognition, abbreviation expansion, and paraphrasing, etc. The detailed training data mix is illustrated in Table 3  ###reference_###. We organize the training data in an order from general, domain, to task specific. The trainer scans the data sequentially within one epoch, following human learning process of domain specialization.\n###table_3###"
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "Training Framework",
+            "text": "SoftTiger models have been trained using our proprietary codebase enhanced from Megatron-DeepSpeed (Chen et al. 2023a  ###reference_b4###; Microsoft 2023  ###reference_b9###). Tensor parallelism (TP) is particularly critical since model size over 70B cannot fit into a single GPU while CPU offloading is slow and we want to avoid. 3D parallelism gives a maximal optimization space for speed and memory tradeoff, under different scenarios and resource settings. In our setting of clinical notes, training on long sequence is a prerequisite, given the data distribution shown in Figure 3  ###reference_###. Our training cluster consists of  A100-40G GPUs. After a quick geometric search, we set ,  and , to minimize inter-node intra-tensor communications while preserving most GPU memory for 8k sequence length."
+        },
+        {
+            "section_id": "3.4",
+            "parent_section_id": "3",
+            "section_name": "Evaluation and Alignment",
+            "text": "We took a two-stage evaluation approach. First, we used an evaluation dataset of 300 examples, with 100 clinical notes sampled from MIMIC IV and three task completions for each executed by Azure OpenAI GPT-4. We then perform next-token prediction programmatically, which is fast and critical for rapid iteration. The automated evaluation results are shown in Table 4  ###reference_###. SoftTiger models outperform Llama-2 for both model sizes and evaluation context lengths. SoftTiger-70b model surpasses 13b by a small margin, possibly because the task-specific training data is still small in volume and the learning is still on the monotonically increasing trajectory.\n###table_4### Secondly, we implemented a ChatBot Arena with LLM-as-a-Judge using Azure OpenAI GPT-4. We followed blind pairwise evaluation method (ModelA vs ModelB), with swap-position executions to prevent positional bias (changed positions with different results are discarded). Study shows average of 85% of agreement with humans using GPT-4 (Zheng et al. 2023  ###reference_b19###). The arena dataset consists of 100 answers for the Patient Clinical Summary task by popular both closed and open-source LLM models. We also designed a control group model, with intentionally wrong information. We determined the intelligence inspired chess ELO rating 666Web: https://www.chess.com/terms/elo-rating-chessratings (initial rating=1000, k=30) as in Table 5  ###reference_###, with some illustrations of SoftTiger and implementation details of the blind test shown in Appendices.\n###table_5### This cost-effective evaluation method rapidly enables iterative experimentation and optimization at scale, allowing further optimized human alignment with healthcare professionals. Reasonable results of bigger closed models as higher ELO, but optimized SoftTiger-70b near Gemini-pro. Lightweight and cost-effective SoftTiger-13b model also showing feasibility for deployment and surpassing GPT-3.5-Turbo and Mixtral-8x7b."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Conclusions",
+            "text": "In this work, we have developed the SoftTiger clinical LLMs to tackle the foundational problem of patient clinical data structuring. The task is very practical and valuable to the clinical workflows, and hopefully becomes our first step towards deeper patient care insights and intelligence in future tasks. Usually physicians deal with high dense and noisy narrative data. Giving them this level of structure and summary helps to alleviate the cognitive pressure and the dramatic situation of healthcare delivery overburden.\nWe leveraged LLM’s excellent capabilities of structural extraction and natural language interaction to achieve satisfactory results, specially in comparison with other popular yet general models, using innovative rapid experimentation and evaluation methods . However, the statistical nature of LLMs still incur hallucination issues, which is particularly risky in medical domain and demand more work towards model alignment. Our future works plan to tackle the hallucination problem using retrieval-augmented generation (RAG) with expert-curated knowledge graphs with biomedical terminologies. We also plan to explore specially designed reinforcement learning algorithms to increase model intelligence and execute the first real cases of clinical workflows integration experiments."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Problem List - continued",
+            "text": "Condition: Shrapnel in Left Hand/Leg\nClinical Status: Not specified\nOnset: Not specified\nCondition: Diplopia\nClinical Status: Not specified\nOnset: Acute\nCondition: Dizziness\nClinical Status: Not specified\nOnset: Acute"
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "History of Procedures",
+            "text": "Procedure Name: Not specified\nProcedure Date: Not specified\nBody Site: Not specified"
+        },
+        {
+            "section_id": "3.4",
+            "parent_section_id": "3",
+            "section_name": "Medical Devices",
+            "text": "Device Name: Not specified"
+        },
+        {
+            "section_id": "3.5",
+            "parent_section_id": "3",
+            "section_name": "Diagnostic Results",
+            "text": "Test Name: Computed Tomography (CT) Scan of the Head\nResult: Questionable hypodensity in the midbrain\nTest Name: Post-Infectious Hydrocephalus (INH) Test\nResult: Positive\nTest Name: Magnetic Resonance Imaging (MRI)\nResult: Not specified due to shrapnel\nTest Name: Computed Tomography Angiography (CTA) of the Head and Neck\nResult: Unremarkable\nTest Name: Laboratory Tests\nResult: Mild C-reactive protein (CRP) elevation, normal erythrocyte sedimentation rate (ESR), hemoglobin A1C, and cholesterol levels"
+        },
+        {
+            "section_id": "3.6",
+            "parent_section_id": "3",
+            "section_name": "Vital Signs",
+            "text": "Observation: Not specified\nValue: Not specified"
+        },
+        {
+            "section_id": "3.7",
+            "parent_section_id": "3",
+            "section_name": "Plan of Care",
+            "text": "Care Plan Description: Discharged with diagnosis of likely peripheral abducens nerve palsy, advised to follow up with primary care physician and stroke neurologist, counseled on expected gradual improvement of diplopia, continue ASA, and importance of follow-up for reassessment"
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Basic Information",
+            "text": "Status: Completed\nStatus Reason: Patient discharged with follow-up plan\nDescription: Assessment of male patient with acute onset diplopia and dizziness"
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Subject and Encounter Details",
+            "text": "Subject: Male patient, age not specified\nEncounter: Presentation with acute onset diplopia and dizziness"
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "Assessment Timing",
+            "text": "Effective DateTime: Not specified\nEffective Period: Not specified\nDate of Assessment Documentation: Not specified"
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "Assessment Performer",
+            "text": "Performer: Attending physician, Not specified"
+        },
+        {
+            "section_id": "4.5",
+            "parent_section_id": "4",
+            "section_name": "Clinical Context",
+            "text": "Previous Assessment: Not specified\nProblems/Conditions: Gastroesophageal reflux disease (GERD), Positive PPD test, Depression, Peripheral vertigo, Shrapnel in left hand/leg\nChange Pattern: Acute onset diplopia and dizziness\nProtocol Followed: Not specified"
+        },
+        {
+            "section_id": "4.6",
+            "parent_section_id": "4",
+            "section_name": "Summary and Findings",
+            "text": "Summary: Male patient presented with acute onset diplopia and dizziness. No major surgical history. Allergies to Pantoprazole (Protonix). Neuro exam revealed right abducens nerve palsy. CT head showed questionable hypodensity in midbrain. No MRI due to shrapnel. Labs showed mild CRP elevation, normal ESR, A1C, and cholesterol levels. Lyme serology negative. CTA head/neck unremarkable. Discharged with likely peripheral abducens nerve palsy.\nFindings:\nRight abducens nerve palsy (Basis: Neuro exam)\nHypodensity in midbrain (Basis: CT head)"
+        },
+        {
+            "section_id": "4.7",
+            "parent_section_id": "4",
+            "section_name": "Prognosis",
+            "text": "Prognosis Codeable Concept: Not specified\nPrognosis Reference: Not specified"
+        },
+        {
+            "section_id": "4.8",
+            "parent_section_id": "4",
+            "section_name": "Supporting Information",
+            "text": "Supporting Info: Past medical history of GERD, positive PPD test, depression, peripheral vertigo, and shrapnel in left hand/leg. Allergies to Pantoprazole (Protonix). Neuro exam findings. CT head and CTA head/neck imaging results. Labs results showing mild CRP elevation, normal ESR, A1C, and cholesterol levels. Discharge medications: omeprazole and ASA 81 mg Oral (PO) daily."
+        },
+        {
+            "section_id": "4.9",
+            "parent_section_id": "4",
+            "section_name": "Notes and Comments",
+            "text": "Patient advised on likely peripheral etiology of diplopia\nExpected gradual improvement of diplopia\nContinue ASA therapy\nImportance of follow-up appointments for reassessment"
+        },
+        {
+            "section_id": "5.1",
+            "parent_section_id": "5",
+            "section_name": "Basic Information",
+            "text": "Status: Completed\nClass: Outpatient"
+        },
+        {
+            "section_id": "5.2",
+            "parent_section_id": "5",
+            "section_name": "Encounter Details",
+            "text": "Priority: Non-urgent\nType: Consultation\nService Type: Neurology"
+        },
+        {
+            "section_id": "5.3",
+            "parent_section_id": "5",
+            "section_name": "Subject Information",
+            "text": "Subject: Not specified\nSubject Status: Departed"
+        },
+        {
+            "section_id": "5.4",
+            "parent_section_id": "5",
+            "section_name": "Contextual Links",
+            "text": "Episode Of Care: Not specified\nBased On: Not specified\nCare Team: Not specified\nService Provider: Not specified"
+        },
+        {
+            "section_id": "5.5",
+            "parent_section_id": "5",
+            "section_name": "Timing Information",
+            "text": "Actual Period: Not specified\nPlanned Start Date: Not specified\nPlanned End Date: Not specified\nLength: Not specified"
+        },
+        {
+            "section_id": "5.6",
+            "parent_section_id": "5",
+            "section_name": "Reasons and Diagnoses",
+            "text": "Reason: Chief Complaint - Diplopia, dizziness\nDiagnosis: Peripheral abducens nerve palsy (Use: Admission)"
+        },
+        {
+            "section_id": "5.7",
+            "parent_section_id": "5",
+            "section_name": "Billing and Preferences",
+            "text": "Diet Preference: Not specified\nSpecial Arrangement: Not specified\nSpecial Courtesy: Not specified"
+        },
+        {
+            "section_id": "5.8",
+            "parent_section_id": "5",
+            "section_name": "Admission Details",
+            "text": "Admission Origin: Not specified\nAdmit Source: Not specified\nReAdmission: Not specified\nDestination: Not specified\nDischarge Disposition: Home"
+        },
+        {
+            "section_id": "5.9",
+            "parent_section_id": "5",
+            "section_name": "Location Information",
+            "text": "Location: Emergency department\nStatus: Completed\nForm: Not specified\nPeriod: Not specified"
+        },
+        {
+            "section_id": "6.1",
+            "parent_section_id": "6",
+            "section_name": "Evaluation Overview",
+            "text": "Act as an impartial judge to evaluate the performance of two AI models, Model A and Model B, in processing and structuring data from clinical notes. Focus on helpfulness, harmlessness, relevance, and accuracy."
+        },
+        {
+            "section_id": "6.2",
+            "parent_section_id": "6",
+            "section_name": "Structuring Information",
+            "text": "Assess the proficiency in organizing information into appropriate sections: Header Information, Medications, Allergies and Intolerances, Problem, Social History, History of Procedures, Medical Devices, Diagnostic Results, Vital Signs, Plan of Care.\nEach term in the section must be structured as a single item. Penalize for cases not itemized."
+        },
+        {
+            "section_id": "6.3",
+            "parent_section_id": "6",
+            "section_name": "Information Reliability",
+            "text": "Evaluate adherence to the original clinical note.\nPenalize for fabrication or invention of data.\nData not in the original note and inserted by the model is considered fabrication."
+        },
+        {
+            "section_id": "6.4",
+            "parent_section_id": "6",
+            "section_name": "Extraction and Relation of Medical Attributes",
+            "text": "Judge accuracy in extracting correct information.\nEvaluate how well information is correlated with its respective attributes in the clinical note."
+        },
+        {
+            "section_id": "6.5",
+            "parent_section_id": "6",
+            "section_name": "Scoring and Decision",
+            "text": "The winning model is the one with the highest total score, considering all criteria. Data fabrication is a is a decisive criteria for evaluation and is also a tiebreaker."
+        },
+        {
+            "section_id": "7.1",
+            "parent_section_id": "7",
+            "section_name": "Evaluation Summary",
+            "text": "Winner: Model B"
+        },
+        {
+            "section_id": "7.2",
+            "parent_section_id": "7",
+            "section_name": "Detailed Explanation",
+            "text": "Model B excelled in structuring information into appropriate sections with high detail and specificity, especially in the Problem List.\nIt adheres closely to the original clinical note, ensuring no data fabrication.\nModel B accurately extracts and correlates medical attributes like conditions, treatments, and diagnostic results with their details.\nDespite both models needing improvement in specifying medication details, Model B’s approach in detailing patient conditions and treatments is superior.\nNotable strengths include the addition of oral route for warfarin and specific conditions like fevers, night sweats, and back pain.\nBased on these factors, Model B is awarded the highest total score across all evaluation criteria."
+        },
+        {
+            "section_id": "8",
+            "parent_section_id": null,
+            "section_name": "Ethical Considerations and Reproducibility Statement",
+            "text": "In the development and deployment of SoftTiger, a clinical large language model (CLaM), we have rigorously adhered to ethical guidelines and best practices to ensure the responsible use of technology in healthcare. We recognize the sensitive nature of clinical data and the critical importance of maintaining patient privacy and safety. This statement outlines the ethical considerations we have taken into account and the steps we have taken to ensure the reproducibility of our research and work.\nData Privacy and Confidentiality: All patient data used in training SoftTiger were sampled from the Medical Information Mart for Intensive Care (MIMIC-IV) dataset, already complying with patient data de-identification and safety cleaning.\nData Responsible Use: According to PhysioNet Credentialed Health Data License 1.5.0  777Web: https://physionet.org/about/licenses/physionet-credentialed-health-data-license-150/, and Physionet Responsible use of MIMIC data with online services like GPT  888Web: https://physionet.org/news/post/gpt-responsible-use, Azure OPENAI Service and AWS Bedrock were used to process data. The data and code of this work is also available under Physionet terms and repository.\nBias and Fairness: We acknowledge the potential for inherent biases in AI models. To mitigate this, in the evaluation method of ChatBot-Arena we took the conservative approach of repeating the evaluations twice while switching positions and only considering agreed results. The evaluation was blind sided, also with a control group to detect deviations from judgment. We also randomly sampled data in large MIMIC datasets considering mixed sized and complexity distributions in inputs.\nTransparency and Openness: In line with promoting reproducibility, we have made SoftTiger’s datasets, training data, and model parameters publicly available. All the prompts used and results, including all of the code necessary to generate, expand and recreate the datasets are open-source. All the prompts, data and code to reproduce the ChatbotArena evaluation are also available.\nSafety and Reliability: A core design principle of SoftTiger responsible AI development.For this, we included helpfulness and harmfulness of the models as a core criteria of every evaluation, and warn everyone using our work to further align any real world clinical use first with a human-eval of healthcare professionals considered as a last step of model alignment, then with a Ethics Board Approval of the healthcare institution.\nOngoing Monitoring and Improvement: Recognizing that AI in healthcare is an evolving field, we commit to continuous monitoring of SoftTiger’s performance and making iterative improvements to address emerging issues or changes in clinical practices.\nCompliance with Regulatory Standards: Our development process and model deployment are in compliance with relevant healthcare regulations and standards, ensuring that SoftTiger aligns with legal and ethical requirements. This was particularly considered in the format of the clinical downstream tasks, by selecting the International Patient Summary (IPS) and HL7 FHIR entities (Clinical Impression, Medical Encounter)\nCollaboration with Healthcare Professionals: Throughout development and deployment, we have actively collaborated with healthcare professionals to ensure that SoftTiger meets the practical needs of the healthcare industry and aligns with clinical workflows."
+        },
+        {
+            "section_id": "9",
+            "parent_section_id": null,
+            "section_name": "Ethics Board Approval",
+            "text": "For this initial release of SoftTiger models, involving the development and training of the clinical large language model (CLaM), an Ethics Board approval was not deemed necessary. This decision is grounded in the fact that our work primarily involved the use of de-identified, publicly or credentialed available data and did not directly engage with human subjects or patient-specific data in a clinical setting.\nHowever, we strongly advise that any derivative works, extensions, or real-world clinical implementations of SoftTiger undergo thorough ethical review and obtain necessary approvals. This is particularly crucial when such projects involve:\nThe use of personally identifiable patient data or engagement with human subjects.\nImplementation in clinical settings where decisions may directly affect patient care and outcomes.\nAny form of clinical trial or research that involves human participants.\nWe emphasize the importance of responsible clinical alignment, ensuring that any use of SoftTiger or its derivatives aligns with ethical standards, respects patient privacy and confidentiality, and adheres to all applicable regulations and guidelines. This approach is vital for maintaining public trust and ensuring the responsible use of AI in healthcare."
+        }
+    ]
+}

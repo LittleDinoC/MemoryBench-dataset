@@ -1,0 +1,150 @@
+{
+    "title": "NumLLM: Numeric-Sensitive Large Language Model for Chinese Finance",
+    "abstract": "Recently, many works have proposed various financial large language models (FinLLMs) by pre-training from scratch or fine-tuning open-sourced LLMs on financial corpora. However, existing FinLLMs exhibit unsatisfactory performance in understanding financial text when numeric variables are involved in questions. In this paper, we propose a novel LLM, called numeric-sensitive large language model (NumLLM), for Chinese finance. We first construct a financial corpus from financial textbooks which is essential for improving numeric capability of LLMs during fine-tuning. After that, we train two individual low-rank adaptation (LoRA) modules by fine-tuning on our constructed financial corpus. One module is for adapting general-purpose LLMs to financial domain, and the other module is for enhancing the ability of NumLLM to understand financial text with numeric variables. Lastly, we merge the two LoRA modules into the foundation model to obtain NumLLM for inference.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "Large language models (LLMs), often comprising more than billions of parameters, have revolutionized the research paradigm in natural language processing (NLP). By pre-training on massive corpora, LLMs have shown their excellent capability in learning complex language patterns and representations due to their immense model size. LLMs have also shown promising performance in natural language understanding and generation tasks, such as question answering, machine translation, and sentiment analysis. Hence, LLMs have attracted much attention in the artificial intelligence community.\n\nRecently, many works have proposed various financial large language models (FinLLMs) by pre-training from scratch or fine-tuning open-sourced LLMs on financial corpora. For example, BloombergGPT and XuanYuan 2.0 are pre-trained with a BLOOM-style LLM from scratch. DISC-FinLLM, FinMA, Fin-Alpaca-LoRA-Linly, and FinGPT-v3 are fine-tuned from Baichuan, LLaMA, Chinese-LLaMA, and ChatGLM2, respectively. All these FinLLMs, except for FinGPT-v3, are pre-trained or fine-tuned on financial corpora collected by their corresponding authors.\n\nAlthough these existing FinLLMs can achieve impressive performance in financial natural language understanding, they exhibit unsatisfactory performance in understanding financial text when numeric variables are involved in questions. Most of them, except for FinGPT-v3, are trained with next-token prediction objectives in an auto-regressive manner, which only includes preceding context for prediction of numeric variables. However, training in an auto-regressive manner cannot fully learn the context dependency of numeric variables, which is important for understanding financial text with numeric variables. Although FinGPT-v3 can learn the context dependency with an auto-regressive blank infilling objective, it constructs blank tokens with random masking, lacking sensitivity to numeric variables within financial text. Since it is common for financial text to involve numeric variables, improving the numeric capability is essential for FinLLMs to better understand financial text with numeric variables.\n\nIn this paper, we propose a novel LLM, called numeric-sensitive large language model (NumLLM), for Chinese finance. The contributions of this paper are outlined as follows: We construct a financial corpus from financial textbooks, which is essential for improving numeric capability of LLMs during fine-tuning. We develop a novel fine-tuning method with two individual low-rank adaptation (LoRA) modules to enhance the ability of NumLLM in understanding financial text with numeric variables."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "Related Works",
+            "text": "In this section, we introduce some related works about financial corpora and financial LLMs."
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "Financial Corpora",
+            "text": "Adapting LLMs for a particular domain often requires domain-specific corpora. Therefore, constructing financial corpora is a crucial step for training financial LLMs. Existing works have constructed a few financial corpora in various ways. For example, FinGPT-v3 constructs its financial corpora from diverse sources, such as financial news, filing data, and social media, which can be collected from Stocknet and FiQA SA. BBT-FinCorpus is a massive Chinese financial corpus, collected from financial news, company announcements, research reports, and social media. TigerBot constructs its corpus from thousands of research reports and earnings reports. Yayi is an instruction tuning dataset which is constructed from financial news events. DISC-Fin-SFT is an instruction dataset derived from various data sources. PIXIU constructs a financial instruction tuning dataset (FIT) from open-sourced data.\n\nAll financial corpora mentioned above lack financial expertise from financial textbooks. This phenomenon motivates us to construct a financial corpus collected from financial textbooks, which is essential for improving numeric capability of LLMs during fine-tuning."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "Financial LLMs",
+            "text": "Since general-purpose LLMs are pre-trained on massive and diverse corpora to learn general language representations, fine-tuning is often required to adapt them to specific domains. Existing financial LLMs can be mainly categorized into models pre-trained from scratch and models fine-tuned from open-sourced LLMs. Models pre-trained from scratch include BloombergGPT and XuanYuan 2.0, both of which are BLOOM-style LLMs. More specifically, BloomberGPT pre-trains a BLOOM-50B model on its collected massive financial corpora. XuanYuan 2.0 pre-trains a BLOOM-176B model on its collected Chinese financial corpora. Models fine-tuned from open-sourced LLMs include DISC-FinLLM, PIXIU, Fin-Alpaca-LoRA-Linly, and FinGPT-v3, which are fine-tuned from different open-sourced LLMs. For example, DISC-FinLLM is fine-tuned from Baichuan 13B with its proposed multiple experts fine-tuning framework. PIXIU, the first English financial LLM, is fine-tuned from LLaMA with its constructed instruction data. Fin-Alpaca-LoRA-Linly, a model for question-answering in Chinese finance, is fine-tuned from Chinese-LLaMA which is a LLaMA model adapted for Chinese. FinGPT-v3 applies LoRA to fine-tune ChatGLM2 with the inherent feedback from markets. XuanYuan 2.0, DISC-FinLLM, Fin-Alpaca-LoRA-Linly, and FinGPT-v3 are for Chinese finance, while BloomberGPT and PIXIU are for finance tasks in other languages. Although existing financial LLMs can achieve good performance in financial natural language understanding tasks, they exhibit unsatisfactory performance in understanding financial text when numeric variables are involved in questions. This phenomenon motivates the work in this paper."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Numeric-Sensitive Large Language Model",
+            "text": "In this section, we introduce the details of our proposed NumLLM, the architecture of which is illustrated in Figure 1  ###reference_###. Firstly, we construct a financial corpus, called Fin-Textbooks, from textbooks in finance. After that, we train two individual LoRA modules by fine-tuning on Fin-Textbooks. In particular, one module is for continual pre-training by fine-tuning the foundation LLM with next-token prediction task.\nThe other module is trained by fine-tuning the foundation model with our proposed numeric-sensitive choice tuning (NumCT) to enhance the capability of the LLM in understanding financial text with numeric variables.\nLastly, we mix the two LoRA modules and merge the mixed LoRA module into the foundation model to obtain NumLLM for inference. We choose Qwen-7B [Bai et al., 2023  ###reference_b19###] as the foundation model, because our experiments show that Qwen-7B is superior over other models with comparable model size on both numeric and non-numeric questions."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Fin-Textbooks: Chinese Financial Textbook Corpus",
+            "text": "Fin-Textbooks consists of 24 preprocessed financial textbook documents. It covers 34 different financial subjects, including fundamentals of futures and derivatives, probability and mathematical statistics and so on. The statistics of Fin-Textbooks are summarized in Table 1  ###reference_###. All textbooks are crawled or downloaded from websites.\nWe preprocess the raw textbooks by filtering, refinement and numeric calibration. The details are as follows:\nThe filtering operation removes non-financial content from the raw textbooks, such as information of publication and list of references.\nThe refinement operation further eliminates components that do not contain financial knowledge, such as table of contents and some section headings.\nThe numeric calibration addresses numeric-related formatting issues in the raw textbook texts, such as spacing and paragraph breaks within numeric variables."
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Continual Pre-Training",
+            "text": "Continual pre-training refers to domain-adaptive pre-training with augmented data [Gururangan et al., 2020  ###reference_b20###]. Continual pre-training has been proved successful in adapting pre-trained language models to domain-specific tasks [Zhang et al., 2023a  ###reference_b21###, Xie et al., 2023b  ###reference_b22###, Gong et al., 2022  ###reference_b23###]. We apply LoRA to continually pre-train Qwen-7B on Fin-Textbooks. The training settings are the same as in Qwen-7B. The learning task is to perform next-token prediction as in the standard language modeling objective [Chowdhery et al., 2023  ###reference_b24###]. In particular, we maximize the following log likelihood function:\nwhere  is the -th token in the corpus,  is the size of the context window and  is the model parameters."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "Numeric-Sensitive Choice Tuning",
+            "text": "NumCT is developed to enhance the capability of the LLM in understanding financial text when numeric variables are involved in questions. NumCT includes four steps: numeric-sensitive instance extraction, numeric-masked choice generation, NumCT instruction construction and instruction fine-tuning."
+        },
+        {
+            "section_id": "3.3.1",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.1 Numeric-Sensitive Instance Extraction",
+            "text": "In this step, we extract instances containing numeric variables from the preprocessed corpus, where each instance is a segment of text. We define the hyperparameter  as the minimum number of paragraphs per instance and  as the maximum number of paragraphs per instance. These two hyperparameters influence the average length per instruction. We define  as the ratio of selected instances. We conduct instance extraction from the beginning of the corpus. For each instance, we initialize it as an empty string and add  paragraphs in the first place. We make sure that each instance is grammatically intact and does not exceed  paragraphs. If an instance does not contain numeric variables, it is discarded. In addition, if all the numeric variables are structural variables, such as the “3” in “Figure 3”, the instance is discarded. We repeat this procedure until we reach the end of the corpus.\nAfter going through the whole corpus, we can extract  instances. In the end, we randomly select  portion of the instances, which is\n\ninstances, for the next step. The randomness in numeric-sensitive instance extraction enhances the relevance of financial knowledge in the selected instances. Even in textbooks, there are still rare texts that are irrelevant and contain little financial knowledge, like common formal expressions and nonessential details in the used examples. These irrelevant texts are not likely to be removed in the preprocessing stage because of the variety of structures and styles across different textbooks. If we assume the number of instances composed of such irrelevant texts is , the probability of all the selected instances being relevant should be\nSince , a smaller  means a larger  and lower occurrence of irrelevant texts. Please note that  should not be too small, in order to make full usage of the corpus."
+        },
+        {
+            "section_id": "3.3.2",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.2 Numeric-Masked Choice Generation",
+            "text": "We define  as the ratio of selected numeric variables to mask per instance and  as the number of choices in each instruction. For each instance , where , we perform numeric-masked choice generation. Suppose there are  legitimate numeric variables in the current instance . The numeric variables with the same numeric value but at different positions within the instance will be treated as different numeric variables. We then randomly select\n\nnumeric variables from  for numeric-masked choice generation. For each numeric variable  we define  as its numeric value. For each , we generate  numeric choices, denoted as , where . Specifically, we handle  in two different ways according to its numeric type, thus enabling the LLM to learn to reason on both integers and floating-point numbers. If  is a floating-point number, we generate  random floating-point numbers within the following interval:\nIf  is an integer, we generate  random integers between the following interval:\nwhere  is a scaler and set to be 1000 in our implementation. The randomness in numeric-masked choice generation maintains the diversity of instructions, which can improve model performance according to LIMA [Zhou et al., 2023  ###reference_b25###]. The appropriate value of  is dependent on the corpus. If  is set to be too large, then most of the content of the instructions constructed from the same instance would be overlapped, thus impairing diversity.  should not be too small either, in order to make full exploitation of the corpus."
+        },
+        {
+            "section_id": "3.3.3",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.3 NumCT Instruction Construction",
+            "text": "One NumCT instruction is a string comprised of a question,  identifiers ,  choices , and the necessary prompt constituents, where .  corresponds to , respectively. Then, for each , we randomly select one identifier  as the identifier for the choice of the correct answer. The randomness in selection is the same as the choice shuffling proposed in Medprompt [Nori et al., 2023  ###reference_b26###], which can be helpful in mitigating position bias of models [Ko et al., 2020  ###reference_b27###, Zheng et al., 2023  ###reference_b28###]. Then  is assigned as . The other choices, i.e., , are assigned as , respectively. For , we concatenate  with  to produce .\nFinally, for each , we transform the instance into a question by masking  with a blank underline of four token length. For , we generate an NumCT instruction, by combining the question,  and the necessary prompt constituents. The output matching the instruction is . As a common practice [Hendrycks et al., 2021  ###reference_b29###, Huang et al., 2023  ###reference_b30###], we set  and set the identifiers as “A”, “B”, “C”, “D”. An example of the instruction-output pair is shown in Figure 2  ###reference_###.\n###figure_2###"
+        },
+        {
+            "section_id": "3.3.4",
+            "parent_section_id": "3.3",
+            "section_name": "3.3.4 Instruction Fine-Tuning",
+            "text": "After the above steps, we obtain an instruction-output pair for each . By traversing all the selected numeric variables in all the selected instances, we obtain an instruction fine-tuning dataset containing  instruction-output pairs, where  is computed as:\nWe use this instruction fine-tuning dataset to perform instruction fine-tuning [Wei et al., 2022  ###reference_b31###] on the foundation LLM. The settings of fine-tuning are the same as the standard settings of fine-tuning Qwen, LLAMA2 and so on. We optimize an auto-regressive objective function, while zeroing out the loss on tokens from the instruction. NumCT maximizes the following log likelihood function:\nwhere\nHere,  is the number of instruction-output pairs,  is the length of the -th instruction,  is the length of the -th output,  is the -th token in the instruction,  is the -th token in the output,  is the size of the context window and  is the model parameters."
+        },
+        {
+            "section_id": "3.4",
+            "parent_section_id": "3",
+            "section_name": "Mixing and Merging LoRA Modules",
+            "text": "After continual pre-training and NumCT, we obtain two LoRA modules. In the mixing and merging step, we employ a singular value decomposition (SVD) based method to mix the two LoRA modules and finally merge LoRA modules into the foundation LLM with an add operation as in PEFT [Mangrulkar et al., 2022  ###reference_b32###]. For convenience, we denote the LoRA module of continual pre-training by  and denote the LoRA module of NumCT by .  is the rank of  and  is the rank of .  denotes the product between the two low-rank matrices learned for , and  denotes the product between the two low-rank matrices learned for . Let . We perform SVD on\nand retain the top  singular values for the mixed LoRA module. Specifically, SVD decomposition for  can be represented by\nAfter extracting the top  singular values and the corresponding singular vectors, we can obtain . The we can obtain the full matrix for the mixed LoRA module as follows:\nDuring inference, we merge the mixed LoRA module with the foundation model by using an add operation to obtain the NumLLM model, which is consistent with the default operation in LoRA [Hu et al., 2022  ###reference_b18###]. We set  and . By mixing and merging the two LoRA modules through an SVD-based method, we preserve the most important information from each LoRA module. Thus we enhance the ability of NumLLM to understand the financial texts involving numeric variables as well as those not involving numeric variables."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Experiment",
+            "text": "In this section, we conduct experiments to compare our NumLLM with existing LLMs, including representative general-purpose LLMs and financial LLMs."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Experimental Setup",
+            "text": ""
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1 Evaluation Tasks",
+            "text": "###figure_3### We evaluate all models on FinEval [Zhang et al., 2023b ###reference_b33###] which is a comprehensive benchmark for the Chinese financial question answering task. Each task is in the form of multiple-choice question answering and is evaluated under a five-shot scenario without chain-of-thought. \n\nWe present results in four sub-domains of finance, including Finance, Economy, Accounting and Certificate. We also present average results over all sub-domains. Additionally, we decompose all questions within each sub-domain into numeric questions and non-numeric questions, and present the results respectively. Figure 3 ###reference_### shows examples of numeric and non-numeric questions. More examples can be found in the Appendix. FinEval adopts the same settings as in existing works [Hendrycks et al., 2021 ###reference_b29###, Brown et al., 2020 ###reference_b1###], where the choice corresponding to the largest output logit is returned as the choice made by LLMs. \n\nThe prompt template in FinEval simply concatenates the necessary prompt constituents, the question, four identifiers and four choices. The question is masked partially with a blank underline of four token length. The financial-domain questions in FinEval include 34 distinct subjects which are classified into four sub-domains. Please note that the testing set we use corresponds to the validation set in the original paper of FinEval, because the labels for the testing set in the original paper are not publicly available. The number of questions within the testing set is shown in Table 2 ###reference_###."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2 Implementation Details",
+            "text": "For hyperparameters mentioned in Section 3.1, we set various parameters, and the experiments on hyperparameters can be found in the Appendix. In continual pre-training, we set the learning rate and adjust it with the cosine annealing schedule during training. We set the block size to be 512, where the block size denotes the maximum length of the input sequence. We run the continual pre-training on 8 Tesla-V100-32G GPUs. The batch size per GPU is set to be 8. The number of total optimization steps is 6004, and the patience of early stopping is 5 epochs. For NumCT, we set the learning rate and adjust it with the cosine annealing schedule during training."
+        },
+        {
+            "section_id": "4.1.3",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.3 Baselines",
+            "text": "The baselines can be mainly categorized into two classes. The first class includes general-purpose LLMs that are able to answer financial questions. The second class includes financial LLMs that are fine-tuned from open-sourced LLMs on financial corpora.\n\nThe general-purpose LLMs for comparison include ChatGLM2-6B, ChatGLM3-6B, LLaMA-7B, LLAMA2-7B-CHAT, Qwen-7B, InternLM-7B, Tigerbot-7B-chat-v3, Baichuan2-13B-Chat, and Ziya-LLaMA-13B-v1.\n\nThe financial LLMs for comparison include FinGPT-v3-6B, ChatGLM2-6B-AFAC2023Generation, ChatGLM2-6B-Yayi, Qwen-7B-Yayi, Fin-Alpaca-LoRA-7B-Linly, and DISC-FinLLM-13B. ChatGLM2-6B-AFAC2023Generation is fine-tuned from ChatGLM2-6B with the instruction dataset AFAC2023Generation derived from the AFAC2023 competition in generation of financial market viewpoints. ChatGLM2-6B-Yayi is fine-tuned from ChatGLM2-6B with the instruction dataset constructed in Yayi. Qwen-7B-Yayi is fine-tuned from ChatGLM2-6B with the instruction dataset constructed in Yayi. DISC-FinLLM-13B refers to DISC-FinLLM-13B (consulting) which performs the best among the four variants proposed in the original work."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Results on Financial Question Answering",
+            "text": "Experiment results are presented in Table 3  ###reference_###. The results of NumLLM are averaged over five independent NumCT runs. From Table 3  ###reference_###, we can find the following phenomena.\n\nFirstly, NumLLM shows distinct performance on numeric questions of the sub-domains, surpassing Qwen on Finance, Economy and Certificate by a notable margin. More specifically, NumLLM achieves gains of 5.00%, 2.38% and 1.09%, respectively. Meanwhile, NumLLM is comparable with Qwen on Accounting.\n\nOn non-numeric questions of the sub-domains, NumLLM also shows superior performance over Qwen on Finance, Economy and Certificate. More specifically, it achieves gains of 1.97%, 2.18% and 0.77%, respectively. NumLLM maintains the second-best performance among all the compared models.\n\nIt is important to note that Qwen-Yayi is fine-tuned from the same foundation model as NumLLM but on different corpora, yet Qwen-Yayi obtains much lower scores than NumLLM.\n\nFinally, among all FinLLMs, NumLLM achieves notable results in terms of overall performance within each sub-domain. This phenomenon can also be observed from the radar graph in Figure 4  ###reference_###."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "Ablation Study",
+            "text": "To study the effectiveness of each procedure during the construction of NumLLM, we conduct the ablation study by substituting each procedure with its variants or removing the procedure. The results are presented in Table 4."
+        },
+        {
+            "section_id": "4.3.1",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.1 Effectiveness of NumCT",
+            "text": "To verify the effectiveness of NumCT, we remove the LoRA module obtained by NumCT. Therefore, the foundation model is merged only with the LoRA module obtained by continual pre-training. The model obtained under this setting is denoted by NumLLM (w/o NumCT) in Table 4  ###reference_###.\n\nMoreover, we verify the effectiveness of numeric-masked choice generation within the procedure of NumCT. More specifically, we remove the step of numeric-masked choice generation when constructing NumCT instructions. For the target numeric variable in each instance, we transform the instance into a question by masking the numeric variable with a blank underline of four token length. The instruction is constructed by concatenating the necessary prompt constituents and the masked instance. The output is set to be the corresponding true value of the target numeric variable. The model obtained under this setting is denoted by NumLLM (w/o numeric choices) in Table 4  ###reference_###."
+        },
+        {
+            "section_id": "4.3.2",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.2 Effectiveness of Continual Pre-Training",
+            "text": "To verify the necessity of conducting continual pre-training, we train a model which only performs NumCT with LoRA on Qwen but without LoRA for continual pre-training. The model obtained under this setting is denoted by NumLLM (w/o CP) in Table 4."
+        },
+        {
+            "section_id": "4.3.3",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.3 Effectiveness of SVD-based Method to Mix LoRA Modules",
+            "text": "To verify the effectiveness of the SVD-based method for mixing the two LoRA modules, we construct two variants of NumLLM for comparison. Specifically, we construct one variant using mean-based method for mixing LoRA modules, which adopts the  in Section 3.4. We construct the other variant using sum-based method for mixing LoRA modules, which adopts as the full matrix of the mixed LoRA module. These two variants are denoted by NumLLM (mean-based mix) and NumLLM (sum-based mix), respectively. One possible reason to explain the result is that because the ranks and training objectives are both different between continual pre-training and NumCT, the subspaces of  and  have different meanings which will result in noises in computing. But NumCT can mitigate the resulting noise through SVD, since SVD is an effective way for denoising."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Conclusion",
+            "text": "In this paper, we propose a novel LLM, called numeric-sensitive large language model (NumLLM), for Chinese finance, which addresses the shortcoming of existing FinLLMs in understanding financial text when numeric variables are involved in questions. Applying our method for finance in other languages will be pursued in our future work."
+        }
+    ]
+}

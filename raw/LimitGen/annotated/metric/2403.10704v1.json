@@ -1,0 +1,288 @@
+{
+    "title": "PERL: Parameter Efficient Reinforcement Learning from Human Feedback",
+    "abstract": "Reinforcement Learning from Human Feedback (RLHF) has proven to be a strong method to align Pretrained Large Language Models (LLMs) with human preferences. But training models with RLHF is computationally expensive, and an overall complex process. In this work, we study RLHF where the underlying models are trained using the parameter efficient method of Low-Rank Adaptation (LoRA) introduced by Hu et al. (2021). We investigate the setup of “Parameter Efficient Reinforcement Learning” (PERL), in which we perform reward model training and reinforcement learning using LoRA. We compare PERL to conventional fine-tuning (full-tuning) across various configurations for 7 benchmarks, including 2 novel datasets, of reward modeling and reinforcement learning. We find that PERL performs on par with the conventional RLHF setting, while training faster, and with less memory. This enables the high performance of RLHF, while reducing the computational burden that limits its adoption as an alignment technique for Large Language Models. We also release 2 novel thumbs up/down preference datasets: ‘Taskmaster Coffee’, and ‘Taskmaster Ticketing’ to promote research around RLHF.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "Introduction",
+            "text": "Pretrained Large Language Models (LLMs), such as GPT-4 and Gemini, have shown impressive performance in a variety of tasks. Aligning these models with human preferences is key to ensuring high-quality behavior: it improves instruction following and helps fine-tune models for behaviors that lack a direct mathematical expression of a loss function, such as safety properties or characteristics of summarization. Reinforcement Learning from Human Feedback (RLHF) is one of the most popular methods to achieve this alignment. It involves fitting a reward model (RM) on human preference data and then using this RM to tune the parameters of the LLM using Reinforcement Learning (RL). We provide more details about the RLHF method in Appendix A.1. While RLHF has been shown to be an effective method for alignment, the complexity and computational cost of its process have hindered its adoption: the RL loop, for example, requires at least twice the memory of standard fine-tuning, as it needs multiple instances of LLMs, such as a reward model and an anchor model (for KL regularization) to train properly. Another challenge to the wider adoption of RLHF lies in the difficulty of collecting enough high-quality training data to create an effective reward model. In this work, we investigate how Parameter Efficient Fine-Tuning (PEFT) approaches can make RLHF more efficient and accessible. We compare the performance of conventional RLHF, for which all the parameters of the reward model and the policy are fine-tuned, to Parameter Efficient Reinforcement Learning, referred to as PERL, which uses a PEFT method (Low-Rank Adaptation) to fine-tune the reward model and an RL Policy. Our contributions in this paper are as follows: Through extensive experiments, we evaluate the effects of LoRA on two dimensions of the training of the RM and RL policy: model size, and number of LoRA trainable parameters. We compare PERL to conventional RLHF on 7 datasets and show that PERL achieves results on par with the conventional setup which is commonly used while being more memory efficient and faster to train. We release two new preference datasets (thumbs up/down), the Taskmaster Coffee, and Ticketing datasets, which we hope will be useful when evaluating alignment methods."
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "PERL: Parameter Efficient Reinforcement Learning from Human Feedback",
+            "text": "We describe how PERL makes the RLHF process more efficient. For an overview on RLHF, please refer to Appendix A.1. There are 2 model training processes as part of the RLHF process: reward model training, and reinforcement learning.\n\nWe construct the PERL reward models as language models with LoRA adapters. We attach a LoRA adapter to each attention projection matrix, and only train these adapters, while keeping the language model backbone frozen. The trained LoRA adapters are saved, and combined with the projection matrices when running inference with the reward model. This one-time addition operation is performed before running the RL loop, and the resulting reward model is equivalent to a non-LoRA one.\n\nThe PERL reinforcement learning loop similarly trains language models with LoRA adapters as policy models. We attach a LoRA adapter to each attention projection matrix, and only train the LoRA adapters, while keeping the language model backbone frozen. The policy is trained with the policy gradient calculated on the reward score, and a KL regularization with the anchor policy.\n\nThe bulk of the memory required to train a reward model or a reinforcement learning loop is due to modern optimizers, like Adam or Adafactor, which need to track multiple factors for every trainable parameter. The reduction in the number of trainable parameters that PERL operates leads to a significant reduction in memory requirement for training. It also leads to faster training speed, because fewer parameters need to be updated at each training step."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "Datasets and Tasks",
+            "text": "We describe the datasets and tasks we used to train reward models and perform reinforcement learning.\nThe datasets consist of feedback data of either preference pairs, or classification labels used to train reward models. The preference or classification labels are collected for candidate responses sampled from diverse set of policies. As it is helpful for reward models to observe as broad a domain as possible during training.\nIn the reinforcement learning loop, we use inputs from the datasets as prompts to the LLMs to sample episodes, and make policy updates based on the reward calculated for the sampled episodes."
+        },
+        {
+            "section_id": "3.1",
+            "parent_section_id": "3",
+            "section_name": "Text Summarization",
+            "text": "Text summarization is one of the tasks that has been the most extensively studied using RLHF.\nStarting from a large text, the goal is to produce a smaller, yet faithful summary.\nWe explore it with two different datasets: Reddit TL;DR (Völske et al., 2017  ###reference_b73###), and BOLT (Broad Operational Language Translation) English SMS/Chat (Chen et al., 2018  ###reference_b14###)."
+        },
+        {
+            "section_id": "3.1.1",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.1 Reddit TL;DR",
+            "text": "We experiment with Reddit post summarization, where a Reddit post is provided, and the model produces a summary of it.\nWe base our experiments on the TL;DR dataset (Völske et al., 2017  ###reference_b73###), which contains both Reddit posts, and a human preference dataset.\nWe filtered this dataset following the work of Stiennon et al. (2020  ###reference_b68###).\nMore details about this dataset can be found in Appendix A.2.1  ###reference_.SSS1###."
+        },
+        {
+            "section_id": "3.1.2",
+            "parent_section_id": "3.1",
+            "section_name": "3.1.2 BOLT Message Summarization",
+            "text": "We explore the task of summarizing sequences of messages.\nSuch a model could be used, for instance, to show a short and accurate summary to a user, enabling them to understand the context of a conversation without reading every message in it.\nWe experiment with the BOLT English SMS/Chat dataset (Chen et al., 2018  ###reference_b14###).\nThis dataset was generated by paying participants to upload their conversations from SMS and chat applications, and also by randomly matching\nparticipants for conversations on a chat platform.\nMore details about this dataset can be found in Appendix A.3.1  ###reference_.SSS1###"
+        },
+        {
+            "section_id": "3.2",
+            "parent_section_id": "3",
+            "section_name": "Generating Harmless Responses",
+            "text": "We explore the task of preference modeling on harmless responses by using Anthropic’s Helpfulness and Harmlessness (Red Teaming) dataset (Bai et al., 2022a  ###reference_b5###).\nThis dataset consists of a pair of model generated responses for helpfulness examples seeking informational user queries, and harmlessness examples with users eliciting harmful responses from the model.\nWe use the harmlessness part of the dataset to conduct our experiments.\nThe pairwise harmlessness preference dataset labels the least harmful response generated by the model to a user elicited context.\nMore details about this dataset can be found in Appendix A.4.1  ###reference_.SSS1###."
+        },
+        {
+            "section_id": "3.3",
+            "parent_section_id": "3",
+            "section_name": "Generating Helpful Responses",
+            "text": "The Stanford Human Preferences Dataset (SHP) (Ethayarajh et al., 2022  ###reference_b24###) is derived from Reddit questions/instructions, and top comments.\nIt consists of 385,563 Reddit questions/instructions, and top-level comments for the corresponding posts.\nThe data is split into a training set (), a validation set (), and a test set ().\nThe posts are sampled from 18 domains, such as anthropology, legal advice etc.\nThe SHP dataset, unlike the ELI5 one (Fan et al., 2019  ###reference_b27###), makes use of timestamp information to infer that a comment is preferred to another one only if it has received more votes, and has not been visible for longer (to avoid the introduction of a bias favoring older posts).\nThe SHP dataset differs from the Anthropic-HH dataset in that it focuses on helpfulness only (as opposed to both helpfulness and harmlessness for Anthropic-HH).\nThe data in SHP is also human written, whereas Anthropic-HH is made of machine written responses.\nDetailed information on the domains used, and how they compose the mix of examples can be found in Table 18  ###reference_### of Appendix A.5.1  ###reference_.SSS1###."
+        },
+        {
+            "section_id": "3.4",
+            "parent_section_id": "3",
+            "section_name": "UI Automation",
+            "text": "We experiment on the task of controlling a device using a UI automation dataset collected from human demonstrations.\nThis dataset, which will be released as part of concurrent work, is composed of around 3,000 training, and 800 test episodes.\nEach episode is a sequence of observation and action pairs.\nAn observation is derived from the Android View Hierarchy, plus additional information, such as the active app, or the history of previously performed actions.\nAn action is one of a dozen possible actions (such as clicking on a UI element, scrolling, etc.).\nThis UI demonstration dataset only contains ground truth trajectories.\nWe augment it to include negative samples so as to train a classifier that we use as a reward model, by replacing the ground truth action with a different, random one."
+        },
+        {
+            "section_id": "3.4.1",
+            "parent_section_id": "3.4",
+            "section_name": "3.4.1 Training Data Preparation",
+            "text": "We split the 8,000 sample dataset into a training set of 7,000 random examples, and a test set of 1,000 samples.\nThese samples are generated from a randomly chosen subset of the dataset.\nOut of the 8,000 examples, we randomly select half of them and replace the correct action by a randomly wrong one.\nWe call the examples leading to the right action \"Positive\", and the ones with a wrong action \"Negative\".\nSplit details on the dataset are given in Table 1  ###reference_###.\nMore information on how this dataset was generated can be found in Appendix A.6.1  ###reference_.SSS1###."
+        },
+        {
+            "section_id": "3.5",
+            "parent_section_id": "3",
+            "section_name": "Generating Neutral Point of View Responses",
+            "text": "We train a model to generate answers to controversial topics with a neutral point of view.\nWe built a dataset consisting of 300 triplets of (question, answer, rating) spanning 93 topics.\nHumans trained on this task generated both questions and answers, which where then scored between 0 and 5 by high-quality annotators based on both style and neutrality.\nAmong those 300 examples, 136 are deemed adequate answers (i.e. score >= 4).\nThe rest of the answers’ scores spans the whole range between 0 and 4, which helps with training a classifier that we use as a reward model.\nThe dataset was split into train, test and validation.\nMore information about this dataset is given in Appendix A.7.1  ###reference_.SSS1###."
+        },
+        {
+            "section_id": "3.6",
+            "parent_section_id": "3",
+            "section_name": "Taskmaster Datasets",
+            "text": "The Taskmaster datasets were created by paying crowdsourced (Mechanical Turk) workers to produce conversational ordering interactions using a custom-built, text-based dialogue creation tool.\nThis meant either writing turns for both speakers, i.e. the customer and the agent, or filling in specific turns for partially completed conversations.\nEach conversation was annotated with function calls interleaved within the dialogue turns, signalling when to interact with external sources in order to perform tasks in the real world.\nExample tasks that were performed include looking up menu items or movies, adding items to an order, booking tickets, etc.\nThe calls are API-agnostic, so they can easily be converted to any format needed when deployed.\nThe training datasets were used to fine-tune a LaMDA model (Thoppilan et al., 2022  ###reference_b71###) which was served along with an ‘API adapter’ that mapped each function call to a real API.\nThe trained LaMDA model was deployed to another set of crowdsourced workers who were paid to interact with it, and label its responses (conversation turns, or API calls) with thumbs up/down.\nWe collected 3,000 (dialogue, reward) pairs in this manner, where the reward is a thumbs up/down.\nMore details on the data collection methodology, as well as examples and UI screenshots for creating these datasets are given in Appendix A.8.1  ###reference_.SSS1###."
+        },
+        {
+            "section_id": "3.6.1",
+            "parent_section_id": "3.6",
+            "section_name": "3.6.1 Taskmaster Coffee",
+            "text": "The Taskmaster Coffee dataset consists of 6,500 multi-turn conversations, consisting of 20,000 training examples (conversation turns or API calls), and 3,000 reward examples.\nThe reward datasets contains 2,775 examples labeled with thumbs up, and 453 with thumbs down.\nWe have publicly released this dataset and the instructions used to create it at https://github.com/google-research-datasets/Taskmaster/tree/master/TM-4-2024  ###reference_s/Taskmaster/tree/master/TM-4-2024###."
+        },
+        {
+            "section_id": "3.6.2",
+            "parent_section_id": "3.6",
+            "section_name": "3.6.2 Taskmaster Ticketing",
+            "text": "The Taskmaster Ticketing dataset contains 30,000 multi-turn conversations, consisting of 240,000 training examples and 3,000 reward examples.\nThe reward datasets contains 1,146 examples labeled with thumbs up, and 2,210 with thumbs down.\nThis dataset and related materials are publicly released at https://github.com/google-research-datasets/Taskmaster/tree/master/TM-3-2020  ###reference_s/Taskmaster/tree/master/TM-3-2020###."
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "Reward Model Training",
+            "text": "We experiment on the datasets mentioned in Section 3, varying the configurations of model size, and LoRA adapter rank (which controls the number of trainable parameters). We evaluate the classification style reward models using accuracy as a metric, indicating whether the reward model score is close to the label of 0 or 1. We compare High Bandwidth Memory (HBM) usage as estimated by Jax JIT at the time of training (Bradbury et al., 2018).\n\nOur experiments across datasets show that we can LoRA train reward models to match the performance of fully tuned ones with less than 0.1% of the parameters being tuned. We also observe that LoRA generally becomes more effective at matching full-tuning as we increase the LLM size. Across all our datasets, the reward models can be tuned with approximately 50% of the memory needed for full-tuning. The training converges in a similar number of steps for LoRA and full tuning, and the LoRA models are roughly faster to train. The HBM usage and training speedup vary a little with each dataset as they depend on sequence lengths of the examples, which is different for all datasets. We report detailed metrics for each dataset below."
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "Summarization - Reddit TL;DR",
+            "text": "We train reward models using preference pairs of summaries on the dataset described in Section 3.1.1 ###reference_.SSS1###. We report the hyperparameters we used in Appendix A.2.2 ###reference_.SSS2###."
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1 LoRA Adapter Rank",
+            "text": "We observe that LoRA fine-tuning can model reward just as well as full-tuning with adapters of rank at least 4, training as little as of the model’s total parameters. The estimated High Bandwidth Memory (HBM) needed to train a LoRA rank 4 model is just of that needed to train a fully tuned one. We list our results in Table 2 ###reference_###."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2 Model Size",
+            "text": "In this section, we experiment on how the size of the backbone LLM model affects the performance of the reward model learned. We find that the performance of the reward model increases with the model size for both full-tuning and LoRA fine-tuning. We also find that LoRA fine-tuning benefits more from model size increases than full-tuning: for lower model sizes, LoRA fine-tuning falls short of full-tuning, but for the largest size, the tunings are on par. We report our results in Table 3."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "Harmless Dialogue Generation",
+            "text": "We train reward models in different settings using preference pairs of responses as mentioned in section 3.2 ###reference_###. We report the hyperparameters used in Appendix A.4.2 ###reference_.SSS2###."
+        },
+        {
+            "section_id": "4.2.1",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.1 LoRA Adapter Rank",
+            "text": "The performance of LoRA trained reward models is on par with that of fully trained models on the Anthropic Harmlessness preference dataset with all the low ranks we experimented with. We obtain our best results with a LoRA rank 8 model, training less than a full set of model parameters, with half peak HBM memory, and a computational speed up. We report our results in Table 4."
+        },
+        {
+            "section_id": "4.2.2",
+            "parent_section_id": "4.2",
+            "section_name": "4.2.2 Model Size",
+            "text": "We report our results in Table 5."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "Helpful Dialogue Generation",
+            "text": "We train LoRA and fully tuned reward models on the preference dataset introduced in Section 3.3. Details on the hyperparameters used are given in Appendix A.5.2."
+        },
+        {
+            "section_id": "4.3.1",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.1 LoRA Adapter Rank",
+            "text": "Varying the LoRA rank on the SHP datasets also yields comparable results as with full tuning. LoRA trained models have a similar memory and compute time advantage as with the datasets seen so far. Our best results are obtained with a LoRA rank of 1 on PaLM XS, training just of the parameters, saving on the peak HBM usage, and training faster. We list our results in the Table 6."
+        },
+        {
+            "section_id": "4.3.2",
+            "parent_section_id": "4.3",
+            "section_name": "4.3.2 Model Size",
+            "text": "We compare the accuracy of fully tuned and LoRA tuned Reward Models on PaLM 2 XXS, and XS. We report the results with the best LoRA rank out of the set {1, 4, 8, 16}. Both LoRA and fully tuned models benefit slightly from the model size increases. We report our results in Table 7."
+        },
+        {
+            "section_id": "4.4",
+            "parent_section_id": "4",
+            "section_name": "UI Automation",
+            "text": "We train a reward model to score UI automation actions on the dataset described in Section 3.4. \n\nUI automation data has two types of instructions: low-level instruction, e.g. \"Click on the search button\", and high-level instructions, e.g. \"Search for ‘machine learning’\". It also has two different split schemes: Unseen App, for which the test split uses apps not in the train split, and Unseen Task, for which the test split has tasks not in the train split. \n\nWe report the hyperparameters used in Appendix A.6.2. "
+        },
+        {
+            "section_id": "4.4.1",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.1 LoRA Adapter Rank",
+            "text": "We train LoRA and fully tuned reward models on the PaLM 2 S model. We evaluate these models using a classification accuracy. As shown in Table 8, the LoRA reward models, while training less than the total number of parameters, achieve similar accuracy to the fully tuned one. Furthermore, the LoRA models train almost twice as fast and have lower peak HBM usage."
+        },
+        {
+            "section_id": "4.4.2",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.2 Model Size",
+            "text": "The same trend of accuracy with model size is observed in the UI automation task, and both fully tuned and LoRA tuned models seem to benefit from larger architectures."
+        },
+        {
+            "section_id": "4.4.3",
+            "parent_section_id": "4.4",
+            "section_name": "4.4.3 Reward Model as UI Automation Evaluator",
+            "text": "The evaluation of the reward models shows that the UI automation agent model outputs can be evaluated with high accuracy using such a model. We compare this reward model as an evaluator to a heuristic previously used, based on the distance between the position of the click of the action, and a ground truth. The reward model outperforms the heuristic model by a large margin, as shown in Table 10."
+        },
+        {
+            "section_id": "4.5",
+            "parent_section_id": "4",
+            "section_name": "Neutral Point of View (NPOV) Responses",
+            "text": "We trained a reward model on data with 5-point scale discrete scores (increments of 0.5) to judge the neutrality of statements on sensitive topics. More details on the dataset used are available in Appendix A.7.1."
+        },
+        {
+            "section_id": "4.5.1",
+            "parent_section_id": "4.5",
+            "section_name": "4.5.1 LoRA Adapter Rank",
+            "text": "We study the effect of LoRA rank on the accuracy of our NPOV reward model. We find that the LoRA trained models have similar accuracy as the fully trained ones, while using a fraction of the peak HBM, and training significantly faster. Detailed results are given in Table 11."
+        },
+        {
+            "section_id": "4.5.2",
+            "parent_section_id": "4.5",
+            "section_name": "4.5.2 Model Size",
+            "text": "We compare the performance of fully tuned reward models to that of LoRA trained ones on different model sizes: PaLM XXS, XS, and S. The LoRA trained models have similar accuracies as the fully trained ones. Both LoRA models and fully trained ones benefit from bigger model sizes, with LoRA accuracies increasing more as the architecture gets bigger."
+        },
+        {
+            "section_id": "4.6",
+            "parent_section_id": "4",
+            "section_name": "Taskmaster Coffee Dataset",
+            "text": "We train classification reward models on the Taskmaster Coffee dataset."
+        },
+        {
+            "section_id": "4.6.1",
+            "parent_section_id": "4.6",
+            "section_name": "4.6.1 LoRA Adapter Rank",
+            "text": "To investigate the impact of different LoRA ranks on the learning efficiency of the reward model, we conducted experiments using the PaLM 2 XS model. LoRA trained reward models achieve similar accuracies as the fully tuned ones, while reducing the HBM usage by , and training faster. Detailed results are presented in Table 13."
+        },
+        {
+            "section_id": "4.6.2",
+            "parent_section_id": "4.6",
+            "section_name": "4.6.2 Model Size",
+            "text": "As shown in Table 14, the larger PaLM 2 XS model achieves higher accuracies than the smaller model PaLM 2 XXS. This observation stands for both the LoRA and fully tuned versions."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "Reinforcement Learning",
+            "text": "We train reinforcement learning policies on the summarization datasets described in Section 3.1, varying the model size, and LoRA adapter rank (which controls the number of trainable parameters). We conduct these experiments using the \"REINFORCE for Language Models\" algorithm used by Lee et al. (2023a), tuning a LLM policy using reinforcement learning and a standard reward model per dataset trained in Section 4. We evaluate the performance of the learned policy by the max cumulative reward it can achieve as judged by the reward model. We compare peak High Bandwidth Memory (HBM) usage as estimated by Jax JIT at the time of training (Bradbury et al., 2018). We also compare the speed of training by measuring the time each step takes end-to-end, i.e., episode sampling, reward scoring, calculating KL regularization, and performing the learning step. Our experiments across datasets show that we can LoRA train policies with reinforcement learning that come very close to the performance of fully tuned ones with less than 0.1% of the parameters being tuned. We also observe that LoRA generally becomes more effective at matching full-tuning as we increase the LLM size. For both datasets we have experimented with, the policies can be tuned with approximately 76% of the memory needed for full-tuning. The training converges in a similar number of steps for LoRA and full tuning, and the LoRA models are roughly faster to train."
+        },
+        {
+            "section_id": "5.1",
+            "parent_section_id": "5",
+            "section_name": "Reddit TL;DR Summarization",
+            "text": "We perform reinforcement learning with input prompts from the Reddit dataset introduced in Section 3.1.1, and episodes sampled from them. We use a fully tuned Palm 2 S reward model trained in Section 4.1. We report the maximum cumulative reward score as judged by this reward model as an evaluation of the policy. We report our hyperparameter selection process for all experiments in Appendix A.2.2."
+        },
+        {
+            "section_id": "5.1.1",
+            "parent_section_id": "5.1",
+            "section_name": "5.1.1 LoRA Rank",
+            "text": "We study the effect of LoRA rank on the effectiveness of learning reinforcement learned policy on the Reddit dataset by LoRA training an RL policy with varying ranks. We observe a monotonic increase in cumulative reward with increasing LoRA ranks. We observe that a policy trained with LoRA Rank 16 comes the closest to the performance of a fully tuned policy in terms of the reward score. We achieve this performance by training only a fraction of the policy model’s total parameters. The LoRA rank 16 policy RL tuning peaks at a reduced amount of the HBM needed for the RL tuning of the fully tuned policy. We also observed a significant speed-up in the training time of the LoRA policy, as compared to that of the fully tuned one. We list our results in Table 15."
+        },
+        {
+            "section_id": "5.1.2",
+            "parent_section_id": "5.1",
+            "section_name": "5.1.2 Model Size",
+            "text": "We vary the size of the policy model to see how it affects the maximum reward achieved by the policy learned. We find that the maximum reward increases with the model size for both full RL tuning, and LoRA RL tuning. Larger models perform better across full RL tuning and LoRA RL tuning. We report these results in Table 16  ###reference_###."
+        },
+        {
+            "section_id": "5.2",
+            "parent_section_id": "5",
+            "section_name": "BOLT Message Summarization",
+            "text": "We perform reinforcement learning with input prompts from the BOLT message summarization dataset introduced in Section 3.1.2, and episodes sampled from them. We use a fully tuned PaLM 2 XS reward model trained in Section 4.1. We finetune PaLM 2 XXS policies. We detail the hyperparameter selection process for all the experiments in Appendix A.3.2. We evaluate the trained policies using two metrics, in addition to the maximum cumulative reward score, to see whether our results generalize beyond the cumulative reward score:\n\nSummary Quality: the output of a model trained to predict the probability that a human rater will answer \"Yes\" for all 6 questions defined in SEAHORSE (Clark et al., 2023): comprehensibility, non-repetition, grammar, attribution, main ideas, and conciseness.\n\nNatural Language Inference (NLI): the output of a model trained to predict entailment. Higher numbers are better. Low values likely indicate substantial hallucinations."
+        },
+        {
+            "section_id": "5.2.1",
+            "parent_section_id": "5.2",
+            "section_name": "5.2.1 LoRA Rank",
+            "text": "As we vary the LoRA rank of the policy model, we observe that we can match the summary quality and the grounding of the fully tuned RL policy with a policy of LoRA rank 8. We achieve this result by training of the model’s total parameters. We list our results in Table 17."
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "Related Work",
+            "text": ""
+        },
+        {
+            "section_id": "6.1",
+            "parent_section_id": "6",
+            "section_name": "Pretrained Large Models",
+            "text": "Pretrained Large Models (PLMs - (Brown et al., 2020  ###reference_b11###; Smith et al., 2022  ###reference_b66###; Thoppilan et al., 2022  ###reference_b71###; Workshop et al., 2022  ###reference_b77###; Hoffmann et al., 2022  ###reference_b33###; Chowdhery et al., 2022  ###reference_b16###; Touvron et al., 2023  ###reference_b72###; Anil et al., 2023  ###reference_b2###; OpenAI et al., 2023  ###reference_b54###; Jiang et al., 2023  ###reference_b41###)) have shown strong performance in a variety of tasks.\nThey have been used in many different applications, such as summarization (Stiennon et al., 2020  ###reference_b68###), instruction following (Ouyang et al., 2022  ###reference_b55###; Lai et al., 2023  ###reference_b44###), conversational recommender systems (Friedman et al., 2023  ###reference_b29###), question answering (Nakano et al., 2022  ###reference_b52###), personalized dialogue generation (Jandaghi et al., 2023  ###reference_b39###), text annotation tasks (Gilardi et al., 2023  ###reference_b31###), audio generation (Borsos et al., 2023  ###reference_b8###), robotics tasks (Driess et al., 2023  ###reference_b23###), vision tasks (Chen et al., 2023  ###reference_b15###), and more (Ziegler et al., 2020  ###reference_b84###).\nPretrained (Radford et al., 2018  ###reference_b57###; Ramachandran et al., 2016  ###reference_b59###), and instruction-tuned (Wei et al., 2021  ###reference_b76###) large models, while demonstrating impressive performance on a multitude of tasks, still exhibit many limitations, such as returning non-factual outputs, or not following human instructions correctly."
+        },
+        {
+            "section_id": "6.2",
+            "parent_section_id": "6",
+            "section_name": "Aligning Pretrained Large Models with Human/AI Preferences",
+            "text": "Aligning Pretrained Large Models with human preferences has become an important area of research to overcome some of their limitations (Christiano et al., 2017  ###reference_b17###; Leike et al., 2018  ###reference_b47###; Wang et al., 2023  ###reference_b75###; Ji et al., 2023  ###reference_b40###), and is also a paradigm commonly used to steer the behavior of PLMs towards human desiderata.\nThis alignment is generally achieved by collecting a large dataset of contexts, pairwise generations for these contexts, and related preferences.\nOverfitting the reward function can be an important issue when approximating it (Azar et al., 2023  ###reference_b4###), and methods like early stopping, or reducing the number of trainable parameters like we do in this work can help mitigate this issue, and train better policies.\nWhile most alignment techniques have so far been used on natural language tasks, some recent work has started to apply them on other modalities as well (Lee et al., 2023b  ###reference_b46###; Sun et al., 2023  ###reference_b69###).\nThe size and quality of the human preference data can often be a bottleneck to this alignment process.\nFor that reason, different approaches leveraging AI feedback (Bai et al., 2022b  ###reference_b6###; Lee et al., 2023a  ###reference_b45###) have been developed, such as Generator-Critic architectures (Jandaghi et al., 2023  ###reference_b39###; Yuan et al., 2024  ###reference_b80###).\nDifferent techniques have been developed to align PLMs with human/AI preferences, including Reward rAnked Fine-Tuning (RAFT) (Dong et al., 2023  ###reference_b22###), RRHF (Yuan et al., 2023  ###reference_b81###), Reinforcement Learning from Human Feedback (RLHF) (Christiano et al., 2017  ###reference_b17###; Ouyang et al., 2022  ###reference_b55###; Azar et al., 2023  ###reference_b4###), Direct Preference Optimization (DPO) (Rafailov et al., 2023  ###reference_b58###; Azar et al., 2023  ###reference_b4###), Sequence Likelihood Calibration with Human Feedback (SLIC-HF) (Zhao et al., 2023  ###reference_b82###), Pairwise Cringe Optimization (Xu et al., 2023a  ###reference_b78###), and Self-Rewarding Language Models (Yuan et al., 2024  ###reference_b80###).\nAmong these methods, RL{H/AI}F is one of the most popular.\nAs we show here, by combining RL{H/AI}F with parameter-efficient methods like LoRA, the compute and memory efficiencies of the model tuning can be improved substantially."
+        },
+        {
+            "section_id": "6.3",
+            "parent_section_id": "6",
+            "section_name": "Reinforcement Learning from Human/AI Feedback (RL{H/AI}F)",
+            "text": "Reinforcement Learning has been shown to be a useful technique to align agents with human preferences (Dewey, 2011  ###reference_b20###; Hadfield-Menell et al., 2016  ###reference_b32###; Everitt and Hutter, 2018  ###reference_b26###).\nReinforcement Learning from Human Feedback (RLHF) works by first fitting a reward model on the preferred outputs.\nThis reward model is then used to train a policy using a reinforcement learning algorithm, typically Proximal Policy Optimization Algorithms (PPO) (Schulman et al., 2017  ###reference_b64###).\nLabeling examples to train a reward model can be costly (Casper et al., 2023  ###reference_b13###), and many of the existing works had to use tens of thousands of comparison examples to obtain good reward models to train the RL loop from (Stiennon et al., 2020  ###reference_b68###; Menick et al., 2022  ###reference_b51###).\nTo alleviate this labour intensive process, some work has been replacing human feedback by AI feedback, leading to RLAIF approaches (Bai et al., 2022b  ###reference_b6###; Kim et al., 2023  ###reference_b42###; Lee et al., 2023a  ###reference_b45###)).\n(Lee et al., 2023a  ###reference_b45###) show that RLHF and RLAIF can have comparable performance."
+        },
+        {
+            "section_id": "6.4",
+            "parent_section_id": "6",
+            "section_name": "Parameter Efficient Fine-Tuning and Low-Rank Adaptation",
+            "text": "Parameter Efficient Fine-Tuning (PEFT) methods (Houlsby et al., 2019  ###reference_b34###; Ding et al., 2022  ###reference_b21###; Xu et al., 2023b  ###reference_b79###) reduce the number of trainable parameters of a Pretrained Large Model, while maintaining comparable performance to full fine-tuning.\nThese methods are useful to adapt a PLM to downstream tasks: full fine-tuning on these tasks necessitates large amounts of labeled data to avoid overfitting, and significant compute resources.\nPEFT methods leverage the knowledge already acquired by a PLM, and can adapt a small number of parameters on a relatively small dataset.\nHugging Face’s PEFT library is an example implementation of PEFT methods (HuggingFace, 2023a  ###reference_b36###).\nLow-Rank Adaptation (LoRA) (Hu et al., 2021  ###reference_b35###) is an example PEFT method, and the one that we used in our experiments.\nIt factorizes the weight update into two trainable, low rank matrices (down-projection, and up-projection).\nDuring training, only these low rank matrices are being updated.\nDepending on the rank of the decomposition, we end up training only a small fraction of the total number of parameters of the original model.\nSimilarly to the original LoRA paper, we apply the low rank projections to the attention layers, but we note that other layers can be used.\nLoRA offers the advantages that it doesn’t increase the inference time (unlike adapters (Houlsby et al., 2019  ###reference_b34###), for example, which deepen the model), nor does it reduce the context window (unlike prompt-tuning (Lester et al., 2021  ###reference_b48###), for which some tokens must be used for the tunable prompts).\nHydra-RLHF (Santacroce et al., 2023  ###reference_b63###) achieves memory savings in RLHF by sharing a backbone, similarly to our work.\nThey do not, however, compare Hydra-RLHF to fully tuned RLHF.\nQLoRA (Dettmers et al., 2023  ###reference_b19###) combines quantization, and diverse optimizations with LoRA to achieve memory efficient fine-tuning.\nThese optimizations can be incorporated into our method to lead to further memory gains."
+        },
+        {
+            "section_id": "6.5",
+            "parent_section_id": "6",
+            "section_name": "Infrastructure",
+            "text": "The Transformer Reinforcement Learning (TRL) library (von Werra et al., 2020  ###reference_b74###) is the closest implementation of Parameter Efficient Reinforcement Learning that we are aware of.\nTheir Multi-Adapter RL (MARL) approach uses a shared base model for the entire RLHF pipeline (HuggingFace, 2024  ###reference_b38###).\nThis feature, however, is experimental and has not been tested yet.\nBesides, and to the best of our knowledge, the TRL library has only been used in combination with their Parameter Efficient Fine-Tuning (PEFT) library on (HuggingFace, 2023a  ###reference_b36###, b  ###reference_b37###) in the single GPU setting, and it only supports transformer models for text.\nIn contrast, our implementation is parallelized, and generalizes to modalities other than text.\nWe implemented our work in Python using the PAX library (Paxml, 2022  ###reference_b56###).\nOur input and evaluation pipeline relies on the SeqIO library (Roberts et al., 2022  ###reference_b62###).\nWe used an internally designed RL training loop infrastructure."
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "Conclusion and Future Work",
+            "text": "We have presented PERL, a Parameter Efficient Reinforcement Learning technique that can train a Reward Model and RL tune a Language Model Policy with LoRA. Through extensive experiments on various datasets, we have shown that this method achieves comparable results to conventional RLHF, for which all the model parameters are tuned, while reducing memory usage by approx 50%, and speeding up the training by up to 90% for the Reward Model training, and more modest memory savings of 20%, and speed-up of 10% in the RL loop.\n\nAs we demonstrate the success of the PERL method, there are still some questions that are underexplored in our study. We are planning to investigate the following avenues as part of our future work:\n\nPERL matches the performance on in-domain held out test sets, but the exploration of broader generalization would be interesting. There is room to explore ensemble models like Mixture-of-LoRA adapters (Zhu et al., 2023 ###reference_b83###) for the RLHF process at a minimal computational cost that will introduce the robustness needed in training to facilitate cross-domain generalization.\n\nReward models are one of the most critical pieces of the RLHF process, but they are prone to the “reward hacking” behavior. Recent works like Ramé et al. (2024 ###reference_b60###) show that weight-averaging models mitigate reward hacking. It would be interesting to explore this with PERL, as it can provide similar benefits by weight-averaging multiple adapters at a much lower computational cost."
+        }
+    ]
+}

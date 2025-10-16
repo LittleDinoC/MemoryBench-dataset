@@ -1,0 +1,824 @@
+{
+    "2404.08817v2": {
+        "section_numbers": [
+            4.2,
+            5.1
+        ],
+        "element": [
+            "BLEU Score",
+            "Jaccard Similarity",
+            "Execution Match"
+        ],
+        "ground_truth": "The paper does not assess the proposed approach against a diverse array of well-established methods. It would benefit from including BLEU Score, Jaccard Similarity, and Execution Match as baseline comparisons."
+    },
+    "2404.07520v2": {
+        "section_numbers": [
+            1,
+            2,
+            4,
+            4.1,
+            4.2,
+            4.3
+        ],
+        "element": [
+            "CoOp",
+            "CoCoOp",
+            "TPT",
+            "PromptAlign"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse set of established methods. Specifically, it should include CoOp, CoCoOp, TPT, and PromptAlign as baselines for comparison."
+    },
+    "2404.03411v1": {
+        "section_numbers": [
+            2.2,
+            2.3,
+            5
+        ],
+        "element": [
+            "GCG",
+            "AutoDAN",
+            "FigStep"
+        ],
+        "ground_truth": "The paper does not evaluate the proposed approach against a wide range of established methods. It should include GCG, AutoDAN, and FigStep as baseline comparisons."
+    },
+    "2405.07500v1": {
+        "section_numbers": [
+            3.1,
+            3.2
+        ],
+        "element": [
+            "Cosine Distance",
+            "BioBERT",
+            "SAPBERT"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a comprehensive set of well-established methods. It is essential to include Cosine Distance, BioBERT, and SAPBERT as baseline comparisons."
+    },
+    "2404.00216v1": {
+        "section_numbers": [
+            3.1,
+            4.1,
+            5.1
+        ],
+        "element": [
+            "ICE",
+            "MeLLo",
+            "CD"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide array of well-established methods. It should include ICE, MeLLo, and CD as baseline comparisons."
+    },
+    "2404.05540v1": {
+        "section_numbers": [
+            5
+        ],
+        "element": [
+            "Logistic Regression",
+            "K-Nearest Neighbors",
+            "Support Vector Machine"
+        ],
+        "ground_truth": "The paper does not evaluate the proposed approach against a diverse set of well-established methods. It should include Logistic Regression, K-Nearest Neighbors, and Support Vector Machine as baseline comparisons."
+    },
+    "2404.07989v2": {
+        "section_numbers": [
+            4.2,
+            4.3
+        ],
+        "element": [
+            "Prompt Tuning",
+            "Adapter Tuning",
+            "Low-Rank Adaptation"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide array of established methods. It should include Prompt Tuning, Adapter Tuning, and Low-Rank Adaptation as baseline comparisons."
+    },
+    "2405.13984v1": {
+        "section_numbers": [
+            4.2,
+            4.4
+        ],
+        "element": [
+            "TxtChem-T5",
+            "Chem-LLM",
+            "Meditron"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide range of well-established methods. It should include TxtChem-T5, Chem-LLM, and Meditron as baseline comparisons."
+    },
+    "2404.04237v1": {
+        "section_numbers": [
+            3,
+            3.1,
+            3.2,
+            3.3
+        ],
+        "element": [
+            "GPT-4 Turbo",
+            "Chain of Thought (COT)",
+            "LLAMA 2-chat"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a comprehensive range of well-established methods. It should include GPT-4 Turbo, Chain of Thought (COT), and LLAMA 2-chat as baseline comparisons."
+    },
+    "2405.11950v1": {
+        "section_numbers": [
+            4.1,
+            4.2,
+            5
+        ],
+        "element": [
+            "BioM",
+            "Llama3",
+            "OpenBio"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a comprehensive set of well-established methods. It should include BioM, Llama3, and OpenBio as baseline comparisons."
+    },
+    "2403.01472v2": {
+        "section_numbers": [
+            2.2,
+            3.1,
+            3.2,
+            4.2,
+            4.3
+        ],
+        "element": [
+            "EmbMarker",
+            "BERT",
+            "SBERT"
+        ],
+        "ground_truth": "The paper does not evaluate the proposed approach against a comprehensive range of established methods. Baselines such as EmbMarker, BERT, and SBERT should be included for comparison."
+    },
+    "2404.03635v4": {
+        "section_numbers": [
+            4,
+            4.1,
+            4.1,
+            4.1
+        ],
+        "element": [
+            "DepthCLIP",
+            "AdaBins",
+            "DORN"
+        ],
+        "ground_truth": "The paper does not evaluate the proposed approach against a wide array of well-established methods. It should include DepthCLIP, AdaBins, and DORN as baselines for comparison."
+    },
+    "2405.20770v1": {
+        "section_numbers": [
+            1,
+            3.1,
+            4,
+            5.1,
+            5.2
+        ],
+        "element": [
+            "LLM-based adversarial fine-tuning",
+            "adversarial purification"
+        ],
+        "ground_truth": "The paper does not adequately assess the proposed approach against a diverse array of well-established methods. It should include LLM-based adversarial fine-tuning and adversarial purification as baseline comparisons."
+    },
+    "2403.01518v1": {
+        "section_numbers": [
+            2,
+            3.1,
+            3.2,
+            4
+        ],
+        "element": [
+            "Overlapping",
+            "Transformer-XL style",
+            "Online LoRA adaptation"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse set of well-established methods. It is essential to include Overlapping, Transformer-XL style, and Online LoRA adaptation as baseline comparisons."
+    },
+    "2404.13504v1": {
+        "section_numbers": [
+            4.1,
+            4.2
+        ],
+        "element": [
+            "BERT",
+            "BART",
+            "ChatGPT"
+        ],
+        "ground_truth": "The paper does not adequately assess the proposed approach against a wide variety of established methods. It should include BERT, BART, and ChatGPT as baseline comparisons."
+    },
+    "2405.14622v3": {
+        "section_numbers": [
+            4,
+            4.1,
+            4.1,
+            4.2
+        ],
+        "element": [
+            "self-rewarding approach",
+            "Silkie (Vlfeedback)",
+            "LLaVA-RLHF (Human-preference)"
+        ],
+        "ground_truth": "The paper does not assess the proposed approach against a diverse array of well-established methods. It should include the self-rewarding approach, Silkie (Vlfeedback), and LLaVA-RLHF (Human-preference) as baseline comparisons."
+    },
+    "2404.08886v1": {
+        "section_numbers": [
+            4,
+            4.1,
+            4.2
+        ],
+        "element": [
+            "DEFLATE",
+            "CMA-CLIP",
+            "M-JAVE"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide array of well-established methods. It should include DEFLATE, CMA-CLIP, and M-JAVE as baseline comparisons."
+    },
+    "2404.03626v1": {
+        "section_numbers": [
+            1,
+            3.1,
+            3.6,
+            4
+        ],
+        "element": [
+            "Byte-level Tokenization",
+            "SentencePiece Tokenization",
+            "GZip Compression"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse array of well-established methods. It should include Byte-level Tokenization, SentencePiece Tokenization, and GZip Compression as baseline comparisons."
+    },
+    "2403.03496v1": {
+        "section_numbers": [
+            4,
+            4.1,
+            4.2
+        ],
+        "element": [
+            "Roberta-base"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse array of well-established methods. It is essential to include Roberta-base as a baseline for comparison."
+    },
+    "2404.15500v1": {
+        "section_numbers": [
+            5,
+            6
+        ],
+        "element": [
+            "Chain-of-Thought",
+            "ReAct",
+            "Chameleon"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide variety of established methods. It should include Chain-of-Thought, ReAct, and Chameleon as baseline comparisons."
+    },
+    "2403.04317v1": {
+        "section_numbers": [
+            1,
+            4,
+            4.1
+        ],
+        "element": [
+            "Uniform",
+            "Salient Spans",
+            "CaMeLS"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide array of well-established methods. It should include Uniform, Salient Spans, and CaMeLS as baseline comparisons."
+    },
+    "2403.02757v1": {
+        "section_numbers": [
+            "2.1",
+            "4.2"
+        ],
+        "element": [
+            "In-context Learning"
+        ],
+        "ground_truth": "The paper does not evaluate the proposed approach against a wide array of established methods. It is essential to include In-context Learning as a baseline for comparison."
+    },
+    "2405.11297v1": {
+        "section_numbers": [
+            2.1,
+            3.1,
+            3.2,
+            4.1,
+            4.3,
+            5.1
+        ],
+        "element": [
+            "SimCSE",
+            "MixCSE",
+            "PromptBERT"
+        ],
+        "ground_truth": "The paper does not evaluate the proposed approach against a diverse set of well-established methods. It should include SimCSE, MixCSE, and PromptBERT as baseline comparisons."
+    },
+    "2405.04872v1": {
+        "section_numbers": [
+            1,
+            6.1,
+            6.2
+        ],
+        "element": [
+            "AutoPrompt",
+            "Random"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse array of well-established methods. It should include AutoPrompt, and random guesses as baseline comparisons."
+    },
+    "2405.06001v1": {
+        "section_numbers": [
+            3.3,
+            3.2
+        ],
+        "element": [
+            "Transformation",
+            "Clipping",
+            "Reconstruction"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse array of well-established methods. It is essential to include Transformation, Clipping, and Reconstruction as baseline comparisons."
+    },
+    "2404.04949v1": {
+        "section_numbers": [
+            4.5
+        ],
+        "element": [
+            "Random selection",
+            "K-Center Greedy algorithm"
+        ],
+        "ground_truth": "The paper does not evaluate the proposed approach against a diverse array of well-established methods. It should include Random Selection, and the K-Center Greedy algorithm as baseline comparisons."
+    },
+    "2403.16527v1": {
+        "section_numbers": [
+            1,
+            2.1,
+            2.2,
+            3,
+            4.1,
+            4.2,
+            4.3
+        ],
+        "element": [
+            "ChatGPT",
+            "GPT-4",
+            "LLaMA 2"
+        ],
+        "ground_truth": "The paper does not adequately assess the proposed approach against a wide array of established methods. It would be beneficial to include ChatGPT, GPT-4, and LLaMA 2 as baseline comparisons."
+    },
+    "2403.01747v1": {
+        "section_numbers": [
+            2.1,
+            3.2,
+            4.1,
+            4.3
+        ],
+        "element": [
+            "TREC CAsT",
+            "Google Natural Questions",
+            "QuAC"
+        ],
+        "ground_truth": "The paper does not adequately assess the proposed approach against a diverse array of well-established methods. To strengthen the evaluation, it should include TREC CAsT, Google Natural Questions, and QuAC as baseline comparisons."
+    },
+    "2404.01461v2": {
+        "section_numbers": [
+            4.2,
+            5,
+            5.1
+        ],
+        "element": [
+            "GPT-3.5",
+            "GPT-4",
+            "PaLM 2"
+        ],
+        "ground_truth": "The paper does not evaluate the proposed approach against a diverse array of well-established methods. It should include GPT-3.5, GPT-4, and PaLM 2 as baseline comparisons."
+    },
+    "2405.10597v1": {
+        "section_numbers": [
+            5.1,
+            5.2,
+            5.3
+        ],
+        "element": [
+            "ETSformer",
+            "TimesNet",
+            "GPT4TS"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse set of well-established methods. It should include ETSformer, TimesNet, and GPT-4TS as baseline comparisons."
+    },
+    "2403.11369v2": {
+        "section_numbers": [
+            2,
+            3,
+            4.1,
+            4.2
+        ],
+        "element": [
+            "Llama2",
+            "Mistral-7B",
+            "MetaMath-13B"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse range of well-established methods. It should include Llama2, Mistral-7B, and MetaMath-13B as baseline comparisons."
+    },
+    "2405.13046v1": {
+        "section_numbers": [
+            1,
+            4.1,
+            4.2,
+            4.3
+        ],
+        "element": [
+            "cosFormer",
+            "ReLU-based mechanism"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse array of well-established methods. It should include cosFormer, and a ReLU-based mechanism as baseline comparisons."
+    },
+    "2405.19874v1": {
+        "section_numbers": [
+            1,
+            2,
+            3.1,
+            4.1,
+            5
+        ],
+        "element": [
+            "Supervised Fine-Tuning",
+            "Reinforcement Learning"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse array of well-established methods. It should include Supervised Fine-Tuning and Reinforcement Learning as baseline comparisons."
+    },
+    "2404.12526v1": {
+        "section_numbers": [
+            2,
+            4.1,
+            5
+        ],
+        "element": [
+            "Experience Replay",
+            "coreset selection replay"
+        ],
+        "ground_truth": "The paper does not sufficiently evaluate the proposed approach against a diverse array of well-established methods. It is essential to include Experience Replay and coreset selection replay as baseline comparisons."
+    },
+    "2405.02814v2": {
+        "section_numbers": [
+            "4.1"
+        ],
+        "element": [
+            "Original Zero-Shot Prompts",
+            "Automatic Prompt Engineer (APE) Prompts"
+        ],
+        "ground_truth": "The paper does not adequately assess the proposed approach against a wide array of well-established methods. It should include Original Zero-Shot Prompts and Automatic Prompt Engineer (APE) Prompts as baseline comparisons."
+    },
+    "2403.08111v1": {
+        "section_numbers": [
+            2.2,
+            3.2,
+            6
+        ],
+        "element": [
+            "Theory of Change (ToC)"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a comprehensive range of well-established methods. It should include a Theory of Change (ToC) as baseline for comparison."
+    },
+    "2403.01241v2": {
+        "section_numbers": [
+            4,
+            4.2,
+            4.3
+        ],
+        "element": [
+            "RTN",
+            "GPTQ",
+            "OmniQuant"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide array of well-established methods. It should include RTN, GPTQ, and OmniQuant as baseline comparisons."
+    },
+    "2403.07974v2": {
+        "section_numbers": [
+            1,
+            5,
+            6.1,
+            6.2
+        ],
+        "element": [
+            "HumanEval",
+            "HumanEval+",
+            "CRUXEval"
+        ],
+        "ground_truth": "The paper does not adequately assess the proposed approach in comparison to a wide variety of established methods. It should include HumanEval, HumanEval+, and CRUXEval as baseline comparisons."
+    },
+    "2403.19424v1": {
+        "section_numbers": [
+            1,
+            2.1,
+            3.1,
+            4.2,
+            4.3
+        ],
+        "element": [
+            "LIME",
+            "Integrated Gradient",
+            "Vanilla Gradient"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide variety of well-established methods. It is necessary to include LIME, Integrated Gradient, and Vanilla Gradient as baseline comparisons."
+    },
+    "2404.01476v1": {
+        "section_numbers": [
+            4.2,
+            4.3
+        ],
+        "element": [
+            "LLoVi",
+            "ProViQ",
+            "SeViLA"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse set of well-established methods. It should include LLoVi, ProViQ, and SeViLA as baseline comparisons."
+    },
+    "2404.15758v1": {
+        "section_numbers": [
+            1,
+            3.1,
+            3.2,
+            4,
+            5
+        ],
+        "element": [
+            "Chain of Thought",
+            "Immediate Answer"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a comprehensive range of well-established methods. It should include Chain of Thought and Immediate Answer as baseline comparisons."
+    },
+    "2403.14990v3": {
+        "section_numbers": [
+            "4.1",
+            "4.2",
+            "4.3"
+        ],
+        "element": [
+            "TF-IDF",
+            "PPMI",
+            "BERT-based models"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide variety of established methods. It should include TF-IDF, PPMI, and BERT-based models as baseline comparisons."
+    },
+    "2404.09138v1": {
+        "section_numbers": [
+            3.1,
+            3.2,
+            4.1,
+            4.2
+        ],
+        "element": [
+            "Gemma",
+            "Mistral",
+            "LLaMa2"
+        ],
+        "ground_truth": "The paper does not adequately assess the proposed approach against a diverse array of well-established methods. It should include Gemma, Mistral, and LLaMa2 as baseline comparisons."
+    },
+    "2404.01084v1": {
+        "section_numbers": [
+            4,
+            5
+        ],
+        "element": [
+            "BERT",
+            "RoBERTa-large",
+            "DeBERTaV3-base"
+        ],
+        "ground_truth": "The paper lacks a thorough evaluation of the proposed approach in comparison to a diverse set of well-established methods. It should include BERT, RoBERTa-large, and DeBERTaV3-base as baseline benchmarks."
+    },
+    "2405.19893v1": {
+        "section_numbers": [
+            "4.1.2",
+            "4.1.3",
+            "4.2.1"
+        ],
+        "element": [
+            "ChatGLM2",
+            "Llama2",
+            "Baichuan",
+            "Qwen",
+            "ChatGPT",
+            "Self-RAG",
+            "RECOMP"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse selection of well-established methods. It should include ChatGLM2, Llama2, Baichuan, Qwen, ChatGPT, Self-RAG, and RECOMP as baselines for comparison."
+    },
+    "2404.07461v1": {
+        "section_numbers": [
+            4.1,
+            4.3
+        ],
+        "element": [
+            "Retrieval Augmented Generation Systems",
+            "Data-driven Metrics",
+            "Human Evaluation"
+        ],
+        "ground_truth": "The paper does not assess the proposed approach against a comprehensive range of established methods. It should incorporate Retrieval Augmented Generation Systems, data-driven metrics, and human evaluation as baselines for comparison."
+    },
+    "2404.12387v1": {
+        "section_numbers": [
+            1,
+            3.1,
+            3.2,
+            3.6,
+            4
+        ],
+        "element": [
+            "GPT-4V",
+            "Claude 3",
+            "Gemini Ultra"
+        ],
+        "ground_truth": "The paper does not adequately assess the proposed approach against a diverse array of well-established methods. It would benefit from including GPT-4V, Claude 3, and Gemini Ultra as baseline comparisons."
+    },
+    "2405.07682v1": {
+        "section_numbers": [
+            5.2,
+            5.4
+        ],
+        "element": [
+            "SingSong",
+            "RandSong"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse array of established methods. It is important to include SingSong and RandSong as baseline comparisons."
+    },
+    "2404.09937v1": {
+        "section_numbers": [
+            3.1,
+            3.2,
+            4,
+            4.1
+        ],
+        "element": [
+            "arithmetic coding",
+            "bits per character",
+            "linear regression"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a comprehensive range of well-established methods. It should include arithmetic coding, bits per character, and linear regression as baseline comparisons."
+    },
+    "2403.09054v2": {
+        "section_numbers": [
+            4,
+            4.1,
+            4.2,
+            4.4
+        ],
+        "element": [
+            "Full Attention",
+            "Window Attention",
+            "HO"
+        ],
+        "ground_truth": "The paper does not adequately assess the proposed approach against a diverse array of well-established methods. It should include Full Attention, Window Attention, and HO as baseline comparisons."
+    },
+    "2403.16084v1": {
+        "section_numbers": [
+            1,
+            3.1,
+            3.2,
+            4
+        ],
+        "element": [
+            "Project Debater",
+            "IBM's argument search",
+            "GPT-4"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide array of well-established methods. It should include Project Debater, IBM's Argument Search, and GPT-4 as baseline comparisons."
+    },
+    "2403.00868v2": {
+        "section_numbers": [
+            "3.1",
+            "3.2",
+            "4.1"
+        ],
+        "element": [
+            "Llama-2",
+            "TigerBot"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide variety of well-established methods. It should include Llama-2 and TigerBot as baseline comparisons."
+    },
+    "2403.11108v1": {
+        "section_numbers": [
+            4,
+            4.1,
+            4.2,
+            4.3
+        ],
+        "element": [
+            "HASOC",
+            "OLID"
+        ],
+        "ground_truth": "The paper does not evaluate the proposed approach against a wide variety of well-established methods. It would be beneficial to include HASOC, OLID as baselines for comparison."
+    },
+    "2404.02761v3": {
+        "section_numbers": [
+            2.1,
+            3.2,
+            4.1
+        ],
+        "element": [
+            "Deliberative Quality Index",
+            "Listening Quality Index",
+            "Deliberative Reason Index"
+        ],
+        "ground_truth": "The paper does not assess the proposed approach against a diverse set of well-established methods. It should include the Deliberative Quality Index, Listening Quality Index, and Deliberative Reason Index as baseline comparisons."
+    },
+    "2405.15750v1": {
+        "section_numbers": [
+            3.1,
+            3.2,
+            4,
+            5,
+            6
+        ],
+        "element": [
+            "LSTM",
+            "Transformer",
+            "BLiMP"
+        ],
+        "ground_truth": "The paper does not evaluate the proposed approach against a wide array of well-established methods. It should include LSTM, Transformer, and BLiMP as baseline comparisons."
+    },
+    "2405.00821v1": {
+        "section_numbers": [
+            4.1,
+            5.1,
+            5.2
+        ],
+        "element": [
+            "BERT",
+            "SBERT",
+            "mBERT"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse array of well-established methods. It should include BERT, SBERT, and mBERT as baseline comparisons."
+    },
+    "2403.01411v1": {
+        "section_numbers": [
+            3.1,
+            5.1,
+            5.4
+        ],
+        "element": [
+            "Chinese-CLIP",
+            "AltCLIP"
+        ],
+        "ground_truth": "The paper does not adequately assess the proposed approach against a diverse array of well-established methods. It would be beneficial to include Chinese-CLIP, and AltCLIP as baseline comparisons."
+    },
+    "2404.04932v1": {
+        "section_numbers": [
+            6.2,
+            4.1,
+            5
+        ],
+        "element": [
+            "Pythia-410m",
+            "TinyLlama-1.1B-chat",
+            "Pythia-2.8B"
+        ],
+        "ground_truth": "The paper does not assess the proposed approach against a diverse array of well-established methods. It should include Pythia-410m, TinyLlama-1.1B-chat, and Pythia-2.8B as baseline comparisons."
+    },
+    "2405.01474v1": {
+        "section_numbers": [
+            3.1,
+            3.1,
+            3.3,
+            4
+        ],
+        "element": [
+            "MuSE"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide array of well-established methods. It should include MuSE as baseline comparisons."
+    },
+    "2405.13044v1": {
+        "section_numbers": [
+            1,
+            3.2,
+            3.3,
+            5
+        ],
+        "element": [
+            "FinQA baseline model",
+            "Neural Symbolic Reader"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse array of well-established methods. It is important to include the FinQA baseline model and the Neural Symbolic Reader as baselines for comparison."
+    },
+    "2405.13798v1": {
+        "section_numbers": [
+            "4.1",
+            "4.2",
+            "4.3"
+        ],
+        "element": [
+            "GPT-2"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a wide variety of established methods, as it should include GPT-2 as a baseline for comparison."
+    },
+    "2404.04031v1": {
+        "section_numbers": [
+            4,
+            5,
+            6
+        ],
+        "element": [
+            "valence norms",
+            "XLM-RoBERTa",
+            "BERT"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse array of well-established methods. It would benefit from including valence norms, XLM-RoBERTa, and BERT as baseline comparisons."
+    },
+    "2403.07339v1": {
+        "section_numbers": [
+            2.1,
+            2.2,
+            5,
+            3.2
+        ],
+        "element": [
+            "Rounding To Nearest (RTN)"
+        ],
+        "ground_truth": "The paper does not adequately evaluate the proposed approach against a diverse range of well-established methods. It should include Rounding To Nearest (RTN) as baseline comparisons."
+    }
+}

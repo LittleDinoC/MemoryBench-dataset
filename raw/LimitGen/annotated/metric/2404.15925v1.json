@@ -1,0 +1,228 @@
+{
+    "title": "Inside the echo chamber: Linguistic underpinnings of misinformation on Twitter",
+    "abstract": "Social media users drive the spread of misinformation online by sharing posts that include erroneous information or commenting on controversial topics with unsubstantiated arguments often in earnest. Work on echo chambers has suggested that users’ perspectives are reinforced through repeated interactions with like-minded peers, promoted by homophily and bias in information diffusion. Building on long-standing interest in the social bases of language and linguistic underpinnings of social behavior, this work explores how conversations around misinformation are mediated through language use. We compare a number of linguistic measures, e.g., in-/out-group cues and discourse connectives, within and across topics of conversation and user communities. Our findings reveal increased presence of group identity signals within echo chambers during discussions of misinformation. We discuss the specific character of these broader trends across topics and examine contextual influences.",
+    "sections": [
+        {
+            "section_id": "1",
+            "parent_section_id": null,
+            "section_name": "1. Introduction",
+            "text": "In recent years, Online Social Networks (OSNs) have developed into a primary source of news for a growing majority of the US population (Levy, 2021  ###reference_b40###). As OSNs have expanded, so have concerns about the role of social media in promoting misinformation and deepening social fissures (Allcott et al., 2019  ###reference_b5###; Zimdars and McLeod, 2020  ###reference_b82###), the consequences of which were particularly tangible during the COVID-19 pandemic and response (Abrams and Greenhawt, 2020  ###reference_b2###; Brennen et al., 2020  ###reference_b14###; Bursztyn et al., 2020  ###reference_b17###).\n\nUser interactions in OSNs are scaffolded by platforms’ algorithms and moderation practices. Optimized primarily for engagement, these algorithms promote interaction with like-minded peers and isolate users from disagreeable content. While this can create safe spaces for individuals to share opinions and find validation, it can also drive polarization (Barberá, 2020  ###reference_b9###; Cinelli et al., 2021  ###reference_b20###; Rhodes, 2022  ###reference_b60###). Some have suggested that the effects of so-called filter bubbles and echo chambers have been overstated or oversimplified and have argued for a more nuanced characterization based on, e.g., ideology or topic of discussion (Barberá et al., 2015  ###reference_b10###; Bruns, 2017  ###reference_b16###; Guess et al., 2018  ###reference_b34###). Irrespective, these phenomena speak to the broader, well-studied phenomenon of homophily in social group formation (McPherson et al., 2001  ###reference_b46###; Currarini et al., 2009  ###reference_b24###). In the online setting, user-generated content facilitates aggregation around shared interests and worldviews, which in turn serves to support the deepening and reinforcement of social ties (Del Vicario et al., 2016  ###reference_b26###).\n\nAt the heart of OSN communities is discourse rich with linguistic signals of individual and relational identities. That is, users of language perform their identities within the uses of language (Benwell, 2006  ###reference_b12###; Zappavigna, 2014  ###reference_b80###; Zhang et al., 2017  ###reference_b81###). This is both heightened and complicated by the affordances of social media (Tagg and Seargeant, 2014  ###reference_b68###). Identities are partially performed through alignment with communities, opinions, and cultural issues (Tagg and Seargeant, 2014  ###reference_b68###). Online, this can be enacted as direct engagement and participation in groups, or through indirect interactions, e.g., hashtagging, sharing memes (Zappavigna, 2011  ###reference_b78###, 2014  ###reference_b80###), or even simple repetition (Rosenblum and Muirhead, 2019  ###reference_b63###).\n\nSeveral schools of thought have driven work to understand the co-evolution of language, social ties, and the environment (Group” et al., 2009  ###reference_b33###; Lupyan and Dale, 2010  ###reference_b43###; Roberts and Winters, 2012  ###reference_b62###; Bentz et al., 2018  ###reference_b11###; Raviv et al., 2020  ###reference_b56###). Languages adapt to the constraints and biases of their learners, which include social, physical and technological contexts (Dale and Lupyan, 2012  ###reference_b25###; Lupyan and Dale, 2016  ###reference_b44###). Foundational work in sociolinguistics, for example, has studied the ways in which language change correlates with social network dynamics (Milroy and Milroy, 1992  ###reference_b47###; Blommaert, 2010  ###reference_b13###). Shared linguistic features can enhance so-called processing fluency, making communications more effective and reinforcing community bonds (Canestrino et al., 2022  ###reference_b18###; Pancer et al., 2019  ###reference_b49###). Within the landscape of social media, both notions of community and language practices are flexible and interactively constructed (Tagg and Seargeant, 2014  ###reference_b68###).\n\nOur work is a study of the relationships between social media users’ linguistic patterns and the community structures in which they are embedded. We have selected misinformation as our point of"
+        },
+        {
+            "section_id": "2",
+            "parent_section_id": null,
+            "section_name": "2. Related Work",
+            "text": ""
+        },
+        {
+            "section_id": "2.1",
+            "parent_section_id": "2",
+            "section_name": "2.1. Misinformation dynamics",
+            "text": "The extensive presence of user-generated content on online social media platforms enables the formation of communities that unite around shared beliefs and narratives.\nEcho chambers, where beliefs are amplified and reinforced by repeated internal validation, play a role in the dynamics of misinformation within online platforms (Del Vicario et al., 2016  ###reference_b26###). The architecture of modern social media algorithms, which prioritizes user engagement, can inadvertently foster echo-chambered communities (Zollo et al., 2015  ###reference_b83###).\nWithin these environments, misinformation thrives and evolves, taking on new narratives that further reinforce the community’s existing beliefs (Vosoughi et al., 2018  ###reference_b76###)."
+        },
+        {
+            "section_id": "2.2",
+            "parent_section_id": "2",
+            "section_name": "2.2. Social identity formation",
+            "text": "Social identity formation emerges as a critical process underlying group dynamics and individual affiliations in social networks. In this study, social identities are performed and measured through a combination of explicit identity cues, as explained by social identity theory, and implicit identity cues via ambient affiliation."
+        },
+        {
+            "section_id": "2.2.1",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.1. Social identity theory.",
+            "text": "Social identity theory posits that individuals tend to see themselves and others in relation to groups (Tajfel et al., 1979  ###reference_b70###; Tajfel and Turner, 2004  ###reference_b69###; Stets and Burke, 2000  ###reference_b67###). When a group identity becomes prominent, individuals develop their self-concept around paradigmatic ingroup characteristics (Brewer et al., 1999  ###reference_b15###). They are motivated to differentiate between their ingroup and relevant outgroups (Li and Su, 2020  ###reference_b41###). Social identity theory has been engaged to describe political group formation in online social communities, e.g., (Greene, 2004  ###reference_b32###; Trepte and Loy, 2017  ###reference_b72###).\nRecent work (Li and Su, 2020  ###reference_b41###) looked at discussions containing the term “fake news” on Twitter and found an uptrend in the use of identity language, as measured by increased frequency of group pronouns. They also found that group pronouns were likely to collocate with words boosting ingroup messaging. These findings dovetail with concerns about polarization. Rathje et al. (Rathje et al., 2021  ###reference_b55###) found out-group animosity to be a predictor of engagement on Facebook and Twitter, due in part to algorithmic designs favoring messages containing out-group antagonism. Our work operationalizes linguistic indicators of social identity as in-/out-group reference language."
+        },
+        {
+            "section_id": "2.2.2",
+            "parent_section_id": "2.2",
+            "section_name": "2.2.2. Ambient affiliation.",
+            "text": "So-called ambient affiliation through hashtagging has evolved as a ubiquitous mechanism for social media users to associate and communicate in digital environments, especially on OSNs. It allows for the spontaneous aggregation of like-minded individuals around shared interests, experiences, or sentiments, often leading to the establishment of virtual communities or “micro-groupings” (Zappavigna, 2011  ###reference_b78###). More than just categorization, the act of hashtagging serves as an instrument of social group identity formation. By selecting specific hashtags, users signal an allegiance or a stance, fostering both inclusion within communities and distinction from others. Consistent patterns of hashtagging behaviors can solidify these group identities, creating online communities unified by shared narratives and ideologies (Zappavigna, 2012  ###reference_b79###, 2014  ###reference_b80###)."
+        },
+        {
+            "section_id": "2.3",
+            "parent_section_id": "2",
+            "section_name": "2.3. Processing fluency",
+            "text": "Processing fluency theory suggests that the subjective experience of ease with which people process information influences people’s judgments of that information (Reber et al., 1998  ###reference_b59###; Reber, 2012  ###reference_b57###). People are more likely to judge information favorably if they are able to digest it easily. This effect has been shown robust over diverse experimental settings and a variety of formulations of fluency, e.g., conceptual, perceptual, linguistic (Oppenheimer, 2008  ###reference_b48###; Alter and Oppenheimer, 2009  ###reference_b6###). Central to this theory is the notion that enhanced fluency can be interpreted in multiple ways: it might signify the benefits of a simplified message; the role of priming and familiarity; or, the importance of explanation and elaboration."
+        },
+        {
+            "section_id": "2.3.1",
+            "parent_section_id": "2.3",
+            "section_name": "2.3.1. Simplicity bolsters information processing.",
+            "text": "Recent work has shown that easy-to-read social media posts facilitate processing fluency, resulting in more likes, comments, and shares (Bailey, 2013  ###reference_b8###; Pancer et al., 2019  ###reference_b49###).\nLikewise, repeated assertions gain a valence of credibility (Hasher et al., 1977  ###reference_b35###; Reber and Unkelbach, 2010  ###reference_b58###; Unkelbach and Rom, 2017  ###reference_b74###). The so-called repetition-induced truth effect explains one mechanism by which individuals come to trust obviously false information, a concern magnified by echo chambers (Pennycook et al., 2018  ###reference_b52###; Unkelbach and Speckmann, 2021  ###reference_b75###). In the context of today’s misinformation landscape, scholars have noted that conspiracism is increasingly expressed as bare assertion (Rosenblum and Muirhead, 2019  ###reference_b63###). New conspiracists repeat simple statements, signaling solidarity with one another through retweets, likes, and shares (Rosenblum and Muirhead, 2019  ###reference_b63###)."
+        },
+        {
+            "section_id": "2.3.2",
+            "parent_section_id": "2.3",
+            "section_name": "2.3.2. Elaboration bolsters information processing.",
+            "text": "In parallel, there exists a body of psychological theories suggesting that explanations bolster credibility of a claim, namely, the idea of rational persuasion. Information-processing theories of human cognition have explored the ways in which we engage in the reception, encoding, storage, and retrieval of information (Simon, 1978  ###reference_b65###; Anderson and Crawford, 1980  ###reference_b7###). Systematic information processing is associated with explanations, whereby individuals engage in effortful scrutiny and comparison of information (Trumbo, 1999  ###reference_b73###; Todorov et al., 2002  ###reference_b71###; Chaiken and Ledgerwood, 2012  ###reference_b19###).\nRelatedly, the Elaboration Likelihood Model (ELM) (Petty Richard and Cacioppo, 1986  ###reference_b54###; Petty and Wegener, 1999  ###reference_b53###) suggests that when people process information deeply, they are more likely to be influenced by it.\nPrior studies on the QAnon conspiracy have demonstrated the efficacy of this technique. Individuals aligned with these beliefs use archival practices to enable the construction and diffusion of knowledge within their community. Members are urged to engage in critical thinking and do extensive research using key terms promoted by the group (Marwick and Partin, 2022  ###reference_b45###)."
+        },
+        {
+            "section_id": "3",
+            "parent_section_id": null,
+            "section_name": "3. Data",
+            "text": "We collected tweets using the Twitter Developer API and keywords associated with our target topics, namely: anti-vaccination; 2020 US election fraud; and, QAnon. We pulled author ID, tweet ID, and referenced tweets (type and ID) for interaction network construction and tweet content for linguistic analyses.\nTweets were collected using popular keywords and hashtags over date ranges selected for greatest topic relevance. With the exception of discussion surrounding the US election which has a shorter activity period and limited number of tweets, we collect approximately 1 million tweets per topic, adjusting date ranges accordingly. In addition, we collected discussions to serve as comparative for our misinformation-related discourse: the MeToo movement, Black Lives Matter movement (BLM), and #mondaymotivation. While not generally associated with misinformation, these have been topics of widespread social media discourse, representing very different degrees of social sensitivity and polarization.\nPre-processing. We retained only tweets containing interactions within the datasets, as well as original tweets without interactions, to ensure that all users in the social network have representative linguistic content.\nDataset statistics are provided in Table 1  ###reference_###.\nWe removed mentions, #hashtags, URLs, RT signs, and emojis. For readability tests, we retained punctuation marks to allow sentence length calculation. Hashtags and URLs were extracted directly from the raw data. Tweet IDs and code have been made publicly available and are provided with detailed documentation including a Datasheet (Gebru et al., 2021  ###reference_b31###) and README111Github link: https://github.com/XinyuWang1998/Linguistic-Underpinning.\n###table_1###"
+        },
+        {
+            "section_id": "4",
+            "parent_section_id": null,
+            "section_name": "4. Preliminaries",
+            "text": "We introduce key definitions and measures used throughout.\n"
+        },
+        {
+            "section_id": "4.1",
+            "parent_section_id": "4",
+            "section_name": "4.1. Linguistic metrics",
+            "text": "Linguistic features were computed using and extending state-of-the-art open-source toolboxes for linguistic analyses. In- and out-group language was used to measure group identity formation. Group identity is expressed and sustained through pronouns; pronominal choices are not just categorical references but also reflect power dynamics and relationships (Íñigo-Mora, 2004  ###reference_b36###; Pennycook, 1994  ###reference_b51###). Specifically, “we-pronouns” are used to invoke ingroup solidarity while “they-pronouns” create distance with the outgroup, often implying the superiority of one’s own community (Brewer et al., 1999  ###reference_b15###; Li and Su, 2020  ###reference_b41###). Discourse connectives may also improve online processing and reading comprehension in both narrative and expository texts (Zufferey et al., 2015  ###reference_b84###; Crible et al., 2021  ###reference_b22###). Evidence from these studies forms the basis for our approach."
+        },
+        {
+            "section_id": "4.1.1",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.1. In-/out-group identity language.",
+            "text": "In-/out-group language ratio (Crossley et al., 2016  ###reference_b23###) is used as an index of group identity. Exemplars of in-/out-group cues include: we, our, us, they, their, them, themselves."
+        },
+        {
+            "section_id": "4.1.2",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.2. Big words.",
+            "text": "Words containing seven or more letters serve as a rough indicator of language complexity. This metric is derived from The Linguistic Inquiry and Word Count (LIWC) (Pennebaker Conglomerates, Inc., 2022) software."
+        },
+        {
+            "section_id": "4.1.3",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.3. Readability.",
+            "text": "We use various text analysis measures to evaluate our dataset. These measures provide insight into the complexity and style of the language used. By applying these analyses to our text corpus, we are able to quantify and compare linguistic features systematically."
+        },
+        {
+            "section_id": "4.1.4",
+            "parent_section_id": "4.1",
+            "section_name": "4.1.4. Discourse connectives.",
+            "text": "We consider the incidence of discourse connectives (Addawood et al., 2019; Crossley et al., 2016) as an indicator of explanation/elaboration. Our analyses consider three families of discourse connectives. Logical connectives reflect logical explanation, e.g., because, consequently, hence; Additive connectives reflect agreement and further explanation, e.g., and, besides, further; Negative connectives, indicate an adversative argument, e.g., but, alternatively, although. Connectives ratios are calculated as the number of connective words from the given family divided by total number of words."
+        },
+        {
+            "section_id": "4.2",
+            "parent_section_id": "4",
+            "section_name": "4.2. Network representation",
+            "text": "We construct user interaction networks for each topic. Users are represented as nodes and interactions–replies, quotes, retweets–are represented as directed, weighted edges. Edge weights indicate number of interactions. Echo chambers are recognized by coherent content and structural connectivity. Given that our interaction networks are topic-specific by virtue of our data collection, there is coherence in content by design. For structural identification of echo chamber members, we focus on strongly connected components, i.e., subgraphs in which there is a path from each vertex to every other, respecting directionality of the edges. This approach follows precedent set in prior literature, e.g., (Cota et al., 2019), and is particularly suitable for modeling echo chambers on platforms like Twitter where interactions are often non-reciprocal (Kwak et al., 2010; Smith et al., 2012). Following, we identify users within strongly connected components as echo chamber members and their shared content as echo chamber tweets. User statistics are provided in Table 2."
+        },
+        {
+            "section_id": "4.3",
+            "parent_section_id": "4",
+            "section_name": "4.3. Ambient affiliation",
+            "text": "Sociolinguists have theorized that Twitter users signal group identity implicitly through hash-tagging. Hashtags serve as a semiotic identifier for the discourse community they establish, as well as a searchable record of discourse for the purpose of establishing new affiliates (Zappavigna, 2011  ###reference_b78###). We measure ambient affiliation through the use of hash-tagging."
+        },
+        {
+            "section_id": "5",
+            "parent_section_id": null,
+            "section_name": "5. RQ1: Group identity formation",
+            "text": "RQ1 asks whether there are observable disparities in group identity between echo chambers and external groups within discussions surrounding misinformation-related topics. We assess this through two approaches: analyzing explicit signaling of group identity through the use of first and third-person pronouns; and, exploring implicit signaling of group identity through ambient affiliation."
+        },
+        {
+            "section_id": "5.1",
+            "parent_section_id": "5",
+            "section_name": "5.1. Explicit identity signaling through in-/out-group cues",
+            "text": ""
+        },
+        {
+            "section_id": "5.1.1",
+            "parent_section_id": "5.1",
+            "section_name": "5.1.1. Methodology.",
+            "text": "We employ the zero-inflated beta regression model to examine the relationship between a user’s membership to (presence within) an echo chamber and their use of group pronouns. The zero-inflated beta model is particularly suited for this analysis due to the nature of the data, which contains many zeros and is bounded between 0 and 1. We concentrate on the model’s non-zero component because it remains largely unaffected by extreme outliers, specifically instances where the content is very short thus not containing target vocabularies. The coefficient of the predictor variable in this regression, which represents echo chamber membership, provides an estimate of the log odds ratio of the change in identity measurement in response to echo chamber membership. If this coefficient is positive and statistically significant, it suggests that membership to an echo chamber is associated with higher log odds of using group pronouns. Recognizing that analyses with large datasets often yields small, less informative p-values, we employ a stratified random sampling method (Fox and Weisberg, 2002  ###reference_b30###). This involves selecting 1000 data points each from echo chamber and non-echo chamber data subsets (2000 total), ensuring a balanced representation of both categories. To address potential small sample biases and enhance the robustness of our findings, we conduct 1,000 iterations of this regression analysis, obtaining median values for the coefficient, standard error, T-score, and p-value. Analyses without sampling are also provided, for completeness, alongside datasets and code through the project’s Github page."
+        },
+        {
+            "section_id": "5.1.2",
+            "parent_section_id": "5.1",
+            "section_name": "5.1.2. Findings.",
+            "text": "We observe clear, heightened group identity development through the deliberate utilization of target plural pronouns in echo chambers within US election fraud and QAnon discussions. See Table 3  ###reference_###.\nFollowing is a typical tweet from within a QAnon echo chamber that exemplifies pronounced group identity. After mentioning 50 names in a chain, the tweet reads:\nTotally agreed. We Americans chart our own destiny\nThe Individual is THE most protected of its rights by the Constitution\nwe need to know this, and go forward confidently.\nDeepState, we will deal w/them in unity w/our President.\nFor such a time like this-we have our fighting man!\nLikewise, strong group identity cues are evident within election fraud echo chambers. For instance:\n@realDonaldTrump keep fighting like the warrior you are! We are with you! #VoterFraud https://t.co/RuxhsXyO8U\nNote that we observe an inverse coefficient for Monday Motivation. We expect this may be attributed to the inherent characteristics of the challenge, wherein individuals share personal experiences with their communities (Ridings et al., 2002  ###reference_b61###)."
+        },
+        {
+            "section_id": "5.2",
+            "parent_section_id": "5",
+            "section_name": "5.2. Implicit identity signaling through ambient affiliation",
+            "text": "###figure_1### ###table_3###"
+        },
+        {
+            "section_id": "5.2.1",
+            "parent_section_id": "5.2",
+            "section_name": "5.2.1. Methodology.",
+            "text": "Building on our observations of increased explicit group identity formation within echo chambers for misinformation-related topics in particular, we explore differences in ambient affiliation between echo chambers and the remainder of interaction network during discussions of misinformation-related topics.\nTop hashtags.\nWe extract all hashtags present inside the dataset.\nFrom these, we select the 10 with highest density, standardized over the total number of tweets within each category. We exclude hashtags identical to the keywords used for data collection.\nHashtag networks. We construct undirected common hashtag networks to model ambient affiliation within echo chambers, for all three topics of misinformation. In these networks, nodes represent users within echo chambers and a weighted edge exists between users who share at least one common hashtag. As before, we exclude hashtags identical to keywords utilized during data collection."
+        },
+        {
+            "section_id": "5.2.2",
+            "parent_section_id": "5.2",
+            "section_name": "5.2.2. Findings.",
+            "text": "A conspicuous pattern emerges, complementing our findings from in-/out-group identity analyses. Both QAnon and election fraud discussions are characterized by methodical use of ambient affiliation relative to anti-vaccination dataset. When conducting a comparison of hashtag usage within echo chambers versus overall hashtag usage, we observe that echo chambers have notably higher rate of ambient affiliation. This suggests members may be rallying around common hashtags to amplify their message and consolidate their identity.\nTop hashtags.\nIt is clear that the strategic use of hashtags plays an important role, both within and outside echo chambers, in QAnon-related conversations (see Figure 1  ###reference_###). Several hashtags speak directly to group membership, such as #Mighty200 (a group of conservative or right-wing influencers) and #wearethenewsnow (QAnon supporters use it to suggest that mainstream media cannot be trusted, positioning the QAnon community as the authentic purveyors of news). Some hashtags are slogan-like, e.g., #WWG1WGA (“Where We Go One, We Go All”) and #kag (“Keep America Great”).\nHashtag networks.\nHashtag network statistics are provided in Table 4  ###reference_###. In the QAnon echo chamber, the hashtag network exhibits the highest density, suggesting a deliberate and strategic approach to hashtag bulk use, likely for content promotion. Additionally, we see high percentage of ambient affiliation engagement and average common hashtags per paired users for election fraud, which is consistent with the high identity consolidation observed within election fraud discussions. Conversely, we observe limited hashtag usage within anti-vaccination discourse, which is also mirrored in the network structure. These findings highlight the complex nature of online discourse and nuance under the very broad umbrella of misinformation-related conversations."
+        },
+        {
+            "section_id": "5.3",
+            "parent_section_id": "5",
+            "section_name": "5.3. Case Study 1. Echo chambers in conversations about US election fraud",
+            "text": "We observe strongest group identity formation within US election fraud discourse. To further explore this, we conduct a case study analyzing interactions within, between, and outside echo chambers. We find that echo chamber members are deeply embedded in the broader interaction network, maintaining active engagements with individuals outside their group. This heightened activity of echo chamber members in external interactions challenges the simplistic view of echo chambers as entirely insular entities and suggests a more nuanced understanding of discourse dynamics.\nFigure 2  ###reference_### shows the internal interaction network amongst members of the largest echo chamber (red) and other echo chamber members with which they interact. We observe echo chambers are interconnected rather than isolated. Two nodes, in particular, exhibit highest centrality: Node ECa, a member of the largest echo chamber; and, ECb, a bridge between echo chambers.\nDeeper examination of the content shared by these two nodes reveals distinct roles.\nNode ECa emerges as a pivotal resource hub, disseminating information about the election status, often accompanied by a URL. These URLs typically redirect to tweets conveying similar content, supplemented by relevant hashtags.\nFurthermore, we notice several indicators of group identity from ECa that extend beyond our initial examination of first and third-person plural pronouns. This content manifests as expressions of favoritism and support within the group or, conversely, as extreme animosity towards those outside the group. For instance:\nGood morning @realDonaldTrump. I’m still here, standing with you and 70 million other freedom loving patriots. It time to expose the #voterfraud. #DoNotConcede #DoNotConcedeUnderAnyCircumstances\n#DoNotGiveUp\nGDMRNNG (The vowels have been stolen by Democrats) #Election2020 #VoterFraud #BidenHarris2020 #2020Elections (Explanation: GDMRNNG is goodmorning without vowels.)\nWe observe that ECb mainly interacts with itself. Among 111 tweets posted by ECb, 93 are retweets or replies to its own tweets. Within this set of tweets, we notice: heavy use of user mentioning, an average of 46.32 mentions per tweet; use of hashtags, an average of 5.7 hashtags per tweet; and ending the post with a URL.\n###figure_2### ###table_4###"
+        },
+        {
+            "section_id": "6",
+            "parent_section_id": null,
+            "section_name": "6. RQ2: Processing fluency effects",
+            "text": "We explore the impact of processing fluency on discourse around misinformation-related topics, with particular focus on the variance between echo chambers and external members. This study is not intended to compare the overall simplicity or elaboration between misinformation and control topics, but to identify differences in processing fluency between discussions within echo chambers and those outside of them. We utilize a series of linguistic metrics to measure processing fluency, complemented by an analysis of URLs, to understand these dynamics in detail."
+        },
+        {
+            "section_id": "6.1",
+            "parent_section_id": "6",
+            "section_name": "6.1. Processing fluency through linguistic simplicity",
+            "text": ""
+        },
+        {
+            "section_id": "6.1.1",
+            "parent_section_id": "6.1",
+            "section_name": "6.1.1. Methodology",
+            "text": "Simplicity is captured through word length measurements.\n\nBig words.  \nWe employ LIWC to calculate the “bigword” score for each tweet. To avoid biases, we apply this analysis to cleaned texts, excluding hashtags, mentions, URLs, and similar elements that could be erroneously identified as “big words.”  \nGiven that resulting scores are no longer bounded between 0 and 1, the zero-inflated beta model proves unsuitable for our comparative tasks. As the datasets being compared exhibit approximately normal distribution and similar variances, we employ an independent two-sample T-test. Given our relatively large dataset, this test tends to yield very small p-values, hence less informative. To mitigate this effect or potential non-normality in distribution, we perform bootstrapping by randomly sampling 1000 data points from both the echo chamber and non-echo chamber groups and conducting the t-test over 1000 iterations (Lumley et al., 2002; Ahad et al., 2012; Faber and Fonseca, 2014). We select the median as the representative outcome."
+        },
+        {
+            "section_id": "6.1.2",
+            "parent_section_id": "6.1",
+            "section_name": "6.1.2. Findings",
+            "text": "Our findings demonstrate clearly and consistently that simplicity, as a measure of processing fluency, is amplified within echo chambers in misinformation-related discussions.\n\nBig words.\nThe results of all independent two-sample T-tests are presented in Table 5. We also report the percentage of iterations having mean EC smaller than mean EXT and the percentage of p-value0.05 in the table. Our findings consistently indicate that all misinformation topics yield a lower average percentage of big words in echo chamber posts compared to non-echo chamber posts, with all p-values less than 0.05. This suggests that echo chambers exhibit less linguistic complexity, possibly due to the development of a shared knowledge base within their community."
+        },
+        {
+            "section_id": "6.2",
+            "parent_section_id": "6",
+            "section_name": "6.2. Processing fluency through elaboration",
+            "text": ""
+        },
+        {
+            "section_id": "6.2.1",
+            "parent_section_id": "6.2",
+            "section_name": "6.2.1. Methodology",
+            "text": "Elaboration is captured through the use of discourse connectives. Similar to our analysis of in-/out-group language, we employ a zero-inflated beta regression model with bootstrap sampling to examine the relationship between echo chamber membership and the use of discourse connectives."
+        },
+        {
+            "section_id": "6.2.2",
+            "parent_section_id": "6.2",
+            "section_name": "6.2.2. Findings",
+            "text": "Median statistics are shown in Table 6. We observe that US election fraud discourse shows a positive relationship between echo chamber membership and additive and negative connectives. QAnon exhibits a positive significant coefficient for logical and additive connectives. Conversely, in the context of the control topics Monday Motivation and BLM, an entirely opposite behavior is observed; echo chambers tend to exhibit a lower prevalence of discourse connectives, aligning with our findings above that suggest greater simplicity in these communities.\n\nGenerally speaking, we might expect fewer discourse connectives in echo chambers due to greater preexisting consensus amongst members. However, the nature of some misinformation-related topics requires more elaboration and explanation, and might explain the increased use of connectives in these contexts.\n\nIn line with prior work on QAnon, we also note cues of explanation-oriented behavior within QAnon echo chambers, co-occurring with straightforward vocabulary. QAnon proponents often use phrases like “do the research.” These phrases appear to steer users toward an archive of QAnon-related information, likely intended for persuasive or reinforcing purposes. For instance:\n\nThere are many sides to any issue. It doesn't matter what others think. What matters is what you think. Do the research. Dig. Come to your own conclusion. Seek the truth knowing that you will never know what TRUTH really is, but come as close as you possibly can. #QAnon \n\nPeople no longer have the luxury of claiming ignorance is why they believe the things they believe. We are living in a time where the truth can be easily accessed via documentation, YouTube, QAnon, and even if you don’t want to do the research there are many who do and give.\n\nA pattern in many such tweets is the inclusion of URLs, guiding users to external sources, e.g., news articles, videos, or other tweets to “validate” claims. While the strategic use of archival information may vary by topic, it complements the linguistic characteristics we have identified and can be an asset for debunking misinformation."
+        },
+        {
+            "section_id": "6.3",
+            "parent_section_id": "6",
+            "section_name": "6.3. Case Study 2: URL usage in discussions of misinformation",
+            "text": "Including URLs or referencing news sources can appear to enhance the credibility of information presented online without the need for extensive explanation. We explore whether echo chamber members exhibit increased URL usage, as compared to external nodes. To examine this, we assess URL density in interactions within echo chambers, outside echo chambers, and in standalone original tweets across our three misinformation topics, as shown in Figure 4 ###reference_###.\n\nNotably, we observe a consistently higher URL density in isolated posts across all misinformation-related topics. Conversely, echo chamber interactions tend to utilize URLs less frequently, perhaps suggesting that users within echo chambers may not feel the need to persuade each other with new information, given their synchronized beliefs.\n\nIn between-topic comparisons, QAnon discussions have most frequent URL usage, followed by election fraud. In contrast, discussions about anti-vaccination do not engage as much with URLs. Among QAnon tweets, 73.68% contains at least one URL, in comparison to Election Fraud (69.81%) and Antivax (44.45%).\n\nThis trend is accentuated when considering tweets with at least two URLs. Within QAnon discourse, a substantial 10.82% of tweets fall into this category, as compared to 3.51% for US election fraud and 3.91% for anti-vaccination. Extensive use of URLs in QAnon discussions suggests a deliberate strategy to strengthen main assertions with multiple references. ###figure_4###"
+        },
+        {
+            "section_id": "7",
+            "parent_section_id": null,
+            "section_name": "7. Discussion and Conclusion",
+            "text": "Our work is motivated by longstanding theories from the socio-psychological and socio-linguistics literatures that describe phenomena like collective belonging through social identity and the importance of familiarity and fluency in information credibility. We operationalize these theories through a suite of computational metrics and analyses, which let us test these theories in the wild through social media with a particular focus on discussions around misinformation-related topics. This approach also allows us to differentially explore echo chambers and understand their linguistic underpinnings.\n\nWe do not see uniform behavior across all misinformation topics. Perhaps surprisingly, anti-vaccination discourse shows distinct linguistic patterns from US election fraud and QAnon discussions. This may signify the differential impact of political group identities, in particular, on the linguistic characteristics of politically-charged topics. We also note that the neutral topic we selected (#mondaymotivation) consistently displays behaviors contrary to those of misinformation. This underscores that echo chamber dynamics are not uniform but are influenced by discourse.\n\nThese insights might enable identification of social communities prone to influence through anomalous linguistic signs. Moreover, understanding the anatomy of echo chambers offers a blueprint for designing more effective and targeted moderation strategies. By studying the linguistic underpinning of social communities around misinformation-related discussions, we offer a fresh perspective on dynamics of information dissemination in the digital age."
+        },
+        {
+            "section_id": "8",
+            "parent_section_id": null,
+            "section_name": "8. Limitations and Future Work",
+            "text": "Our methodology necessitates the selection of a data collection time frame coincident with peak popularity of the respective topics. Given our intentional control over the total volume of tweets, it is an intrinsic outcome that different topics span different lengths of time. Future work should consider controlling for temporal variables to better understand the influence of time on our findings.\nAdditionally, here we employed a relatively strict, network structure-based definition of echo chambers using strongly connected components within topic-specific discourse. It is possible that other approaches to defining echo chambers would yield different insights.\nFinally, our study selected the zero-inflated beta model to analyze the relationship between echo chamber membership and linguistic patterns as it is suitable for the data distribution. The extensive size of our dataset results in the models being hyper-sensitive, detecting even the slightest deviations in values. This heightened sensitivity is not unique to this model but is observed in other tests we employed, such as permutation tests. As a remedy, we adopted bootstrapping across 1,000 iterations for all tests, using the median as a representative measure. Nevertheless, it is the direction and magnitude of the coefficients that offer deeper insights into the interplay between echo chamber dynamics and linguistic underpinnings in discussions."
+        },
+        {
+            "section_id": "9",
+            "parent_section_id": null,
+            "section_name": "9. Ethical Considerations",
+            "text": "This study primarily involves the comprehensive analysis of data collected from social media users on a large scale. The data was obtained from the Twitter Developer API is solely utilized for the purposes of this research. We ensure that the analyses conducted do not display any identifiable information of users. Tweet IDs are shared with the public for reproducibility of the analyses in this work. Our findings are expected to support ongoing conversations within data ethics about misinformation and polarization on social media, and potential interventions."
+        }
+    ]
+}
